@@ -9,6 +9,116 @@ export const COMPANIES = ['КодМастер', 'РобоЛаб', 'ХимПра�
 
 const SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
 
+const SCHOOL_DIRECTORY = [
+  {
+    id: 'sch-lbsu',
+    name: 'Лицей БГУ',
+    type: 'Лицей',
+    region: 'Минск',
+    directions: ['Математика', 'Информатика', 'Физика', 'Проектная работа'],
+    programs: ['Олимпиадная математика, 10–11 классы', 'Кружок алгоритмов', 'Проектные смены по физике'],
+    partnerships: ['КодМастер', 'НаноСофт'],
+    events: ['Республиканская олимпиада по математике', 'Проектная смена «Физическая лаборатория»'],
+    achievements: ['Дипломы республиканской олимпиады по математике, 2025'],
+    history: ['2025 — 6 подтверждённых результатов по математике', '2024 — 4 по информатике'],
+    admission: 'Набор в 10–11 классы по конкурсу. Это справка, не рейтинг поступления.',
+    contacts: 'Демо: приёмная +375 17 209-11-10. Официальные правила — на сайте лицея.',
+    indicators: [
+      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 14, 'республиканский и городской'),
+      indicator('Информатика', 'олимпиады', 'Подтверждённые результаты по олимпиадной информатике', 9, 'республиканский и областной'),
+      indicator('Физика', 'олимпиады', 'Подтверждённые результаты по олимпиадной физике', 6, 'областной'),
+      indicator('Математика', 'проектная деятельность', 'Подтверждённые проектные результаты по математике', 3, 'городской'),
+      indicator('Информатика', 'хакатоны', 'Подтверждённые результаты хакатонов', 2, 'городской'),
+    ],
+  },
+  {
+    id: 'sch-gym1',
+    name: 'Гимназия №1 Минск',
+    type: 'Гимназия',
+    region: 'Минск',
+    directions: ['Математика', 'Физика'],
+    programs: ['Городской кружок по математике', 'Физический практикум, 8–9 классы'],
+    partnerships: [],
+    events: ['Городская олимпиада по математике'],
+    achievements: ['Дипломы городской олимпиады по математике, 2025'],
+    history: ['2025 — 3 подтверждённых результата по математике'],
+    admission: 'Набор в гимназические классы. Подробности — в официальном приказе школы.',
+    contacts: 'Демо: приёмная +375 17 209-22-20. Официальные сведения — на сайте гимназии.',
+    indicators: [
+      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 7, 'городской'),
+      indicator('Физика', 'олимпиады', 'Подтверждённые результаты по олимпиадной физике', 3, 'городской'),
+    ],
+  },
+  {
+    id: 'sch-grodno',
+    name: 'СШ №4 Гродно',
+    type: 'Средняя школа',
+    region: 'Гродно',
+    directions: ['Химия', 'Биология'],
+    programs: ['Химическая лаборатория выходного дня', 'Биологический кружок'],
+    partnerships: ['ХимПрактикум'],
+    events: ['Олимпиада «Юный химик»'],
+    achievements: ['Сертификаты химической лаборатории, 2025'],
+    history: ['2025 — 2 подтверждённых результата по химии'],
+    admission: 'Обычный набор по микрорайону. Олимпиадных классов в открытых данных нет.',
+    contacts: 'Демо: приёмная +375 152 00-00-04. Официальные сведения — на сайте школы.',
+    indicators: [
+      indicator('Химия', 'олимпиады', 'Подтверждённые результаты по олимпиадной химии', 5, 'областной'),
+      indicator('Биология', 'олимпиады', 'Подтверждённые результаты по олимпиадной биологии', 4, 'областной'),
+      indicator('Химия', 'проектная деятельность', 'Подтверждённые проектные результаты по химии', 2, 'городской'),
+    ],
+  },
+  {
+    id: 'sch-brest',
+    name: 'Гимназия №2 Брест',
+    type: 'Гимназия',
+    region: 'Брест',
+    directions: ['Математика', 'Информатика', 'Проектная работа'],
+    programs: ['Математический макет, 8–10 классы', 'Кружок информатики'],
+    partnerships: [],
+    events: ['Городская олимпиада по математике', 'Конкурс «Математический макет»'],
+    achievements: ['Дипломы конкурса «Математический макет», 2025'],
+    history: ['2025 — 2 подтверждённых результата по математике'],
+    admission: 'Набор в гимназические классы по правилам учреждения.',
+    contacts: 'Демо: приёмная +375 162 00-00-02. Официальные сведения — на сайте гимназии.',
+    indicators: [
+      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 5, 'городской'),
+      indicator('Информатика', 'олимпиады', 'Подтверждённые результаты по олимпиадной информатике', 2, 'городской'),
+      indicator('Математика', 'проектная деятельность', 'Подтверждённые проектные результаты по математике', 3, 'областной'),
+    ],
+  },
+  {
+    id: 'sch-new',
+    name: 'Школа «Новая линия»',
+    type: 'Средняя школа',
+    region: 'Минск',
+    directions: ['Проектная работа'],
+    programs: [],
+    partnerships: [],
+    events: [],
+    achievements: [],
+    history: [],
+    admission: 'Учреждение недавно в каталоге. Данных о поступлении нет.',
+    contacts: 'Официальный контакт в каталоге ещё не указан.',
+    indicators: [],
+    gap: 'Недостаточно подтверждённых данных за 2024–2026. Это не значит, что школа слабее остальных.',
+  },
+]
+
+function indicator(subject, direction, criterion, count, level) {
+  return {
+    subject,
+    direction,
+    criterion,
+    source: 'Протоколы и подтверждения школы',
+    period: '2024–2026',
+    count,
+    level,
+    updated: '2026-10-01',
+    confirmation: 'подтверждено',
+  }
+}
+
 const memory = { raw: null }
 
 function clone(value) {
@@ -154,6 +264,8 @@ function seed() {
         firstName: 'Ольга',
         lastName: 'Коваль',
         childId: null,
+        childIds: [],
+        activeChildId: null,
       },
       {
         id: 'u-school',
@@ -582,6 +694,7 @@ function seed() {
         status: 'pending',
       },
     ],
+    suggestions: [],
     notifications: demoNotifications(),
   }
 }
@@ -592,11 +705,12 @@ function load() {
     try {
       const parsed = JSON.parse(raw)
       if (parsed && parsed.version === VERSION && Array.isArray(parsed.users)) {
+        let dirty = false
         const stale = !Array.isArray(parsed.notifications)
           || parsed.notifications.some((item) => item.type === 'school' || item.type === 'admin')
         if (stale) {
           parsed.notifications = demoNotifications()
-          writeRaw(JSON.stringify(parsed))
+          dirty = true
         }
         if (!parsed.users.some((item) => item && item.role === 'company')) {
           parsed.users.push({
@@ -608,8 +722,20 @@ function load() {
             lastName: 'Мороз',
             orgName: 'КодМастер',
           })
-          writeRaw(JSON.stringify(parsed))
+          dirty = true
         }
+        if (!Array.isArray(parsed.suggestions)) {
+          parsed.suggestions = []
+          dirty = true
+        }
+        parsed.users.forEach((user) => {
+          if (!user || user.role !== 'parent' || Array.isArray(user.childIds)) return
+          user.childIds = []
+          user.childId = null
+          user.activeChildId = null
+          dirty = true
+        })
+        if (dirty) writeRaw(JSON.stringify(parsed))
         return parsed
       }
     } catch {
@@ -625,11 +751,32 @@ function save(db) {
   writeRaw(JSON.stringify(db))
 }
 
+function linkedChildIds(user) {
+  const ids = []
+  const list = Array.isArray(user?.childIds) ? user.childIds : []
+  list.forEach((id) => {
+    if (id && !ids.includes(id)) ids.push(id)
+  })
+  if (user?.childId && !ids.includes(user.childId)) ids.push(user.childId)
+  return ids
+}
+
 function viewUser(db, user) {
   const copy = clone(user)
   delete copy.password
   if (copy.role === 'parent') {
-    copy.child = copy.childId ? presentStudent(db.students.find((student) => student.id === copy.childId)) : null
+    const children = linkedChildIds(copy)
+      .map((id) => presentStudent(db.students.find((student) => student.id === id)))
+      .filter(Boolean)
+    const childIds = children.map((student) => student.id)
+    const active = childIds.includes(copy.activeChildId)
+      ? copy.activeChildId
+      : (childIds.includes(copy.childId) ? copy.childId : (childIds[0] || null))
+    copy.childIds = childIds
+    copy.children = children
+    copy.activeChildId = active
+    copy.childId = active
+    copy.child = children.find((student) => student.id === active) || null
   }
   return copy
 }
@@ -974,9 +1121,81 @@ export function linkChild({ firstName, lastName, birthDate } = {}) {
   )
   if (!child) return { ok: false, child: null }
   const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (user && user.role === 'parent') {
-    user.childId = child.id
-    save(db)
+  if (!user || user.role !== 'parent') return { ok: false, child: null, reason: 'auth' }
+  if (!Array.isArray(user.childIds)) user.childIds = []
+  if (user.childId && !user.childIds.includes(user.childId)) user.childIds.push(user.childId)
+  const already = user.childIds.includes(child.id)
+  if (!already) user.childIds.push(child.id)
+  user.childId = child.id
+  user.activeChildId = child.id
+  save(db)
+  return { ok: true, already, child: presentStudent(child) }
+}
+
+export function selectChild(childId) {
+  const db = load()
+  const user = db.users.find((item) => item.id === db.sessionUserId)
+  if (!user || user.role !== 'parent') return { ok: false }
+  const ids = linkedChildIds(user)
+  if (!ids.includes(childId)) return { ok: false }
+  user.childId = childId
+  user.activeChildId = childId
+  save(db)
+  return { ok: true }
+}
+
+export function suggestToChild({ childId, eventId } = {}) {
+  const db = load()
+  const user = db.users.find((item) => item.id === db.sessionUserId)
+  if (!user || user.role !== 'parent') return { ok: false, reason: 'auth' }
+  if (!linkedChildIds(user).includes(childId)) return { ok: false, reason: 'child' }
+  const found = db.events.find((item) => item.id === eventId && (!item.status || item.status === 'published'))
+  if (!found) return { ok: false, reason: 'event' }
+  if (!Array.isArray(db.suggestions)) db.suggestions = []
+  const existing = db.suggestions.find((item) => item.parentId === user.id && item.childId === childId && item.eventId === eventId)
+  if (existing) return { ok: true, already: true, suggestion: clone(existing) }
+  const suggestion = {
+    id: nextId('sg'),
+    parentId: user.id,
+    childId,
+    eventId,
+    title: found.title,
+    date: TODAY,
+    status: 'предложено',
   }
-  return { ok: true, child: presentStudent(child) }
+  db.suggestions.push(suggestion)
+  save(db)
+  return { ok: true, suggestion }
+}
+
+export function parentCabinet() {
+  const db = load()
+  const session = db.users.find((item) => item.id === db.sessionUserId)
+  if (!session || session.role !== 'parent') {
+    return {
+      loggedIn: false,
+      role: session?.role || null,
+      user: null,
+      children: [],
+      activeId: null,
+      suggestions: [],
+      events: [],
+      schools: [],
+    }
+  }
+  const user = viewUser(db, session)
+  const suggestions = (db.suggestions || [])
+    .filter((item) => item.parentId === session.id)
+    .map((item) => clone(item))
+  const events = db.events.filter((item) => !item.status || item.status === 'published')
+  return {
+    loggedIn: true,
+    role: 'parent',
+    user,
+    children: user.children,
+    activeId: user.activeChildId,
+    suggestions,
+    events: clone(events),
+    schools: clone(SCHOOL_DIRECTORY),
+  }
 }

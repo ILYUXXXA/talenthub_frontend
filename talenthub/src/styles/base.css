@@ -54,6 +54,39 @@ body {
   padding: 8px 16px;
 }
 
+.parent-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.parent-bar .logo {
+  justify-self: start;
+}
+
+.parent-bar .student-tabs {
+  justify-self: end;
+}
+
+.header-greet {
+  margin: 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+@media (max-width: 760px) {
+  .parent-bar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .parent-bar .logo,
+  .parent-bar .student-tabs {
+    justify-self: center;
+  }
+}
+
 .logo {
   font-family: var(--font-display);
   font-size: 32px;
@@ -207,6 +240,69 @@ h2 {
   margin: 0 0 6px;
 }
 
+.child-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.child-card .card-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.child-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+}
+
+.child-facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.child-facts dt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.child-facts dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.child-interests {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.child-interests p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.child-interests .chip {
+  cursor: default;
+}
+
+@media (max-width: 760px) {
+  .child-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .muted {
   color: var(--muted);
   font-size: 14px;
@@ -223,6 +319,10 @@ h2 {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+}
+
+.row.center {
+  justify-content: center;
 }
 
 .spread {
@@ -261,6 +361,11 @@ h2 {
   background: transparent;
   border-color: var(--line);
   color: var(--ink);
+}
+
+.btn-muted {
+  background: var(--line);
+  color: var(--muted);
 }
 
 .btn-danger {
@@ -504,7 +609,8 @@ td {
   gap: 8px;
 }
 
-.student-tabs a {
+.student-tabs a,
+.student-tabs button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -514,10 +620,14 @@ td {
   border-radius: 12px;
   background: var(--bg);
   color: var(--ink);
+  font-family: inherit;
+  font-weight: 600;
   font-size: 15px;
+  cursor: pointer;
 }
 
-.student-tabs a.active {
+.student-tabs a.active,
+.student-tabs button.active {
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
@@ -592,6 +702,237 @@ td {
 
 .recommend {
   margin: 8px 0 24px;
+}
+
+.parent-feed .search-row {
+  margin-bottom: 8px;
+}
+
+.parent-feed .recommend {
+  margin-top: 0;
+}
+
+.school-split {
+  display: grid;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (min-width: 761px) {
+  .school-split {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.school-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 22px;
+}
+
+.school-pane .card-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.school-pane h3.card-title {
+  font-size: 18px;
+}
+
+.school-pane p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.school-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.school-kicker,
+.school-name,
+.school-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.school-board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.school-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.school-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+
+.school-tile.wide,
+.school-tile.school-prestige {
+  grid-column: 1 / -1;
+}
+
+.school-tile .card-title,
+.school-prestige .card-title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.school-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.school-chip {
+  cursor: default;
+}
+
+.school-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.school-lines li {
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+  line-height: 1.4;
+}
+
+.school-stat {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.school-stat-num {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.school-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin: 0;
+}
+
+.school-facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.school-facts .wide {
+  grid-column: 1 / -1;
+}
+
+.school-facts dt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.school-facts dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.school-prestige {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.school-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.school-pane .field {
+  margin-bottom: 0;
+}
+
+.school-rank,
+.school-missing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.school-rank li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.school-rank li.mine {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, white);
+}
+
+.school-place {
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.school-rank-name {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.school-missing li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
 }
 
 .recommend-more {
@@ -783,6 +1124,8 @@ td {
   width: 100%;
   text-align: left;
   cursor: pointer;
+  font-family: inherit;
+  color: inherit;
 }
 
 @media (min-width: 761px) {
@@ -873,5 +1216,66 @@ td {
 
   .detail-grid dd {
     margin: 0;
+  }
+}
+
+.mod-tabs button {
+  position: relative;
+  overflow: visible;
+  padding-right: 30px;
+}
+
+.tab-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mod-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.mod-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 210px;
+  padding: 22px 24px;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.45;
+  color: inherit;
+}
+
+.mod-card .card-title {
+  font-size: 22px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.mod-card p {
+  margin: 0;
+}
+
+@media (min-width: 761px) {
+  .mod-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
