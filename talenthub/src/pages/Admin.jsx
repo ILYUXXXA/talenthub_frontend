@@ -333,7 +333,7 @@ export default function Admin() {
       <ModeratorBar section={section} onSection={onSection} counts={counts} />
       <main>
         <div className="container">
-          <p className="muted">Демо: admin@demo.by</p>
+          
           {visible.length === 0 ? <p className="muted">Нет заявок</p> : (
             <div className="mod-grid">
               {visible.map((item) => (
