@@ -134,4 +134,23 @@ export const api = {
     const query = kind ? `?kind=${encodeURIComponent(kind)}` : ''
     return list(await request(`/api/v1/organizations${query}`))
   },
+  organizationDashboard: () => request('/api/v1/organizations/me/dashboard'),
+  organizationStudents: async (q = '') => list(await request(`/api/v1/organizations/me/students?q=${encodeURIComponent(q)}`)),
+  organizationEvents: async () => list(await request('/api/v1/organizations/me/events')).map(mapEvent),
+  createEvent: (data) => request('/api/v1/events', { method: 'POST', body: JSON.stringify(data) }),
+  eventParticipants: async (eventId) => list(await request(`/api/v1/events/${encodeURIComponent(eventId)}/registrations`)),
+  decideRegistration: (id, decision) => request(`/api/v1/registrations/${encodeURIComponent(id)}/decision`, { method: 'PATCH', body: JSON.stringify({ decision }) }),
+  markAttendance: (id) => request(`/api/v1/registrations/${encodeURIComponent(id)}/attendance`, { method: 'PUT' }),
+  closeEvent: (id) => request(`/api/v1/events/${encodeURIComponent(id)}/close-registration`, { method: 'POST' }),
+  openEvent: (id) => request(`/api/v1/events/${encodeURIComponent(id)}/open-registration`, { method: 'POST' }),
+  completeEvent: (id) => request(`/api/v1/events/${encodeURIComponent(id)}/complete`, { method: 'POST' }),
+  partnerships: async (view = 'mine') => list(await request(`/api/v1/partnership-requests?view=${view}`)),
+  createPartnership: (data) => request('/api/v1/partnership-requests', { method: 'POST', body: JSON.stringify(data) }),
+  decidePartnership: (id, decision) => request(`/api/v1/partnership-requests/${encodeURIComponent(id)}/decision`, { method: 'PATCH', body: JSON.stringify({ decision }) }),
+  respondPartnership: (id) => request(`/api/v1/partnership-requests/${encodeURIComponent(id)}/responses`, { method: 'POST' }),
+  decidePartnershipResponse: (id, decision) => request(`/api/v1/partnership-responses/${encodeURIComponent(id)}/decision`, { method: 'PATCH', body: JSON.stringify({ decision }) }),
+  moderationQueue: () => request('/api/v1/moderation/queue'),
+  moderateEvent: (id, decision) => request(`/api/v1/moderation/events/${encodeURIComponent(id)}/decision`, { method: 'POST', body: JSON.stringify({ decision }) }),
+  moderatePartnership: (id, decision) => request(`/api/v1/moderation/partnership-requests/${encodeURIComponent(id)}/decision`, { method: 'POST', body: JSON.stringify({ decision }) }),
+  moderateAchievement: (id, decision) => request(`/api/v1/moderation/achievements/${encodeURIComponent(id)}/decision`, { method: 'POST', body: JSON.stringify({ decision }) }),
 }
