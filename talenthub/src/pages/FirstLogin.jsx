@@ -73,12 +73,12 @@ export default function FirstLogin() {
     }
     const gradeItem = grades.find((item) => valueOf(item) === grade);
     const cityItem = cities.find((item) => valueOf(item) === city);
-    const picked = interests.filter((item) => selected.includes(valueOf(item))).map(storedValue);
+    const picked = interests.filter((item) => selected.includes(valueOf(item))).map(labelOf);
     try {
       await api.updateProfile({
         grade: Number(gradeItem == null ? grade : storedValue(gradeItem)),
         city: String(cityItem == null ? city : storedValue(cityItem)),
-        interests: picked.map((item) => typeof item === 'string' ? item : labelOf(item)),
+        interests: picked,
       });
       const user = await api.me();
       if (user.profile_complete) navigate('/events');
