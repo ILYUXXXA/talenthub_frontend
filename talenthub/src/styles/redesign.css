@@ -519,3 +519,78 @@ label { color: #435573; }
   .success-grid { grid-template-columns: 1fr; }
   .success-detail { padding-left: 14px; }
 }
+
+
+/* Parent dashboard: aligned greeting and child selector */
+.parent-dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin: 24px 0 30px;
+}
+.parent-greeting { min-width: 250px; }
+.parent-greeting-eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted, #758197);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .11em;
+}
+.parent-greeting h1 {
+  margin: 0;
+  color: var(--ink, #17243b);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.15;
+}
+.parent-greeting p { margin: 8px 0 0; color: var(--muted, #758197); }
+.parent-child-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.parent-child-pill, .parent-child-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 7px 14px 7px 8px;
+  border: 1px solid #e3e9f2;
+  border-radius: 14px;
+  background: #fff;
+  color: #26364f;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.parent-child-pill:hover, .parent-child-add:hover { border-color: #9bb8f4; box-shadow: 0 5px 16px #243c6410; }
+.parent-child-pill.active { border-color: #8eaff4; background: #f1f6ff; color: #2456b4; }
+.parent-child-avatar {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 10px;
+  background: #e9effb;
+  color: #315caa;
+  font-size: 12px;
+  font-weight: 800;
+}
+.parent-child-pill.active .parent-child-avatar { background: #dce8ff; }
+.parent-child-check { margin-left: 2px; color: #2764c7; }
+.parent-child-add { padding-inline: 14px; color: #315caa; border-style: dashed; }
+.parent-child-add span { font-size: 19px; line-height: 1; }
+@media (max-width: 850px) {
+  .parent-dashboard-toolbar { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .parent-child-switcher { justify-content: flex-start; }
+}
+@media (max-width: 520px) {
+  .parent-child-switcher { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .parent-child-pill, .parent-child-add { justify-content: flex-start; min-width: 0; padding-right: 9px; font-size: 13px; }
+  .parent-child-add { grid-column: 1 / -1; }
+}
