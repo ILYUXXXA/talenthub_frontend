@@ -212,7 +212,7 @@ export default function Applications() {
             {open.status && open.status !== 'отменена' ? (
               <p className="notice">Ваша заявка: {open.status}.</p>
             ) : null}
-            <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Зарегистрироваться</button>
+            <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Подать заявку</button>
           </div>
         </div>
       ) : null}
