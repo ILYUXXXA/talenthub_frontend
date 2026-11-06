@@ -383,7 +383,7 @@ label { color: #435573; }
 .th-nav a:hover { color: #3159e8; background: #f2f5ff; }
 .th-login { display: inline-flex; align-items: center; gap: 12px; padding: 11px 16px; border: 1px solid #e2e9f7; border-radius: 12px; color: #3555bc; background: #f8faff; font-size: 12px; font-weight: 800; }
 .th-hero.th-hero-clean { padding-top: 90px!important; padding-bottom: 70px!important; background: linear-gradient(135deg,#f8faff 0%,#f2f6ff 55%,#fff 100%)!important; }
-.th-clean-inner h1 { max-width: 920px; color: #000; font-size: clamp(56px,7vw,88px); }
+.th-clean-inner h1 { max-width: none; width: 100%; color: #000; font-size: clamp(42px,5vw,60px); line-height: 1.08; letter-spacing: -.055em; white-space: nowrap; }
 .th-clean-inner h1 em { color: #3159e8; }
 .th-clean-inner > p { color: #71809a; font-size: 16px; }
 .th-clean-decoration { top: 78px; right: 5%; width: 185px; height: 185px; border-radius: 42px; }
@@ -467,7 +467,7 @@ label { color: #435573; }
   .th-header-inner { width: calc(100% - 28px); }
   .th-nav a { padding: 8px 9px; font-size: 10px; }
   .th-hero.th-hero-clean { padding: 45px 20px 34px!important; }
-  .th-clean-inner h1 { font-size: clamp(43px,12vw,60px); }
+  .th-clean-inner h1 { font-size: clamp(27px,8vw,36px); line-height: 1.12; white-space: nowrap; }
   .th-clean-inner > p { font-size: 14px; }
   .th-clean-decoration { display: none; }
   .th-clean-points { margin-top: 35px; }
