@@ -10,20 +10,19 @@ const LINKS = [
   { to: '/parent', label: 'Кабинет родителя' },
 ]
 
+function Brand() {
+  return <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
+}
+
 export default function AppHeader({ children }) {
   return (
     <>
       <header className="header">
         <div className="header-inner">
-          <Link to="/" className="logo">TalentHub</Link>
-          <nav className="nav">
+          <Brand />
+          <nav className="nav" aria-label="Основная навигация">
             {LINKS.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                className={({ isActive }) => (isActive ? 'active' : undefined)}
-              >
+              <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => (isActive ? 'active' : undefined)}>
                 {link.label}
               </NavLink>
             ))}

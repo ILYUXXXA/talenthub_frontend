@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const ICONS = {
   overview: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" /></>,
@@ -16,16 +16,10 @@ export default function OrganizationShell({ tabs, activeTab, onTabChange, childr
     <>
       <header className="header student-header">
         <div className="header-inner">
-          <NavLink to="/" className="logo">TalentHub</NavLink>
+          <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
           <nav className="nav student-tabs org-shell-tabs" aria-label="Разделы кабинета">
             {tabs.map(([id, label, icon = id]) => (
-              <button
-                key={id}
-                type="button"
-                className={activeTab === id ? 'active' : ''}
-                aria-current={activeTab === id ? 'page' : undefined}
-                onClick={() => onTabChange(id)}
-              >
+              <button key={id} type="button" className={activeTab === id ? 'active' : ''} aria-current={activeTab === id ? 'page' : undefined} onClick={() => onTabChange(id)}>
                 <svg className="tab-icon" viewBox="0 0 24 24" aria-hidden="true">{ICONS[icon] || ICONS.overview}</svg>
                 {label}
               </button>
