@@ -263,9 +263,9 @@ function seed() {
         role: 'parent',
         firstName: 'Ольга',
         lastName: 'Коваль',
-        childId: null,
-        childIds: [],
-        activeChildId: null,
+        childId: 's1',
+        childIds: ['s1', 's2'],
+        activeChildId: 's1',
       },
       {
         id: 'u-school',
@@ -710,6 +710,7 @@ function load() {
           parsed.notifications = demoNotifications()
           writeRaw(JSON.stringify(parsed))
         }
+        let changed = false
         if (!parsed.users.some((item) => item && item.role === 'company')) {
           parsed.users.push({
             id: 'u-company',
@@ -720,8 +721,17 @@ function load() {
             lastName: 'Мороз',
             orgName: 'КодМастер',
           })
-          writeRaw(JSON.stringify(parsed))
+          changed = true
         }
+        const demoParent = parsed.users.find((item) => item && item.id === 'u-olga' && item.role === 'parent')
+        const demoChildIds = ['s1', 's2'].filter((id) => parsed.students?.some((student) => student.id === id))
+        if (demoParent && (!Array.isArray(demoParent.childIds) || demoParent.childIds.length === 0) && !demoParent.childId) {
+          demoParent.childIds = demoChildIds
+          demoParent.childId = demoChildIds[0] || null
+          demoParent.activeChildId = demoChildIds[0] || null
+          changed = true
+        }
+        if (changed) writeRaw(JSON.stringify(parsed))
         return parsed
       }
     } catch {
