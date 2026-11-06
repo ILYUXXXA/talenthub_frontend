@@ -178,11 +178,22 @@ export default function Events() {
     }
   }
 
+  async function showEvent(event) {
+    setOpen(event)
+    try {
+      const detail = await api.event(event.id)
+      setOpen(detail)
+    } catch (cause) {
+      if (cause.status === 401) navigate('/auth')
+      else setMessage(cause.message || 'Не удалось загрузить карточку мероприятия.')
+    }
+  }
+
   function RegisterButton({ event }) {
     const existing = activeApplication(cabinet.applications, event.id)
     if (existing) {
       return (
-        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); setOpen(event) }}>
+        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); showEvent(event) }}>
           {existing.status}
         </button>
       )
@@ -194,7 +205,7 @@ export default function Events() {
     )
   }
 
-  const opened = open ? published.find((event) => event.id === open.id) || open : null
+  const opened = open ? { ...(published.find((event) => event.id === open.id) || {}), ...open } : null
   const openedApp = opened ? activeApplication(cabinet.applications, opened.id) : null
 
   return (
@@ -282,7 +293,7 @@ export default function Events() {
               <h2>Рекомендуем для тебя</h2>
               <div className="event-grid">
                 {recommended.map((event) => (
-                  <article key={event.id} className="card event-card" onClick={() => setOpen(event)}>
+                  <article key={event.id} className="card event-card" onClick={() => showEvent(event)}>
                     <span className="badge badge-muted">{categoryLabel(event)}</span>
                     <h2 className="card-title">{event.title}</h2>
                     <p className="muted">{event.organizer}</p>
