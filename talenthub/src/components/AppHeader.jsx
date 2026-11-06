@@ -2,12 +2,12 @@ import { Link, NavLink } from 'react-router-dom'
 
 const LINKS = [
   { to: '/', label: 'Главная', end: true },
-  { to: '/auth', label: 'Вход' },
-  { to: '/welcome', label: 'Первый вход' },
+  { to: '/auth', label: 'Войти' },
+  { to: '/welcome', label: 'Настройка профиля' },
   { to: '/events', label: 'Мероприятия' },
   { to: '/school', label: 'Школа' },
-  { to: '/admin', label: 'Админ' },
-  { to: '/parent', label: 'Родитель' },
+  { to: '/admin', label: 'Администрирование' },
+  { to: '/parent', label: 'Кабинет родителя' },
 ]
 
 export default function AppHeader({ children }) {
