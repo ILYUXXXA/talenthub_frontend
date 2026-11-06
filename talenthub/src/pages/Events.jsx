@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, mapRegistration } from '../api/client.js'
+import { listEvents, registerForEvent, studentCabinet } from '../data/store.js'
 
 const OLYMPIAD_DIRECTIONS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия']
 const PROJECT_DIRECTIONS = ['Робототехника', 'Дизайн', 'Медиа', 'Экология']
@@ -65,40 +65,25 @@ function matchesQuery(event, query) {
 
 export default function Events() {
   const navigate = useNavigate()
-  const [catalog, setCatalog] = useState([])
-  const [cabinet, setCabinet] = useState({ demo: false, loggedIn: false, user: null, applications: [] })
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
-
-  async function refresh() {
+  const catalog = useMemo(() => {
     try {
-      const [events, registrations] = await Promise.all([api.events(), api.registrations()])
-      setCatalog(events)
-      setCabinet((current) => ({ ...current, loggedIn: true, applications: registrations }))
-      setLoadError('')
-    } catch (cause) {
-      setLoadError(cause.message || 'Не удалось загрузить мероприятия.')
-      if (cause.status === 401) navigate('/auth')
-    } finally {
-      setLoading(false)
+      const loaded = listEvents()
+      return Array.isArray(loaded) ? loaded : []
+    } catch {
+      return []
     }
-  }
-
-  useEffect(() => {
-    refresh()
-    api.profile().then((profile) => {
-      setCabinet((current) => ({
-        ...current,
-        user: { interests: profile.interests || [] },
-        student: profile,
-      }))
-    }).catch(() => {})
   }, [])
-
   const published = useMemo(
-    () => catalog.filter((event) => event.status === 'published'),
+    () => catalog.filter((event) => !event.status || event.status === 'published'),
     [catalog],
   )
+  const [cabinet, setCabinet] = useState(() => {
+    try {
+      return studentCabinet()
+    } catch {
+      return { demo: true, loggedIn: false, user: null, applications: [] }
+    }
+  })
   const [directions, setDirections] = useState([])
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('none')
@@ -162,24 +147,34 @@ export default function Events() {
     + Number(status !== 'none')
     + Number(directions.length > 0)
 
-  async function onRegister(event) {
+  function refresh() {
     try {
-      const registration = await api.registerForEvent(event.id)
-      const mapped = mapRegistration({ ...registration, event: {
-        id: event.id, title: event.title, organizer: { name: event.organizer },
-        kind: event.category, event_date: event.date, city: event.city, format: event.format,
-      } })
-      await refresh()
-      setStatus(mapped.status || 'подана')
-      setMessage('Заявка успешно отправлена.')
-      setOpen(event)
-    } catch (cause) {
-      if (cause.status === 401) {
-        navigate('/auth')
-        return
-      }
-      setMessage(cause.message || 'Не удалось отправить заявку.')
+      setCabinet(studentCabinet())
+    } catch {
+      /* оставляем текущий снимок */
     }
+  }
+
+  function onRegister(event) {
+    let result
+    try {
+      result = registerForEvent(event.id)
+    } catch {
+      setMessage('Не удалось отправить заявку.')
+      return
+    }
+    if (!result.ok && result.reason === 'auth') {
+      navigate('/auth')
+      return
+    }
+    if (!result.ok) {
+      setMessage('Регистрация на это мероприятие закрыта.')
+      return
+    }
+    refresh()
+    if (!result.already) setStatus(result.status || 'подана')
+    setMessage(result.already ? `Заявка уже есть: ${result.status}.` : 'Заявка подана. Список переключён на этот статус.')
+    setOpen(event)
   }
 
   function RegisterButton({ event }) {
@@ -204,8 +199,6 @@ export default function Events() {
   return (
     <main>
       <div className="container">
-        {loading ? <p className="muted">Загружаем мероприятия…</p> : null}
-        {loadError ? <p className="notice">{loadError}</p> : null}
         {status !== 'none' ? (
           <p className="notice">
             Показаны только заявки со статусом «{STATUSES.find((item) => item.id === status)?.label || status}».
