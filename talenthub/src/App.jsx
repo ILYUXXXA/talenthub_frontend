@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppHeader from './components/AppHeader.jsx'
-import StudentShell from './components/StudentShell.jsx'
 import Landing from './pages/Landing.jsx'
 import Auth from './pages/Auth.jsx'
 import FirstLogin from './pages/FirstLogin.jsx'
@@ -30,10 +29,10 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<WithHeader><Auth /></WithHeader>} />
         <Route path="/welcome" element={<WithHeader><FirstLogin /></WithHeader>} />
-        <Route path="/school" element={<WithHeader><SchoolCabinet /></WithHeader>} />
+        <Route path="/school" element={<SchoolCabinet />} />
         <Route path="/admin" element={<WithHeader><Admin /></WithHeader>} />
         <Route path="/parent" element={<WithHeader><ParentLink /></WithHeader>} />
-        <Route path="/company" element={<WithHeader><Company /></WithHeader>} />
+        <Route path="/company" element={<Company />} />
       </Routes>
     </BrowserRouter>
   )
