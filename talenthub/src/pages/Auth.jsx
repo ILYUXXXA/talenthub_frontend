@@ -85,7 +85,7 @@ export default function Auth() {
         birth_date: birthDate || null,
         email: email.trim(),
         password,
-        school_id: schoolId || null,
+        school_id: schoolId,
       })
       navigate(user.profile_complete ? '/events' : '/welcome')
     } catch (cause) {
@@ -128,8 +128,8 @@ export default function Auth() {
             <label className="field"><span>Пароль (не менее 8 символов)</span><input type="password" value={password} minLength={8} maxLength={128} required onChange={(event) => setPassword(event.target.value)} /></label>
             <label className="field">
               <span>Учреждение образования</span>
-              <select value={schoolId} onChange={(event) => setSchoolId(event.target.value)}>
-                <option value="">Не выбрано</option>
+              <select value={schoolId} required onChange={(event) => setSchoolId(event.target.value)}>
+                <option value="">Выберите учреждение</option>
                 {schools.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
               </select>
             </label>
