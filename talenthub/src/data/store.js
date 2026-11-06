@@ -221,6 +221,83 @@ function demoNotifications() {
   ]
 }
 
+function demoMarketplacePartnerships() {
+  return [
+    {
+      id: 'market-company-mentors',
+      from: 'КодМастер',
+      to: '',
+      title: 'Наставники для школьных IT-проектов',
+      description: 'Ищем школы для совместной проектной программы: предоставим практикующих разработчиков, проведём вводные занятия и поможем командам довести проекты до презентации. Для 8–11 классов, бесплатно.',
+      text: 'Ищем школы для совместной проектной программы: предоставим практикующих разработчиков, проведём вводные занятия и поможем командам довести проекты до презентации. Для 8–11 классов, бесплатно.',
+      visibility: 'public',
+      audience: 'all_schools',
+      status: 'pending',
+      date: '2026-11-06',
+    },
+    {
+      id: 'market-company-lab',
+      from: 'НаноСофт',
+      to: '',
+      title: 'Партнёрство для инженерной лаборатории',
+      description: 'Готовы предоставить оборудование и наставников для серии практических занятий по робототехнике и электронике. Рассматриваем школы Минска и регионов.',
+      text: 'Готовы предоставить оборудование и наставников для серии практических занятий по робототехнике и электронике. Рассматриваем школы Минска и регионов.',
+      visibility: 'public',
+      audience: 'all_schools',
+      status: 'pending',
+      date: '2026-11-05',
+    },
+    {
+      id: 'market-company-career',
+      from: 'БелТехКарьер',
+      to: '',
+      title: 'Профориентационные встречи с инженерами',
+      description: 'Предлагаем организовать открытые встречи школьников с инженерами и специалистами производства, экскурсию на предприятие и разбор реальных технических задач.',
+      text: 'Предлагаем организовать открытые встречи школьников с инженерами и специалистами производства, экскурсию на предприятие и разбор реальных технических задач.',
+      visibility: 'public',
+      audience: 'all_schools',
+      status: 'pending',
+      date: '2026-11-04',
+    },
+    {
+      id: 'market-school-experts',
+      from: 'Лицей БГУ',
+      to: '',
+      title: 'Ищем компании для проектной мастерской',
+      description: 'Приглашаем технологические компании предоставить экспертам роль наставников для ученических проектов по математике, программированию и инженерии. Формат и график согласуем совместно.',
+      text: 'Приглашаем технологические компании предоставить экспертам роль наставников для ученических проектов по математике, программированию и инженерии. Формат и график согласуем совместно.',
+      visibility: 'public',
+      audience: 'all_companies',
+      status: 'pending',
+      date: '2026-11-06',
+    },
+    {
+      id: 'market-school-lab',
+      from: 'СШ №4 Гродно',
+      to: '',
+      title: 'Партнёр для химической лаборатории выходного дня',
+      description: 'Ищем профильную организацию, которая поможет провести практические занятия по химии: экспертное сопровождение, безопасные демонстрации и материалы для школьников 8–10 классов.',
+      text: 'Ищем профильную организацию, которая поможет провести практические занятия по химии: экспертное сопровождение, безопасные демонстрации и материалы для школьников 8–10 классов.',
+      visibility: 'public',
+      audience: 'all_companies',
+      status: 'pending',
+      date: '2026-11-03',
+    },
+    {
+      id: 'market-school-joint',
+      from: 'Гимназия №2 Брест',
+      to: '',
+      title: 'Совместный городской конкурс инженерных идей',
+      description: 'Ищем партнёров для организации конкурса инженерных идей среди учащихся 8–11 классов. Нужны эксперты в жюри, практические кейсы и поддержка призового фонда.',
+      text: 'Ищем партнёров для организации конкурса инженерных идей среди учащихся 8–11 классов. Нужны эксперты в жюри, практические кейсы и поддержка призового фонда.',
+      visibility: 'public',
+      audience: 'all_companies',
+      status: 'pending',
+      date: '2026-11-02',
+    },
+  ]
+}
+
 function seed() {
   return {
     version: VERSION,
@@ -681,6 +758,7 @@ function seed() {
         description: 'НаноСофт и лицей согласовали IT-каникулы для школьников.',
         status: 'accepted',
       },
+      ...demoMarketplacePartnerships(),
     ],
     achievements: [
       {
@@ -720,6 +798,13 @@ function load() {
             lastName: 'Мороз',
             orgName: 'КодМастер',
           })
+          writeRaw(JSON.stringify(parsed))
+        }
+        if (!Array.isArray(parsed.partnerships)) parsed.partnerships = []
+        const marketplaceIds = new Set(parsed.partnerships.map((item) => item.id))
+        const missingMarketplaceOffers = demoMarketplacePartnerships().filter((item) => !marketplaceIds.has(item.id))
+        if (missingMarketplaceOffers.length) {
+          parsed.partnerships.push(...missingMarketplaceOffers)
           writeRaw(JSON.stringify(parsed))
         }
         const demoParent = parsed.users.find((item) => item && item.id === 'u-olga' && item.role === 'parent')
