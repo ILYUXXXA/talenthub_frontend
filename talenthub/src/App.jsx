@@ -30,10 +30,10 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<WithHeader><Auth /></WithHeader>} />
         <Route path="/welcome" element={<WithHeader><FirstLogin /></WithHeader>} />
-        <Route path="/school" element={<WithHeader><SchoolCabinet /></WithHeader>} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/parent" element={<ParentLink />} />
-        <Route path="/company" element={<WithHeader><Company /></WithHeader>} />
+        <Route path="/school" element={<SchoolCabinet />} />
+        <Route path="/admin" element={<WithHeader><Admin /></WithHeader>} />
+        <Route path="/parent" element={<WithHeader><ParentLink /></WithHeader>} />
+        <Route path="/company" element={<Company />} />
       </Routes>
     </BrowserRouter>
   )
