@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/backend-integration
+      - feat/talenthub-full-ui-refresh
   pull_request:
     branches:
       - feat/talenthub-full-ui-refresh
