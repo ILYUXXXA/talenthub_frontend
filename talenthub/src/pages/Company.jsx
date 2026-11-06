@@ -76,7 +76,7 @@ export default function Company() {
     } catch { setNotice('Не удалось отправить предложение. Попробуйте ещё раз.') }
   }
   function handleRespond(id, decision) {
-    try { respondPartnership(id, decision) } catch { /* обновление интерфейса остаётся доступным в демо */ }
+    try { respondPartnership(id, decision) } catch { /* локальное состояние интерфейса обновляется независимо */ }
     setVersion((value) => value + 1)
     setNotice(decision === 'accepted' ? 'Запрос принят. Можно согласовать детали инициативы.' : 'Запрос отклонён.')
   }
