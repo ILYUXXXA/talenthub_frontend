@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { login, registerStudent, listSchools } from '../data/store.js'
 
 const FALLBACK_SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
-const DEMO_PASSWORD = 'demo1234'
-
 const ROLES = [
-  { id: 'student', label: 'Войти как школьник', demo: 'alina@demo.by' },
-  { id: 'parent', label: 'Войти как родитель', demo: 'olga@demo.by' },
-  { id: 'school', label: 'Войти как администрация школы', demo: 'school@demo.by' },
-  { id: 'company', label: 'Войти как представитель компании', demo: 'company@demo.by' },
-  { id: 'admin', label: 'Войти как модератор', demo: 'admin@demo.by' },
+  { id: 'student', label: 'Войти как школьник' },
+  { id: 'parent', label: 'Войти как родитель' },
+  { id: 'school', label: 'Войти как администрация школы' },
+  { id: 'company', label: 'Войти как представитель компании' },
+  { id: 'admin', label: 'Войти как модератор' },
 ]
 
 function readSchools() {
@@ -67,13 +65,6 @@ export default function Auth() {
     setMode('login')
     setEmail('')
     setPassword('')
-    setError('')
-  }
-
-  function fillDemo() {
-    if (!current?.demo) return
-    setEmail(current.demo)
-    setPassword(DEMO_PASSWORD)
     setError('')
   }
 
@@ -185,11 +176,6 @@ export default function Auth() {
             </label>
             {error ? <p className="notice">{error}</p> : null}
             <button className="btn btn-primary" type="submit">Войти</button>
-            {current.demo ? (
-              <button type="button" className="btn btn-ghost" onClick={fillDemo}>Заполнить демо</button>
-            ) : (
-              <p className="muted">Для представителя компании демо-вход пока не заведён.</p>
-            )}
             {role === 'student' ? (
               <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}
