@@ -56,8 +56,8 @@ export default function FirstLogin() {
   const [upcoming, setUpcoming] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   useEffect(() => {
-    Promise.all([api.events({ upcoming: true }), api.reference()])
-      .then(([events, reference]) => {
+    api.events({ upcoming: true })
+      .then((events) => {
         setUpcoming(events.map((item) => ({ ...item, date: item.date, categoryLabel: item.category === 'project' ? 'Проектная деятельность' : 'Олимпиада' })));
       })
       .catch(() => setUpcoming([]))
