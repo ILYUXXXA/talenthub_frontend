@@ -90,7 +90,7 @@ export default function SchoolCabinet() {
     } catch { setNotice('Не удалось сохранить мероприятие. Попробуйте ещё раз.') }
   }
   function handleRespond(id, decision) {
-    try { respondPartnership(id, decision) } catch { /* состояние демо обновляется ниже */ }
+    try { respondPartnership(id, decision) } catch { /* локальное состояние обновляется ниже */ }
     setVersion((value) => value + 1)
     setNotice(decision === 'accepted' ? 'Запрос принят. Можно переходить к согласованию деталей.' : 'Запрос отклонён.')
   }
