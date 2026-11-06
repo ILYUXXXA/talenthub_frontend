@@ -40,18 +40,16 @@ export default function Landing() {
           <div className="th-hero-caption"><span>Для учащихся</span><i></i><span>Для учреждений</span><i></i><span>Для партнёров</span></div>
         </div>
 
-        <div className="th-hero-art" aria-hidden="true">
-          <div className="th-art-glow"></div>
-          <div className="th-art-orbit th-art-orbit-one"></div>
-          <div className="th-art-orbit th-art-orbit-two"></div>
-          <div className="th-art-tile th-art-tile-back"></div>
-          <div className="th-art-tile th-art-tile-mid"></div>
-          <div className="th-art-tile th-art-tile-front"><span>t.</span></div>
-          <div className="th-art-tag th-art-tag-one"><i>✳</i><span><small>ОТКРЫВАЙ</small><b>Новые возможности</b></span></div>
-          <div className="th-art-tag th-art-tag-two"><i>↗</i><span><small>УЧАСТВУЙ</small><b>Реальные события</b></span></div>
-          <div className="th-art-tag th-art-tag-three"><i>✦</i><span><small>РАЗВИВАЙСЯ</small><b>Собирай достижения</b></span></div>
-          <div className="th-art-spark th-art-spark-one">✳</div>
-          <div className="th-art-spark th-art-spark-two">✦</div>
+        <div className="th-hero-visual" aria-label="Открой. Участвуй. Создавай.">
+          <div className="th-visual-orb"></div>
+          <div className="th-visual-wordmark"><span>talent</span><strong>hub</strong></div>
+          <div className="th-visual-index">01 <i></i> 03</div>
+          <div className="th-visual-steps">
+            <div className="th-visual-step"><span>01</span><div><b>Открой</b><small>Найди своё направление</small></div><i>↗</i></div>
+            <div className="th-visual-step"><span>02</span><div><b>Участвуй</b><small>Выбирай события и проекты</small></div><i>↗</i></div>
+            <div className="th-visual-step"><span>03</span><div><b>Создавай</b><small>Сохраняй результаты и связи</small></div><i>↗</i></div>
+          </div>
+          <div className="th-visual-note">ТВОЯ СЛЕДУЮЩАЯ ВОЗМОЖНОСТЬ — ЗДЕСЬ</div>
         </div>
       </section>
 
