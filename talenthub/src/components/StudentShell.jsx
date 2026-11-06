@@ -21,7 +21,7 @@ const TABS = [
   },
   {
     to: '/applications',
-    label: 'Заявки',
+    label: 'Мои заявки',
     icon: (
       <TabIcon>
         <rect x="6" y="3" width="12" height="18" rx="2" />
@@ -41,7 +41,7 @@ const TABS = [
   },
   {
     to: '/success',
-    label: 'Успехи',
+    label: 'Достижения',
     icon: (
       <TabIcon>
         <circle cx="12" cy="9" r="5" />
