@@ -132,12 +132,11 @@ const PARENT_TABS = [
   },
 ]
 
-function ParentBar({ section, onSection, greeting }) {
+function ParentBar({ section, onSection }) {
   return (
     <header className="header student-header">
       <div className="header-inner parent-bar">
         <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
-        <p className="header-greet">{greeting}</p>
         <nav className="nav student-tabs org-shell-tabs">
           {PARENT_TABS.map((tab) => (
             <button
@@ -278,7 +277,7 @@ export default function ParentLink() {
   if (!cabinet.loggedIn) {
     return (
       <>
-        <ParentBar section={section} onSection={setSection} greeting="" />
+        <ParentBar section={section} onSection={setSection} />
         <main className="parent-workspace">
         <div className="container narrow">
           <h1>Кабинет родителя</h1>
@@ -296,33 +295,37 @@ export default function ParentLink() {
 
   return (
     <>
-      <ParentBar
-        section={section}
-        onSection={setSection}
-        greeting={`Здравствуйте, ${cabinet.user.firstName || parentName.split(' ')[0] || 'родитель'}!`}
-      />
+      <ParentBar section={section} onSection={setSection} />
       <main>
       <div className="container">
-        <div className="stack">
-
-          {cabinet.children.length > 0 ? (
-            <div className="row center">
-              {cabinet.children.map((child) => (
-                <button
-                  key={child.id}
-                  type="button"
-                  className={child.id === active?.id ? 'btn btn-primary' : 'btn btn-ghost'}
-                  onClick={() => onSelect(child.id)}
-                >
-                  {personName(child)}
-                </button>
-              ))}
-              <button type="button" className="btn btn-muted" onClick={() => { setLinkError(''); setAdding(true); }}>
-                Добавить ребёнка
+        <div className="parent-dashboard-toolbar">
+          <div className="parent-greeting">
+            <span className="parent-greeting-eyebrow">ЛИЧНЫЙ КАБИНЕТ</span>
+            <h1>Здравствуйте, {cabinet.user.firstName || parentName.split(' ')[0] || 'родитель'}!</h1>
+            <p>Управляйте профилями детей и следите за их возможностями.</p>
+          </div>
+          <div className="parent-child-switcher" aria-label="Выбор ребёнка">
+            {cabinet.children.map((child) => (
+              <button
+                key={child.id}
+                type="button"
+                className={child.id === active?.id ? 'parent-child-pill active' : 'parent-child-pill'}
+                onClick={() => onSelect(child.id)}
+                aria-pressed={child.id === active?.id}
+              >
+                <span className="parent-child-avatar">{personName(child).split(' ').map((part) => part[0]).slice(0, 2).join('')}</span>
+                <span>{personName(child)}</span>
+                {child.id === active?.id ? <span className="parent-child-check">✓</span> : null}
               </button>
-            </div>
-          ) : null}
-
+            ))}
+            {cabinet.children.length > 0 ? (
+              <button type="button" className="parent-child-add" onClick={() => { setLinkError(''); setAdding(true); }}>
+                <span aria-hidden="true">＋</span> Добавить
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <div className="stack">
           {linkNote ? <p className="notice">{linkNote}</p> : null}
 
           {cabinet.children.length === 0 && !adding ? (
