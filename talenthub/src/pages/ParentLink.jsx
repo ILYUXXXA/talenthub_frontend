@@ -159,9 +159,9 @@ function ParentBar({ section, onSection, greeting }) {
 export default function ParentLink() {
   const [cabinet, setCabinet] = useState(readCabinet)
   const [adding, setAdding] = useState(false)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [birthDate, setBirthDate] = useState('')
+  const [firstName, setFirstName] = useState('Алина')
+  const [lastName, setLastName] = useState('Коваль')
+  const [birthDate, setBirthDate] = useState('2010-04-12')
   const [linkError, setLinkError] = useState('')
   const [linkNote, setLinkNote] = useState('')
   const [section, setSection] = useState('progress')
@@ -317,7 +317,7 @@ export default function ParentLink() {
                   {personName(child)}
                 </button>
               ))}
-              <button type="button" className="btn btn-muted" onClick={() => { setFirstName(''); setLastName(''); setBirthDate(''); setLinkError(''); setLinkNote(''); setAdding(true); }}>
+              <button type="button" className="btn btn-muted" onClick={() => { setLinkError(''); setAdding(true); }}>
                 Добавить ребёнка
               </button>
             </div>
@@ -337,7 +337,7 @@ export default function ParentLink() {
           {adding ? (
             <form className="card stack" onSubmit={onLink}>
               <h2 className="card-title">Добавить ребёнка</h2>
-              <p className="muted">Укажите данные ребёнка точно так, как они указаны в его профиле.</p>
+              <p className="muted">Демо-запись уже подставлена: Алина Коваль, 12.04.2010. Второй ребёнок для переключения: Илья Савич, 11.02.2009.</p>
               <div className="grid-2">
                 <label className="field">
                   <span>Имя</span>
@@ -360,7 +360,7 @@ export default function ParentLink() {
             </form>
           ) : null}
 
-          {active && !adding ? (
+          {active ? (
             <>
               {section === 'child' ? (
                 <section className="card child-card">
