@@ -2099,3 +2099,38 @@ grid-template-columns: 1fr 1fr;
  .th-footer{padding:19px 18px 24px;flex-wrap:wrap}
  .th-footer>span{order:3;width:100%}
 }
+
+
+/* Landing preview mirrors the real student cabinet navigation and event catalog */
+.th-preview-nav{display:flex;gap:0;overflow:hidden;padding:0 15px;border-bottom:1px solid #edf0f5;background:#fff}
+.th-preview-nav span{padding:12px 9px;color:#78859a;font-size:8px;font-weight:650;white-space:nowrap}
+.th-preview-nav span.active{color:#2854e8;border-bottom:2px solid #2854e8}
+.th-preview-content{padding:19px 20px 21px;background:#fbfcfe}
+.th-preview-title small{color:#8793a8;font-size:7px;font-weight:850;letter-spacing:.13em}
+.th-preview-title h3{margin:5px 0 4px;font-size:19px;letter-spacing:-.5px}
+.th-preview-title p{margin:0;color:#8490a4;font-size:9px}
+.th-preview-search{display:flex;align-items:center;gap:8px;margin:15px 0 12px;padding:9px 10px;border:1px solid #e5eaf2;border-radius:6px;background:#fff;color:#9aa5b5;font-size:8px}
+.th-preview-search>span{font-size:15px;color:#71809a}
+.th-preview-search b{margin-left:auto;padding:6px 8px;border-radius:5px;background:#2854e8;color:#fff;font-size:7px}
+.th-preview-list{display:flex;flex-direction:column;gap:8px}
+.th-preview-event{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid #e6eaf1;border-radius:7px;background:#fff}
+.th-preview-event-icon{display:grid;place-items:center;flex:0 0 29px;height:29px;border-radius:6px;background:#eef2ff;color:#315be8;font-size:15px}
+.th-preview-event-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+.th-preview-event-info small{color:#8793a8;font-size:6px;font-weight:850;letter-spacing:.07em}
+.th-preview-event-info b{color:#27344d;font-size:9px;line-height:1.35}
+.th-preview-event-info>span,.th-preview-event-info em{color:#8490a4;font-size:7px;font-style:normal}
+.th-preview-arrow{margin-left:auto;color:#2854e8;font-size:13px}
+.th-preview-empty{color:#8490a4;font-size:9px}
+@media(max-width:600px){
+ .th-preview-nav{padding:0 5px}
+ .th-preview-nav span{padding:10px 5px;font-size:6px}
+ .th-preview-content{padding:13px 9px 14px}
+ .th-preview-title h3{font-size:15px}
+ .th-preview-search{font-size:6px;margin:11px 0 8px;padding:7px}
+ .th-preview-search b{padding:5px;font-size:6px}
+ .th-preview-event{gap:6px;padding:7px}
+ .th-preview-event-icon{flex-basis:23px;height:23px;font-size:12px}
+ .th-preview-event-info small{font-size:5px}
+ .th-preview-event-info b{font-size:7px}
+ .th-preview-event-info>span,.th-preview-event-info em{font-size:6px}
+}
