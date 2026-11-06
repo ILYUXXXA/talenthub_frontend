@@ -7,7 +7,7 @@ const features = [
 ]
 
 const roles = [
-  { title: 'Учащимся', text: 'Находите интересные события, участвуйте и сохраняйте свои результаты.', link: '/auth', action: 'Открыть платформу' },
+  { title: 'Учащимся', text: 'Находите интересные события, участвуйте и сохраняйте свои результаты.', link: '/auth', action: 'Открыть экосистему' },
   { title: 'Школам и учреждениям', text: 'Публикуйте возможности, работайте с заявками и находите партнёров.', link: '/school', action: 'Подробнее' },
   { title: 'Компаниям и академиям', text: 'Предлагайте инициативы и сотрудничайте с образовательными учреждениями.', link: '/company', action: 'Подробнее' },
   { title: 'Родителям', text: 'Следите за образовательной активностью и успехами ребёнка.', link: '/parent', action: 'Подробнее' },
@@ -20,7 +20,7 @@ export default function Landing() {
         <div className="th-header-inner">
           <Link to="/" className="th-logo"><span className="th-logo-mark">t.</span><span>Talent<span>Hub</span></span></Link>
           <nav className="th-nav">
-            <a href="#platform">О платформе</a>
+            <a href="#platform">Об экосистеме</a>
             <a href="#how">Как это работает</a>
             <a href="#partners">Партнёрства</a>
           </nav>
@@ -30,12 +30,12 @@ export default function Landing() {
 
       <section className="th-hero th-hero-clean">
         <div className="th-clean-inner">
-          <div className="th-overline"><span></span> ПЛАТФОРМА ОБРАЗОВАТЕЛЬНЫХ ВОЗМОЖНОСТЕЙ</div>
-          <h1>Возможности<br/><em>начинаются здесь.</em></h1>
-          <p>TalentHub объединяет учащихся, школы, компании и академии. Находите мероприятия, развивайте таланты и создавайте образовательные проекты вместе.</p>
+          <div className="th-overline"><span></span> ОБРАЗОВАТЕЛЬНАЯ ЭКОСИСТЕМА</div>
+          <h1>Твои возможности<br/><em>В одном месте</em></h1>
+          <p>TalentHub — это образовательная экосистема, которая объединяет школьников, родителей, школы, компании и образовательные организации вокруг развития талантов, образовательных возможностей и достижений.</p>
           <div className="th-hero-actions">
             <Link to="/auth" className="th-primary">Открыть TalentHub <span>→</span></Link>
-            <a href="#platform" className="th-secondary">Узнать о платформе ↓</a>
+            <a href="#platform" className="th-secondary">Узнать об экосистеме ↓</a>
           </div>
           <div className="th-clean-points">
             <div><span>01</span><b>Находи</b><small>Мероприятия и проекты</small></div>
@@ -47,8 +47,8 @@ export default function Landing() {
       </section>
 
       <section className="th-intro" id="platform">
-        <div className="th-section-label">TALENTHUB / ПЛАТФОРМА</div>
-        <div><h2>От интереса — к реальным достижениям</h2><p>Возможности для учащихся и инструменты для организаций собраны на одной платформе. Находите события, подавайте заявки, сохраняйте результаты и выстраивайте сотрудничество в единой среде.</p></div>
+        <div className="th-section-label">TALENTHUB / ЭКОСИСТЕМА</div>
+        <div><h2>От интереса — к реальным достижениям</h2><p>Возможности для учащихся и инструменты для организаций собраны в одной экосистеме. Находите события, подавайте заявки, сохраняйте результаты и выстраивайте сотрудничество в единой среде.</p></div>
       </section>
 
       <section className="th-features" id="how">
@@ -66,9 +66,9 @@ export default function Landing() {
         <div className="th-role-grid">{roles.map((role, i) => <article className="th-role" key={role.title}><span>0{i + 1}</span><h3>{role.title}</h3><p>{role.text}</p><Link to={role.link}>{role.action} <b>→</b></Link></article>)}</div>
       </section>
 
-      <section className="th-cta"><div><div className="th-section-label">TALENTHUB</div><h2>Начните открывать новые возможности</h2><p>Присоединяйтесь к единой образовательной среде.</p></div><Link to="/auth" className="th-primary">Открыть платформу <span>→</span></Link></section>
+      <section className="th-cta"><div><div className="th-section-label">TALENTHUB</div><h2>Начните открывать новые возможности</h2><p>Присоединяйтесь к единой образовательной среде.</p></div><Link to="/auth" className="th-primary">Открыть экосистему <span>→</span></Link></section>
 
-      <footer className="th-footer"><Link to="/" className="th-logo"><span className="th-logo-mark">t.</span><span>Talent<span>Hub</span></span></Link><span>Платформа образовательных возможностей и партнёрств</span><small>© TalentHub</small></footer>
+      <footer className="th-footer"><Link to="/" className="th-logo"><span className="th-logo-mark">t.</span><span>Talent<span>Hub</span></span></Link><span>Образовательная экосистема возможностей и партнёрств</span><small>© TalentHub</small></footer>
     </main>
   )
 }
