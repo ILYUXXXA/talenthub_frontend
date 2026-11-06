@@ -1,26 +1,55 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, ApiError, clearSession } from '../api/client.js'
+import { login, registerStudent, listSchools } from '../data/store.js'
+
+const FALLBACK_SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
+const QUICK_ACCESS_PASSWORD = 'demo1234'
 
 const ROLES = [
-  { id: 'student', label: 'Школьник' },
-  { id: 'parent', label: 'Родитель' },
-  { id: 'school', label: 'Администрация школы' },
-  { id: 'company', label: 'Представитель компании' },
-  { id: 'moderator', label: 'Модератор' },
+  { id: 'student', label: 'Войти как школьник', quickEmail: 'alina@demo.by' },
+  { id: 'parent', label: 'Войти как родитель', quickEmail: 'olga@demo.by' },
+  { id: 'school', label: 'Войти как администрация школы', quickEmail: 'school@demo.by' },
+  { id: 'company', label: 'Войти как представитель компании', quickEmail: 'company@demo.by' },
+  { id: 'admin', label: 'Войти как модератор', quickEmail: 'admin@demo.by' },
 ]
 
+function readSchools() {
+  try {
+    const list = listSchools()
+    if (!Array.isArray(list) || list.length === 0) return FALLBACK_SCHOOLS
+    const names = list
+      .map((item) => {
+        if (typeof item === 'string') return item
+        if (item && typeof item === 'object') return item.name || item.title || item.school || ''
+        return ''
+      })
+      .filter(Boolean)
+    return names.length ? names : FALLBACK_SCHOOLS
+  } catch {
+    return FALLBACK_SCHOOLS
+  }
+}
+
+function userFrom(result) {
+  if (!result || result.ok === false) return null
+  if (result.role) return result
+  if (result.user && result.user.role) return result.user
+  return null
+}
+
 function pathFor(user) {
-  if (user.role === 'student') return user.profile_complete ? '/events' : '/welcome'
+  if (!user) return null
+  if (user.role === 'student') return user.profileComplete ? '/events' : '/welcome'
   if (user.role === 'parent') return '/parent'
   if (user.role === 'school') return '/school'
+  if (user.role === 'admin') return '/admin'
   if (user.role === 'company') return '/company'
-  if (user.role === 'moderator') return '/admin'
   return null
 }
 
 export default function Auth() {
   const navigate = useNavigate()
+  const schoolList = readSchools()
   const [role, setRole] = useState('')
   const [mode, setMode] = useState('login')
   const [email, setEmail] = useState('')
@@ -29,20 +58,9 @@ export default function Auth() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
-  const [schools, setSchools] = useState([])
-  const [schoolId, setSchoolId] = useState('')
-  const [busy, setBusy] = useState(false)
-  const current = ROLES.find((item) => item.id === role)
+  const [school, setSchool] = useState(schoolList[0] || '')
 
-  useEffect(() => {
-    if (mode !== 'register') return
-    api.organizations('school')
-      .then((items) => {
-        setSchools(items)
-        if (items.length) setSchoolId(items[0].id)
-      })
-      .catch((cause) => setError(cause.message))
-  }, [mode])
+  const current = ROLES.find((item) => item.id === role)
 
   function choose(next) {
     setRole(next)
@@ -50,48 +68,67 @@ export default function Auth() {
     setEmail('')
     setPassword('')
     setError('')
-    clearSession()
   }
 
-  async function onLogin(event) {
-    event.preventDefault()
-    setBusy(true)
+  function enterAsRole() {
+    if (!current?.quickEmail) return
     setError('')
     try {
-      const user = await api.login(email.trim(), password, role)
+      const user = userFrom(login(current.quickEmail, QUICK_ACCESS_PASSWORD))
+      if (!user || user.role !== role) {
+        setError('Не удалось открыть профиль выбранной роли.')
+        return
+      }
       const path = pathFor(user)
       if (!path) {
-        clearSession()
-        setError('Для этой роли кабинет не настроен.')
+        setError('Для этой роли вход пока недоступен.')
         return
       }
       navigate(path)
-    } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : 'Не удалось войти.')
-    } finally {
-      setBusy(false)
+    } catch {
+      setError('Не удалось открыть профиль выбранной роли.')
     }
   }
 
-  async function onRegister(event) {
+  function onLogin(event) {
     event.preventDefault()
-    setBusy(true)
     setError('')
     try {
-      const user = await api.register({
-        role: 'student',
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        birth_date: birthDate || null,
+      const user = userFrom(login(email.trim(), password))
+      if (!user || user.role !== role) {
+        setError('Неверная почта или пароль для этой роли.')
+        return
+      }
+      const path = pathFor(user)
+      if (!path) {
+        setError('Для этой роли вход пока не открыт.')
+        return
+      }
+      navigate(path)
+    } catch {
+      setError('Неверная почта или пароль для этой роли.')
+    }
+  }
+
+  function onRegister(event) {
+    event.preventDefault()
+    setError('')
+    try {
+      const result = registerStudent({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        birthDate,
         email: email.trim(),
         password,
-        school_id: schoolId || null,
+        school: school || schoolList[0] || '',
       })
-      navigate(user.profile_complete ? '/events' : '/welcome')
-    } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : 'Не удалось зарегистрироваться.')
-    } finally {
-      setBusy(false)
+      if (result && result.ok === false) {
+        setError('Не удалось зарегистрироваться. Проверьте данные.')
+        return
+      }
+      navigate('/welcome')
+    } catch {
+      setError('Не удалось зарегистрироваться. Проверьте данные.')
     }
   }
 
@@ -99,9 +136,7 @@ export default function Auth() {
     return (
       <main className="auth-page">
         <div className="container narrow auth-container">
-          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ЭКОСИСТЕМА</span>
-          <h1>Выберите профиль</h1>
-          <p className="lead">Войдите в существующий аккаунт или создайте аккаунт школьника.</p>
+          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ПЛАТФОРМА</span><h1>Выберите профиль</h1><p className="lead">Перейдите в кабинет своей роли или войдите по данным аккаунта.</p>
           <div className="role-pick">
             {ROLES.map((item) => (
               <button key={item.id} type="button" className="btn btn-ghost" onClick={() => choose(item.id)}>
@@ -121,29 +156,52 @@ export default function Auth() {
         <h1>{current.label}</h1>
         {mode === 'register' ? (
           <form className="card stack" onSubmit={onRegister}>
-            <label className="field"><span>Имя</span><input value={firstName} required maxLength={100} onChange={(event) => setFirstName(event.target.value)} /></label>
-            <label className="field"><span>Фамилия</span><input value={lastName} required maxLength={100} onChange={(event) => setLastName(event.target.value)} /></label>
-            <label className="field"><span>Дата рождения</span><input type="date" value={birthDate} required onChange={(event) => setBirthDate(event.target.value)} /></label>
-            <label className="field"><span>Электронная почта</span><input type="email" value={email} required onChange={(event) => setEmail(event.target.value)} /></label>
-            <label className="field"><span>Пароль (не менее 8 символов)</span><input type="password" value={password} minLength={8} maxLength={128} required onChange={(event) => setPassword(event.target.value)} /></label>
             <label className="field">
-              <span>Учреждение образования</span>
-              <select value={schoolId} onChange={(event) => setSchoolId(event.target.value)}>
-                <option value="">Не выбрано</option>
-                {schools.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              <span>Имя</span>
+              <input value={firstName} required onChange={(event) => setFirstName(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Фамилия</span>
+              <input value={lastName} required onChange={(event) => setLastName(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Дата рождения</span>
+              <input type="date" value={birthDate} required onChange={(event) => setBirthDate(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Электронная почта</span>
+              <input type="email" value={email} required onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Пароль</span>
+              <input type="password" value={password} required onChange={(event) => setPassword(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Школа</span>
+              <select value={school || schoolList[0] || ''} onChange={(event) => setSchool(event.target.value)}>
+                {schoolList.map((name) => <option key={name} value={name}>{name}</option>)}
               </select>
             </label>
             {error ? <p className="notice">{error}</p> : null}
-            <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? 'Отправка…' : 'Зарегистрироваться'}</button>
+            <button className="btn btn-primary" type="submit">Зарегистрироваться</button>
             <button type="button" className="btn btn-ghost" onClick={() => { setMode('login'); setError('') }}>Уже есть аккаунт</button>
           </form>
         ) : (
           <form className="card stack" onSubmit={onLogin}>
-            <label className="field"><span>Электронная почта</span><input type="email" value={email} autoComplete="username" required onChange={(event) => setEmail(event.target.value)} /></label>
-            <label className="field"><span>Пароль</span><input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} /></label>
+            <label className="field">
+              <span>Электронная почта</span>
+              <input type="email" value={email} autoComplete="username" required onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>Пароль</span>
+              <input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} />
+            </label>
             {error ? <p className="notice">{error}</p> : null}
-            <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? 'Входим…' : 'Войти'}</button>
-            {role === 'student' ? <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button> : null}
+            <button className="btn btn-primary" type="submit">Войти</button>
+            <button type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
+            {role === 'student' ? (
+              <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
+            ) : null}
           </form>
         )}
       </div>
