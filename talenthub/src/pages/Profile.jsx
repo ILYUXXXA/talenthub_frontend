@@ -12,7 +12,7 @@ function readCabinet() {
   try {
     return studentCabinet()
   } catch {
-    return { loggedIn: false, demo: false, user: null, student: null }
+    return { loggedIn: false, user: null, student: null }
   }
 }
 
@@ -96,7 +96,6 @@ export default function Profile() {
         <div className="grid-2">
           <section className="card">
             <h1>{profileName || 'Школьник'}</h1>
-            {cabinet.demo ? <p className="notice">Войдите, чтобы менять свои настройки.</p> : null}
             {!user && !student ? <p className="muted">Профиль не найден. <Link to="/auth">Войти</Link></p> : (
               <dl className="profile-facts">
                 <div>
