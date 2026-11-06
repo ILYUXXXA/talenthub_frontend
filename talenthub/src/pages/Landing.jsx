@@ -28,35 +28,33 @@ export default function Landing() {
 
       <section className="showcase-hero prd-hero">
         <div className="showcase-copy prd-copy">
-          <div className="showcase-pill"><span className="showcase-live-dot" /> Платформа образовательных возможностей и партнёрств</div>
-          <h1>Возможности<br />для учащихся.<br /><em>Партнёрства для всех.</em></h1>
-          <p className="showcase-lead">TalentHub объединяет учащихся, образовательные учреждения, компании и академии — чтобы находить возможности для развития и вместе создавать новые.</p>
+          <div className="showcase-pill"><span className="showcase-live-dot" /> Образовательные возможности и партнёрства</div>
+          <h1>Находи возможности.<br /><em>Создавай партнёрства.</em></h1>
+          <p className="showcase-lead">TalentHub объединяет учащихся, школы, компании и академии. Здесь можно находить мероприятия, развивать свои интересы и запускать совместные образовательные инициативы.</p>
           <div className="showcase-actions">
             <Link className="showcase-primary" to="/auth">Открыть платформу <span>→</span></Link>
-            <a className="showcase-secondary" href="#platform">Узнать о TalentHub <span>↓</span></a>
+            <a className="showcase-secondary" href="#platform">Как это работает <span>↓</span></a>
           </div>
-          <div className="prd-hero-note"><span className="prd-note-icon">◎</span><span><strong>От интереса — к участию. От контакта — к сотрудничеству.</strong><small>Единое пространство для образования и инициатив</small></span></div>
+          <div className="prd-hero-note"><span className="prd-note-icon">◎</span><span><strong>Всё необходимое — в одном пространстве</strong><small>От поиска события до реального сотрудничества</small></span></div>
         </div>
 
-        <div className="prd-visual" aria-label="Трёхмерная композиция образовательных возможностей и партнёрств">
-          <div className="prd-visual-glow" />
-          <div className="prd-ring ring-a" /><div className="prd-ring ring-b" /><div className="prd-ring ring-c" />
-          <div className="prd-node node-student"><span>✳</span><small>УЧАЩИЕСЯ</small></div>
-          <div className="prd-node node-school"><span>⌂</span><small>ШКОЛЫ</small></div>
-          <div className="prd-node node-company"><span>▣</span><small>КОМПАНИИ</small></div>
-          <div className="prd-node node-academy"><span>◇</span><small>АКАДЕМИИ</small></div>
-          <div className="prd-platform">
-            <div className="prd-platform-top">
-              <div className="prd-cap"><span className="cap-board" /><span className="cap-crown" /><span className="cap-tassel" /></div>
-              <div className="prd-book"><span /><span /><span /></div>
-              <div className="prd-trophy">★</div>
+        <div className="prd-product-preview" aria-label="Пример интерфейса TalentHub">
+          <div className="preview-window">
+            <div className="preview-topbar"><div className="preview-brand"><span>✳</span> TalentHub</div><div className="preview-top-actions"><i></i><i></i><b>АК</b></div></div>
+            <div className="preview-body">
+              <aside className="preview-sidebar"><span className="active">⌂ <small>Обзор</small></span><span>▦ <small>Мероприятия</small></span><span>◇ <small>Партнёрства</small></span><span>▤ <small>Портфолио</small></span></aside>
+              <div className="preview-content">
+                <div className="preview-greeting"><div><small>ЛИЧНЫЙ КАБИНЕТ</small><strong>Привет, Алина!</strong><p>Твои новые возможности уже здесь.</p></div><span className="preview-avatar">А</span></div>
+                <div className="preview-stats"><div><small>Мероприятия</small><strong>12</strong><em>доступно сейчас</em></div><div><small>Мои достижения</small><strong>08</strong><em>в портфолио</em></div><div><small>Интересы</small><strong>04</strong><em>направления</em></div></div>
+                <div className="preview-section-title">Подобрали для тебя <a href="#audience">Все возможности →</a></div>
+                <div className="preview-event"><div className="preview-event-art art-blue">✦</div><div><small>ОЛИМПИАДА · 18 НОЯБРЯ</small><strong>Технологии будущего</strong><span>Наука · Онлайн</span></div><b>→</b></div>
+                <div className="preview-event"><div className="preview-event-art art-violet">◇</div><div><small>ОБРАЗОВАТЕЛЬНАЯ ПРОГРАММА</small><strong>Лаборатория идей</strong><span>Проектная деятельность</span></div><b>→</b></div>
+              </div>
             </div>
-            <div className="prd-platform-disc disc-top" /><div className="prd-platform-disc disc-mid" /><div className="prd-platform-disc disc-bottom" />
-            <div className="prd-platform-label"><span>✳</span> TALENTHUB <i>•</i> CONNECTING OPPORTUNITIES</div>
           </div>
-          <div className="prd-float-card float-event"><span className="float-symbol">◷</span><span><strong>Мероприятия</strong><small>Новые возможности</small></span></div>
-          <div className="prd-float-card float-trust"><span className="float-symbol">✦</span><span><strong>Подтверждённый вклад</strong><small>Престиж организаций</small></span></div>
-          <div className="prd-visual-caption">ЕДИНАЯ СРЕДА · ОБЩИЕ ВОЗМОЖНОСТИ</div>
+          <div className="preview-float preview-float-top"><span>✓</span><div><strong>Твой прогресс</strong><small>Сохраняется в портфолио</small></div></div>
+          <div className="preview-float preview-float-bottom"><span>↗</span><div><strong>Новые партнёрства</strong><small>Школы и организации рядом</small></div></div>
+          <div className="preview-caption">ИНТЕРФЕЙС TALENTHUB</div>
         </div>
       </section>
 
