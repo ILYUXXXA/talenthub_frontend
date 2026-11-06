@@ -1,3 +1,5 @@
+import { currentUser as apiUser, listMarketplace, dashboard, schoolInfo } from '../data/store.js'
+import { useStoreRevision } from '../data/hooks.js'
 import { useMemo, useState } from 'react'
 import OrganizationShell from '../components/OrganizationShell.jsx'
 import {
@@ -16,21 +18,8 @@ import {
   GRADES,
 } from '../data/store.js'
 
-const SCHOOL = 'Лицей БГУ'
-const FALLBACK_STUDENTS = [
-  { id: 's1', firstName: 'Алина', lastName: 'Коваль', grade: '10', interests: ['Математика', 'Информатика'], signedUp: [{ title: 'Республиканская олимпиада по математике' }], attended: [{ title: 'Городская олимпиада по математике' }], achievements: [{ title: 'Диплом II степени' }] },
-  { id: 's2', firstName: 'Илья', lastName: 'Савич', grade: '11', interests: ['Физика'], signedUp: [{ title: 'Областная олимпиада по физике' }], attended: [{ title: 'Физическая лаборатория' }], achievements: [{ title: 'Сертификат участника' }] },
-  { id: 's3', firstName: 'Мария', lastName: 'Гуд', grade: '9', interests: ['Биология'], signedUp: [{ title: 'Биологическая интернет-олимпиада' }], attended: [], achievements: [] },
-  { id: 's4', firstName: 'Тимофей', lastName: 'Орлов', grade: '10', interests: ['Робототехника'], signedUp: [{ title: 'Мастерская роботов' }], attended: [{ title: 'Инженерные каникулы' }], achievements: [] },
-]
-const FALLBACK_PARTNERS = [
-  { id: 'p1', from: 'КодМастер', to: SCHOOL, title: 'Мастер-класс по программированию', description: 'Командный практикум по разработке для учеников 9–11 классов.', status: 'incoming' },
-  { id: 'p2', from: 'РобоЛаб', to: SCHOOL, title: 'Оборудование для мастерской', description: 'Комплект оборудования и наставник для школьной мастерской.', status: 'incoming' },
-  { id: 'p3', from: SCHOOL, to: 'ХимПрактикум', title: 'Лабораторная смена', description: 'Практическая программа для учащихся 10 класса.', status: 'pending' },
-  { id: 'p4', from: 'НаноСофт', to: SCHOOL, title: 'IT-каникулы', description: 'Совместная образовательная смена.', status: 'accepted' },
-]
-const statusText = { incoming: 'Входящий запрос', pending: 'Ожидает ответа', accepted: 'Согласовано', declined: 'Отклонено' }
-const statusClass = { incoming: 'badge-muted', pending: 'badge-pending', accepted: 'badge-ok', declined: 'badge-no' }
+const statusText = { moderation_pending: 'На модерации', rejected: 'Отклонено модератором', incoming: 'Входящий запрос', pending: 'Ожидает ответа', accepted: 'Согласовано', declined: 'Отклонено' }
+const statusClass = { moderation_pending: 'badge-pending', rejected: 'badge-no', incoming: 'badge-muted', pending: 'badge-pending', accepted: 'badge-ok', declined: 'badge-no' }
 const safeRead = (fn, fallback) => { try { const value = fn(); return Array.isArray(value) ? value : fallback } catch { return fallback } }
 const personName = (student) => [student.firstName, student.lastName].filter(Boolean).join(' ') || student.name || 'Ученик'
 const itemText = (items) => (items || []).map((item) => typeof item === 'string' ? item : item?.title || item?.name || '').filter(Boolean).join(', ') || '—'
@@ -44,6 +33,8 @@ function SectionTitle({ eyebrow, title, children }) {
 }
 
 export default function SchoolCabinet() {
+  const apiRevision = useStoreRevision()
+  const SCHOOL = apiUser()?.orgName || ''
   const [version, setVersion] = useState(0)
   const [tab, setTab] = useState('overview')
   const [expandedEvent, setExpandedEvent] = useState('')
@@ -64,58 +55,54 @@ export default function SchoolCabinet() {
   const [requestTitle, setRequestTitle] = useState('Менторы для проектной мастерской')
   const [requestText, setRequestText] = useState('Ищем партнёра для практической мастерской: ученики 10 класса создадут собственные проекты под руководством специалистов.')
 
-  const students = useMemo(() => safeRead(schoolStudents, FALLBACK_STUDENTS), [version])
-  const events = useMemo(() => safeRead(listEvents, []).filter((item) => item.organizer === SCHOOL), [version])
-  const partnerships = useMemo(() => {
-    const list = safeRead(listPartnerships, FALLBACK_PARTNERS)
-    const scoped = list.filter((item) => item.from === SCHOOL || item.to === SCHOOL)
-    return (scoped.length ? scoped : FALLBACK_PARTNERS).slice().sort((a, b) => (a.status === 'incoming' ? -1 : 0) - (b.status === 'incoming' ? -1 : 0))
-  }, [version])
-  const incoming = partnerships.filter((item) => item.to === SCHOOL && ['incoming', 'pending'].includes(item.status))
-  const marketplace = useMemo(() => safeRead(listPartnerships, []).filter((item) => item.visibility === 'public' && ['all_schools', 'all_organizations'].includes(item.audience) && item.from !== SCHOOL && item.status === 'pending'), [version])
+  const students = useMemo(() => schoolStudents(), [apiRevision])
+  const events = useMemo(() => listEvents(), [apiRevision])
+  const partnerships = useMemo(() => listPartnerships(), [apiRevision])
+  const incoming = partnerships.filter((item) => item.canDecide)
+  const marketplace = useMemo(() => listMarketplace(), [apiRevision])
   const achievementCount = students.reduce((sum, student) => sum + (student.achievements || []).length, 0)
   const activeEvents = events.filter((item) => ['published', 'registration_closed', 'completed'].includes(item.status)).length
   const pendingEvents = events.filter((item) => item.status === 'pending').length
   const publishedRegistrations = events.reduce((sum, item) => sum + eventRegistrations(item.id).length, 0)
   const filteredStudents = students.filter((student) => `${personName(student)} ${student.grade || ''} ${itemText(student.interests)}`.toLowerCase().includes(query.toLowerCase()))
 
-  function handlePublish(event) {
+  async function handlePublish(event) {
     event.preventDefault()
     if (!eventTitle.trim() || !description.trim() || !eventDate || !deadline || Number(seats) < 1) return
     try {
-      publishEvent({ title: eventTitle.trim(), category, interests: [interest], grade, city, date: eventDate, deadline, format, seats: Number(seats), description: description.trim(), organizer: SCHOOL, place: city, terms: 'Регистрация через TalentHub.' })
+      await publishEvent({ title: eventTitle.trim(), category, interests: [interest], grade, city, date: eventDate, deadline, format, seats: Number(seats), description: description.trim(), organizer: SCHOOL, place: city, terms: 'Регистрация через TalentHub.' })
       setVersion((value) => value + 1)
       setNotice('Мероприятие отправлено на модерацию. Оно появится в каталоге после проверки.')
       setTab('events')
-    } catch { setNotice('Не удалось сохранить мероприятие. Попробуйте ещё раз.') }
+    } catch (error) { setNotice(error.message || 'Не удалось сохранить мероприятие. Попробуйте ещё раз.') }
   }
-  function handleRespond(id, decision) {
-    try { respondPartnership(id, decision) } catch { /* локальное состояние обновляется ниже */ }
+  async function handleRespond(id, decision) {
+    try { await respondPartnership(id, decision) } catch (error) { setNotice(error.message); return }
     setVersion((value) => value + 1)
     setNotice(decision === 'accepted' ? 'Запрос принят. Можно переходить к согласованию деталей.' : 'Запрос отклонён.')
   }
-  function handleRequest(event) {
+  async function handleRequest(event) {
     event.preventDefault()
     if (!requestTitle.trim() || !requestText.trim()) return
     try {
       const isPublic = requestAudience === 'marketplace'
-      sendPartnership({ from: SCHOOL, to: isPublic ? '' : partner, title: requestTitle.trim(), text: requestText.trim(), description: requestText.trim(), visibility: isPublic ? 'public' : 'direct', audience: isPublic ? 'all_companies' : 'selected_company' })
+      await sendPartnership({ from: SCHOOL, to: isPublic ? '' : partner, title: requestTitle.trim(), text: requestText.trim(), description: requestText.trim(), visibility: isPublic ? 'public' : 'direct', audience: isPublic ? 'all_companies' : 'selected_company' })
       setVersion((value) => value + 1)
-      setNotice(isPublic ? 'Запрос опубликован на открытом рынке. Компании смогут откликнуться.' : `Запрос отправлен организации «${partner}».`)
+      setNotice(isPublic ? 'Запрос отправлен на модерацию. После допуска компании смогут откликнуться.' : `Запрос отправлен организации «${partner}».`)
       setRequestTitle('')
       setRequestText('')
       setTab('partners')
-    } catch { setNotice('Не удалось отправить запрос. Попробуйте ещё раз.') }
+    } catch (error) { setNotice(error.message || 'Не удалось отправить запрос. Попробуйте ещё раз.') }
   }
 
-  function handleMarketplaceRespond(item) {
+  async function handleMarketplaceRespond(item) {
     const alreadyResponded = partnerships.some((entry) => entry.parentRequestId === item.id && entry.from === SCHOOL)
     if (alreadyResponded) {
       setNotice('Вы уже отправили отклик на этот запрос.')
       return
     }
     try {
-      sendPartnership({
+      await sendPartnership({
         from: SCHOOL,
         to: item.from,
         title: item.title,
@@ -126,7 +113,7 @@ export default function SchoolCabinet() {
       })
       setVersion((value) => value + 1)
       setNotice(`Отклик отправлен организации «${item.from}».`)
-    } catch { setNotice('Не удалось отправить отклик. Попробуйте ещё раз.') }
+    } catch (error) { setNotice(error.message || 'Не удалось отправить отклик. Попробуйте ещё раз.') }
   }
 
   return <OrganizationShell tabs={[['overview','Обзор','overview'],['events','Мои мероприятия','events'],['prestige','Престиж','prestige'],['partners','Сотрудничество','partners'],['market','Предложения компаний','market'],['create','Опубликовать мероприятие','create']]} activeTab={tab} onTabChange={(id) => { setTab(id); setNotice('') }}>
@@ -137,7 +124,7 @@ export default function SchoolCabinet() {
     {notice ? <div className="notice org-notice" role="status">{notice}</div> : null}
 
     {tab === 'overview' ? <>
-      <div className="org-metrics"><Metric value={students.length} label="Учеников в профиле" note="Учащиеся лицея"/><Metric value={events.length} label="Всего мероприятий" note={`${activeEvents} опубликовано`}/><Metric value={pendingEvents} label="На модерации" note="Ожидают проверки"/><Metric value={incoming.length} label="Новых запросов" note="От компаний и академий"/><Metric value={publishedRegistrations} label="Регистраций" note="По вашим мероприятиям"/></div>
+      <div className="org-metrics"><Metric value={students.length} label="Учеников в профиле" note="Учащиеся лицея"/><Metric value={events.length} label="Всего мероприятий" note={`${activeEvents} опубликовано`}/><Metric value={pendingEvents} label="На модерации" note="Ожидают проверки"/><Metric value={dashboard()?.counters.incoming_requests ?? incoming.length} label="Новых запросов" note="От компаний и академий"/><Metric value={publishedRegistrations} label="Регистраций" note="По вашим мероприятиям"/></div>
       <div className="org-dashboard-grid">
         <section className="card org-panel"><SectionTitle eyebrow="ВАША АКТИВНОСТЬ" title="Мероприятия"/><div className="org-list">{events.slice(0,3).map((item) => <article className="org-list-item" key={item.id}><div className="org-list-icon">{item.category === 'project' ? '↗' : '✳'}</div><div className="org-list-main"><strong>{item.title}</strong><small>{dateText(item.date)} · {item.format || 'Формат не указан'}</small></div><span className={`badge ${item.status === 'published' ? 'badge-ok' : item.status === 'rejected' ? 'badge-no' : 'badge-pending'}`}>{item.status === 'published' ? 'Опубликовано' : item.status === 'registration_closed' ? 'Регистрация закрыта' : item.status === 'completed' ? 'Завершено' : item.status === 'rejected' ? 'Отклонено' : 'На модерации'}</span></article>)}{events.length === 0 ? <p className="muted">Пока нет мероприятий. Создайте первое, чтобы привлечь участников.</p> : null}</div><button className="btn btn-ghost btn-small" onClick={() => setTab('events')}>Все мероприятия</button></section>
         <section className="card org-panel"><SectionTitle eyebrow="СОВМЕСТНЫЕ ВОЗМОЖНОСТИ" title="Сотрудничество"/><div className="org-list">{partnerships.slice(0,3).map((item) => <article className="org-list-item" key={item.id}><div className="org-list-icon">⇄</div><div className="org-list-main"><strong>{item.title}</strong><small>{item.from === SCHOOL ? `Для: ${item.to}` : `От: ${item.from}`}</small></div><span className={`badge ${statusClass[item.status] || 'badge-muted'}`}>{statusText[item.status] || 'В обработке'}</span></article>)}{partnerships.length === 0 ? <p className="muted">Запросов пока нет.</p> : null}</div><button className="btn btn-ghost btn-small" onClick={() => setTab('partners')}>К сотрудничеству</button></section>
@@ -145,7 +132,7 @@ export default function SchoolCabinet() {
       <section className="org-quick-actions"><div><span className="org-eyebrow">СЛЕДУЮЩИЙ ШАГ</span><h2>Создайте новую возможность для учеников</h2><p>Опубликуйте олимпиаду или проектную инициативу, а затем отслеживайте её статус и регистрации.</p></div><button className="btn btn-primary" onClick={() => setTab('create')}>Опубликовать мероприятие <span aria-hidden="true">→</span></button></section>
     </> : null}
 
-    {tab === 'events' ? <section className="card org-panel"><SectionTitle eyebrow="УПРАВЛЕНИЕ ПУБЛИКАЦИЯМИ" title="Мероприятия лицея"><button className="btn btn-primary btn-small" onClick={() => setTab('create')}>＋ Опубликовать мероприятие</button></SectionTitle><div className="org-list">{events.map((item) => <article className="org-event-row" key={item.id}><div className="org-event-top"><span className="org-eyebrow">{item.category === 'project' ? 'ПРОЕКТНАЯ ДЕЯТЕЛЬНОСТЬ' : 'ОЛИМПИАДА'}</span><span className={`badge ${item.status === 'published' ? 'badge-ok' : item.status === 'rejected' ? 'badge-no' : 'badge-pending'}`}>{item.status === 'published' ? 'Опубликовано' : item.status === 'registration_closed' ? 'Регистрация закрыта' : item.status === 'completed' ? 'Завершено' : item.status === 'rejected' ? 'Отклонено' : 'На модерации'}</span></div><h3>{item.title}</h3><p>{item.description}</p><div className="org-event-meta"><span>◷ {dateText(item.date)}</span><span>⌖ {item.city || 'Минск'}</span><span>Лимит: {item.seats || '—'}</span><span>Формат: {item.format || '—'}</span><span>Регистраций: {eventRegistrations(item.id).length}</span></div><div className="row org-event-actions"><button className="btn btn-ghost btn-small" type="button" onClick={() => setExpandedEvent(expandedEvent === item.id ? '' : item.id)}>{expandedEvent === item.id ? 'Скрыть участников' : 'Управлять участниками'}</button>{item.status === 'published' ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'registration_closed' }); setVersion((v) => v + 1); setNotice('Регистрация на мероприятие закрыта.') }}>Закрыть регистрацию</button> : null}{item.status === 'registration_closed' ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'published' }); setVersion((v) => v + 1); setNotice('Регистрация снова открыта.') }}>Открыть регистрацию</button> : null}{['published','registration_closed'].includes(item.status) ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'completed' }); setVersion((v) => v + 1); setNotice('Мероприятие отмечено завершённым.') }}>Завершить</button> : null}</div>{expandedEvent === item.id ? <div className="org-participants"><strong>Заявки участников</strong>{eventRegistrations(item.id).map((person) => <div className="org-participant-row" key={person.studentId}><div><b>{person.name}</b><small>{person.grade ? `${person.grade} класс` : 'Класс не указан'} · {person.status}{person.attended ? ' · Посещение подтверждено' : ''}</small></div><div className="row">{person.status === 'подана' ? <><button className="btn btn-primary btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { status: 'подтверждена' }); setVersion((v) => v + 1) }}>Подтвердить</button><button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { status: 'отклонена' }); setVersion((v) => v + 1) }}>Отклонить</button></> : null}{person.status === 'подтверждена' && !person.attended ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { attended: true }); setVersion((v) => v + 1); setNotice(`Посещение подтверждено: ${person.name}.`) }}>Отметить посещение</button> : null}</div></div>)}{eventRegistrations(item.id).length === 0 ? <p className="muted">Заявок пока нет. Они появятся после регистрации школьников.</p> : null}</div> : null}</article>)}{events.length === 0 ? <div className="org-empty"><strong>Здесь появятся ваши мероприятия</strong><p>Создайте первую публикацию — она будет отправлена на модерацию.</p><button className="btn btn-primary" onClick={() => setTab('create')}>Опубликовать мероприятие</button></div> : null}</div></section> : null}
+    {tab === 'events' ? <section className="card org-panel"><SectionTitle eyebrow="УПРАВЛЕНИЕ ПУБЛИКАЦИЯМИ" title="Мероприятия лицея"><button className="btn btn-primary btn-small" onClick={() => setTab('create')}>＋ Опубликовать мероприятие</button></SectionTitle><div className="org-list">{events.map((item) => <article className="org-event-row" key={item.id}><div className="org-event-top"><span className="org-eyebrow">{item.category === 'project' ? 'ПРОЕКТНАЯ ДЕЯТЕЛЬНОСТЬ' : 'ОЛИМПИАДА'}</span><span className={`badge ${item.status === 'published' ? 'badge-ok' : item.status === 'rejected' ? 'badge-no' : 'badge-pending'}`}>{item.status === 'published' ? 'Опубликовано' : item.status === 'registration_closed' ? 'Регистрация закрыта' : item.status === 'completed' ? 'Завершено' : item.status === 'rejected' ? 'Отклонено' : 'На модерации'}</span></div><h3>{item.title}</h3><p>{item.description}</p><div className="org-event-meta"><span>◷ {dateText(item.date)}</span><span>⌖ {item.city || 'Минск'}</span><span>Лимит: {item.seats || '—'}</span><span>Формат: {item.format || '—'}</span><span>Регистраций: {eventRegistrations(item.id).length}</span></div><div className="row org-event-actions"><button className="btn btn-ghost btn-small" type="button" onClick={() => setExpandedEvent(expandedEvent === item.id ? '' : item.id)}>{expandedEvent === item.id ? 'Скрыть участников' : 'Управлять участниками'}</button>{item.status === 'published' ? <button className="btn btn-ghost btn-small" type="button" onClick={async () => { try { await updateEvent(item.id, { status: 'registration_closed' }); setVersion((v) => v + 1); setNotice('Регистрация на мероприятие закрыта.') } catch (error) { setNotice(error.message) } }}>Закрыть регистрацию</button> : null}{item.status === 'registration_closed' ? <button className="btn btn-ghost btn-small" type="button" onClick={async () => { try { await updateEvent(item.id, { status: 'published' }); setVersion((v) => v + 1); setNotice('Регистрация снова открыта.') } catch (error) { setNotice(error.message) } }}>Открыть регистрацию</button> : null}{['published','registration_closed'].includes(item.status) ? <button className="btn btn-ghost btn-small" type="button" onClick={async () => { try { await updateEvent(item.id, { status: 'completed' }); setVersion((v) => v + 1); setNotice('Мероприятие отмечено завершённым.') } catch (error) { setNotice(error.message) } }}>Завершить</button> : null}</div>{expandedEvent === item.id ? <div className="org-participants"><strong>Заявки участников</strong>{eventRegistrations(item.id).map((person) => <div className="org-participant-row" key={person.studentId}><div><b>{person.name}</b><small>{person.grade ? `${person.grade} класс` : 'Класс не указан'} · {person.status}{person.attended ? ' · Посещение подтверждено' : ''}</small></div><div className="row">{['подана', 'на рассмотрении', 'лист ожидания'].includes(person.status) ? <><button className="btn btn-primary btn-small" type="button" onClick={async () => { try { await updateEventRegistration(item.id, person.studentId, { status: 'подтверждена' }); setVersion((v) => v + 1) } catch (error) { setNotice(error.message) } }}>Подтвердить</button><button className="btn btn-ghost btn-small" type="button" onClick={async () => { try { await updateEventRegistration(item.id, person.studentId, { status: 'отклонена' }); setVersion((v) => v + 1) } catch (error) { setNotice(error.message) } }}>Отклонить</button></> : null}{person.status === 'подтверждена' && !person.attended ? <button className="btn btn-ghost btn-small" type="button" onClick={async () => { try { await updateEventRegistration(item.id, person.studentId, { attended: true }); setVersion((v) => v + 1); setNotice(`Посещение подтверждено: ${person.name}.`) } catch (error) { setNotice(error.message) } }}>Отметить посещение</button> : null}</div></div>)}{eventRegistrations(item.id).length === 0 ? <p className="muted">Заявок пока нет. Они появятся после регистрации школьников.</p> : null}</div> : null}</article>)}{events.length === 0 ? <div className="org-empty"><strong>Здесь появятся ваши мероприятия</strong><p>Создайте первую публикацию — она будет отправлена на модерацию.</p><button className="btn btn-primary" onClick={() => setTab('create')}>Опубликовать мероприятие</button></div> : null}</div></section> : null}
 
     {tab === 'prestige' ? <><section className="card org-panel org-prestige-details"><SectionTitle eyebrow="РЕПУТАЦИЯ TALENTHUB" title="Престиж образовательного учреждения"/><p className="muted">Престиж отражает подтверждённую образовательную активность: участие учеников, достижения, посещённые мероприятия и устойчивое сотрудничество. Ниже показана фактическая статистика кабинета, а не условный рейтинг.</p><div className="org-metrics"><Metric value={students.length} label="Учеников в профиле"/><Metric value={achievementCount} label="Достижений учеников"/><Metric value={publishedRegistrations} label="Регистраций на мероприятия"/><Metric value={students.reduce((sum, student) => sum + (student.attended || []).length, 0)} label="Посещений мероприятий"/><Metric value={partnerships.filter((item) => item.status === 'accepted').length} label="Согласованных партнёрств"/></div></section><section className="card org-panel"><SectionTitle eyebrow="СООБЩЕСТВО ЛИЦЕЯ" title="Ученики и их активность"/><p className="muted">Интересы, регистрации, посещённые мероприятия и достижения учащихся. Персональные данные доступны только представителям учреждения.</p><label className="field org-search"><span>Найти ученика или направление</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Например, информатика или Алина"/></label><div className="org-student-grid">{filteredStudents.map((student) => <article className="org-student-card" key={student.id}><div className="org-student-avatar">{personName(student).split(' ').map((part) => part[0]).slice(0,2).join('')}</div><div><strong>{personName(student)}</strong><small>{student.grade ? `${student.grade} класс` : 'Класс не указан'}</small></div><div className="org-student-facts"><span><b>{(student.signedUp || student.registered || []).length}</b> регистраций</span><span><b>{(student.attended || []).length}</b> посещений</span><span><b>{(student.achievements || []).length}</b> достижений</span></div><div className="chips">{(student.interests || []).map((item) => <span className="chip" key={item}>{item}</span>)}</div></article>)}</div>{filteredStudents.length === 0 ? <p className="muted">По вашему запросу учеников не найдено.</p> : null}</section></> : null}
 

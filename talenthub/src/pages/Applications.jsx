@@ -1,3 +1,4 @@
+import { useStoreRevision } from '../data/hooks.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { cancelRegistration, listEvents, registerForEvent, studentCabinet } from '../data/store.js'
@@ -31,6 +32,7 @@ function statusClass(status) {
 }
 
 export default function Applications() {
+  const apiRevision = useStoreRevision()
   const navigate = useNavigate()
   const catalog = useMemo(() => {
     try {
@@ -39,14 +41,8 @@ export default function Applications() {
     } catch {
       return []
     }
-  }, [])
-  const [cabinet, setCabinet] = useState(() => {
-    try {
-      return studentCabinet()
-    } catch {
-      return { loggedIn: false, demo: true, applications: [] }
-    }
-  })
+  }, [apiRevision])
+  const cabinet = studentCabinet()
   const [message, setMessage] = useState('')
   const [open, setOpen] = useState(null)
 
@@ -61,18 +57,18 @@ export default function Applications() {
 
   function refresh() {
     try {
-      setCabinet(studentCabinet())
+      studentCabinet()
     } catch {
       /* снимок остаётся */
     }
   }
 
-  function onCancel(eventId) {
+  async function onCancel(eventId) {
     let result
     try {
-      result = cancelRegistration(eventId)
-    } catch {
-      setMessage('Не удалось отменить заявку.')
+      result = await cancelRegistration(eventId)
+    } catch (error) {
+      setMessage(error.message || 'Не удалось отменить заявку.')
       return
     }
     if (!result.ok && result.reason === 'auth') {
@@ -88,12 +84,12 @@ export default function Applications() {
     refresh()
   }
 
-  function onRegister(event) {
+  async function onRegister(event) {
     let result
     try {
-      result = registerForEvent(event.id)
-    } catch {
-      setMessage('Не удалось отправить заявку.')
+      result = await registerForEvent(event.id)
+    } catch (error) {
+      setMessage(error.message || 'Не удалось отправить заявку.')
       return
     }
     if (!result.ok && result.reason === 'auth') {
@@ -159,6 +155,7 @@ export default function Applications() {
                       <button
                         type="button"
                         className="btn btn-ghost"
+                        disabled={item.attended || item.eventStatus === 'completed'}
                         onClick={(mouse) => {
                           mouse.stopPropagation()
                           onCancel(item.eventId)

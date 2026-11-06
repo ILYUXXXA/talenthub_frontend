@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login, registerStudent, listSchools } from '../data/store.js'
 
-const FALLBACK_SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
 const QUICK_ACCESS_PASSWORD = 'demo1234'
 
 const ROLES = [
@@ -10,13 +9,13 @@ const ROLES = [
   { id: 'parent', label: 'Войти как родитель', quickEmail: 'olga@demo.by' },
   { id: 'school', label: 'Войти как администрация школы', quickEmail: 'school@demo.by' },
   { id: 'company', label: 'Войти как представитель компании', quickEmail: 'company@demo.by' },
-  { id: 'admin', label: 'Войти как модератор', quickEmail: 'admin@demo.by' },
+  { id: 'moderator', label: 'Войти как модератор', quickEmail: 'admin@demo.by' },
 ]
 
 function readSchools() {
   try {
     const list = listSchools()
-    if (!Array.isArray(list) || list.length === 0) return FALLBACK_SCHOOLS
+    if (!Array.isArray(list) || list.length === 0) return []
     const names = list
       .map((item) => {
         if (typeof item === 'string') return item
@@ -24,9 +23,9 @@ function readSchools() {
         return ''
       })
       .filter(Boolean)
-    return names.length ? names : FALLBACK_SCHOOLS
+    return names
   } catch {
-    return FALLBACK_SCHOOLS
+    return []
   }
 }
 
@@ -42,7 +41,7 @@ function pathFor(user) {
   if (user.role === 'student') return user.profileComplete ? '/events' : '/welcome'
   if (user.role === 'parent') return '/parent'
   if (user.role === 'school') return '/school'
-  if (user.role === 'admin') return '/admin'
+  if (user.role === 'moderator') return '/admin'
   if (user.role === 'company') return '/company'
   return null
 }
@@ -55,6 +54,7 @@ export default function Auth() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
@@ -63,6 +63,7 @@ export default function Auth() {
   const current = ROLES.find((item) => item.id === role)
 
   function choose(next) {
+    if (busy) return
     setRole(next)
     setMode('login')
     setEmail('')
@@ -70,11 +71,13 @@ export default function Auth() {
     setError('')
   }
 
-  function enterAsRole() {
+  async function enterAsRole() {
     if (!current?.quickEmail) return
+    if (busy) return
+    setBusy(true)
     setError('')
     try {
-      const user = userFrom(login(current.quickEmail, QUICK_ACCESS_PASSWORD))
+      const user = userFrom(await login(current.quickEmail, QUICK_ACCESS_PASSWORD, role))
       if (!user || user.role !== role) {
         setError('Не удалось открыть профиль выбранной роли.')
         return
@@ -85,16 +88,18 @@ export default function Auth() {
         return
       }
       navigate(path)
-    } catch {
-      setError('Не удалось открыть профиль выбранной роли.')
-    }
+    } catch (error) {
+      setError(error.message || 'Не удалось открыть профиль выбранной роли.')
+    } finally { setBusy(false) }
   }
 
-  function onLogin(event) {
+  async function onLogin(event) {
     event.preventDefault()
+    if (busy) return
+    setBusy(true)
     setError('')
     try {
-      const user = userFrom(login(email.trim(), password))
+      const user = userFrom(await login(email.trim(), password, role))
       if (!user || user.role !== role) {
         setError('Неверная почта или пароль для этой роли.')
         return
@@ -105,16 +110,18 @@ export default function Auth() {
         return
       }
       navigate(path)
-    } catch {
-      setError('Неверная почта или пароль для этой роли.')
-    }
+    } catch (error) {
+      setError(error.message || 'Неверная почта или пароль для этой роли.')
+    } finally { setBusy(false) }
   }
 
-  function onRegister(event) {
+  async function onRegister(event) {
     event.preventDefault()
+    if (busy) return
+    setBusy(true)
     setError('')
     try {
-      const result = registerStudent({
+      const result = await registerStudent({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthDate,
@@ -127,9 +134,9 @@ export default function Auth() {
         return
       }
       navigate('/welcome')
-    } catch {
-      setError('Не удалось зарегистрироваться. Проверьте данные.')
-    }
+    } catch (error) {
+      setError(error.message || 'Не удалось зарегистрироваться. Проверьте данные.')
+    } finally { setBusy(false) }
   }
 
   if (!current) {
@@ -139,7 +146,7 @@ export default function Auth() {
           <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ПЛАТФОРМА</span><h1>Выберите профиль</h1><p className="lead">Перейдите в кабинет своей роли или войдите по данным аккаунта.</p>
           <div className="role-pick">
             {ROLES.map((item) => (
-              <button key={item.id} type="button" className="btn btn-ghost" onClick={() => choose(item.id)}>
+              <button disabled={busy} key={item.id} type="button" className="btn btn-ghost" onClick={() => choose(item.id)}>
                 {item.label}
               </button>
             ))}
@@ -152,7 +159,7 @@ export default function Auth() {
   return (
     <main className="auth-page">
       <div className="container narrow auth-container">
-        <button type="button" className="btn btn-ghost" onClick={() => choose('')}>К выбору роли</button>
+        <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => choose('')}>К выбору роли</button>
         <h1>{current.label}</h1>
         {mode === 'register' ? (
           <form className="card stack" onSubmit={onRegister}>
@@ -183,8 +190,8 @@ export default function Auth() {
               </select>
             </label>
             {error ? <p className="notice">{error}</p> : null}
-            <button className="btn btn-primary" type="submit">Зарегистрироваться</button>
-            <button type="button" className="btn btn-ghost" onClick={() => { setMode('login'); setError('') }}>Уже есть аккаунт</button>
+            <button disabled={busy} className="btn btn-primary" type="submit">Зарегистрироваться</button>
+            <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('login'); setError('') }}>Уже есть аккаунт</button>
           </form>
         ) : (
           <form className="card stack" onSubmit={onLogin}>
@@ -197,10 +204,10 @@ export default function Auth() {
               <input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} />
             </label>
             {error ? <p className="notice">{error}</p> : null}
-            <button className="btn btn-primary" type="submit">Войти</button>
-            <button type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
+            <button disabled={busy} className="btn btn-primary" type="submit">Войти</button>
+            <button disabled={busy} type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
             {role === 'student' ? (
-              <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
+              <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}
           </form>
         )}

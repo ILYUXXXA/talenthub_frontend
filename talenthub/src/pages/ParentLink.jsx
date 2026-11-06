@@ -1,3 +1,4 @@
+import { useStoreRevision } from '../data/hooks.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
@@ -156,7 +157,8 @@ function ParentBar({ section, onSection }) {
 }
 
 export default function ParentLink() {
-  const [cabinet, setCabinet] = useState(readCabinet)
+  const apiRevision = useStoreRevision()
+  const cabinet = readCabinet()
   const [adding, setAdding] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -184,15 +186,15 @@ export default function ParentLink() {
   }, [progressOpen])
 
   function refresh() {
-    setCabinet(readCabinet())
+    readCabinet()
   }
 
-  function onLink(event) {
+  async function onLink(event) {
     event.preventDefault()
     setLinkError('')
     setLinkNote('')
     try {
-      const result = linkChild({
+      const result = await linkChild({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthDate,
@@ -207,17 +209,15 @@ export default function ParentLink() {
         : `${personName(result.child)} привязан к вашему аккаунту.`)
       setSection('progress')
       refresh()
-    } catch {
-      setLinkError('Не удалось проверить запись. Попробуйте ещё раз.')
+    } catch (error) {
+      setLinkError(error.message || 'Не удалось проверить запись. Попробуйте ещё раз.')
     }
   }
 
-  function onSelect(childId) {
+  async function onSelect(childId) {
     try {
-      selectChild(childId)
-    } catch {
-      /* выбор останется прежним, если хранилище недоступно */
-    }
+      await selectChild(childId)
+    } catch (error) { setLinkNote(error.message) }
     refresh()
   }
 
@@ -230,10 +230,10 @@ export default function ParentLink() {
     setProgressOpen({ item, kind, title, event })
   }
 
-  function onSuggestEvent(event) {
+  async function onSuggestEvent(event) {
     if (!active) return { ok: false, message: 'Сначала выберите ребёнка.' }
     try {
-      const result = suggestToChild({ childId: active.id, eventId: event.id })
+      const result = await suggestToChild({ childId: active.id, eventId: event.id })
       if (!result || result.ok !== true) return { ok: false, message: 'Не удалось предложить мероприятие.' }
       refresh()
       return {
@@ -241,8 +241,8 @@ export default function ParentLink() {
         already: result.already,
         message: result.already ? 'Это мероприятие уже предложено.' : 'Мероприятие предложено ребёнку.',
       }
-    } catch {
-      return { ok: false, message: 'Не удалось предложить мероприятие.' }
+    } catch (error) {
+      return { ok: false, message: error.message || 'Не удалось предложить мероприятие.' }
     }
   }
 
@@ -256,6 +256,12 @@ export default function ParentLink() {
     })
     return seen
   }, [cabinet.schools])
+
+  useEffect(() => {
+    if (!prestigeCategories.length) return
+    if (!prestigeCategories.some(item => item.id === ownCategory)) setOwnCategory(prestigeCategories[0].id)
+    if (!prestigeCategories.some(item => item.id === rankCategory)) setRankCategory(prestigeCategories[0].id)
+  }, [prestigeCategories, ownCategory, rankCategory])
 
   const childSchool = cabinet.schools.find((school) => school.name === active?.school) || null
   const ownFact = factFor(childSchool, ownCategory)
@@ -412,6 +418,7 @@ export default function ParentLink() {
               {section === 'events' ? (
                 <EventFeed
                   key={active.id}
+                  childId={active.id}
                   className="parent-feed"
                   recommendTitle="Рекомендуем для вашего ребёнка"
                   interests={active.interests || []}

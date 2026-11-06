@@ -1,1380 +1,234 @@
-const KEY = 'talenthub-db'
-const VERSION = 1
-const TODAY = '2026-11-06'
+import { ApiError, getToken, onUnauthorized, queryString, request, setToken } from '../api/client.js'
+import { childView, eventView, FORMAT_VALUES, notificationView, partnershipViews, REGISTRATION_VALUES, registrationView, studentView, userView } from './normalizers.js'
 
-export const INTERESTS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия', 'Робототехника', 'Проектная работа']
-export const CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв']
-export const GRADES = ['7', '8', '9', '10', '11']
-export const COMPANIES = ['КодМастер', 'РобоЛаб', 'ХимПрактикум', 'НаноСофт']
-
-const SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
-
-const SCHOOL_DIRECTORY = [
-  {
-    id: 'sch-lbsu',
-    name: 'Лицей БГУ',
-    type: 'Лицей',
-    region: 'Минск',
-    directions: ['Математика', 'Информатика', 'Физика', 'Проектная работа'],
-    programs: ['Олимпиадная математика, 10–11 классы', 'Кружок алгоритмов', 'Проектные смены по физике'],
-    partnerships: ['КодМастер', 'НаноСофт'],
-    events: ['Республиканская олимпиада по математике', 'Проектная смена «Физическая лаборатория»'],
-    achievements: ['Дипломы республиканской олимпиады по математике, 2025'],
-    history: ['2025 — 6 подтверждённых результатов по математике', '2024 — 4 по информатике'],
-    admission: 'Набор в 10–11 классы по конкурсу. Это справка, не рейтинг поступления.',
-    contacts: 'Демо: приёмная +375 17 209-11-10. Официальные правила — на сайте лицея.',
-    indicators: [
-      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 14, 'республиканский и городской'),
-      indicator('Информатика', 'олимпиады', 'Подтверждённые результаты по олимпиадной информатике', 9, 'республиканский и областной'),
-      indicator('Физика', 'олимпиады', 'Подтверждённые результаты по олимпиадной физике', 6, 'областной'),
-      indicator('Математика', 'проектная деятельность', 'Подтверждённые проектные результаты по математике', 3, 'городской'),
-      indicator('Информатика', 'хакатоны', 'Подтверждённые результаты хакатонов', 2, 'городской'),
-    ],
-  },
-  {
-    id: 'sch-gym1',
-    name: 'Гимназия №1 Минск',
-    type: 'Гимназия',
-    region: 'Минск',
-    directions: ['Математика', 'Физика'],
-    programs: ['Городской кружок по математике', 'Физический практикум, 8–9 классы'],
-    partnerships: [],
-    events: ['Городская олимпиада по математике'],
-    achievements: ['Дипломы городской олимпиады по математике, 2025'],
-    history: ['2025 — 3 подтверждённых результата по математике'],
-    admission: 'Набор в гимназические классы. Подробности — в официальном приказе школы.',
-    contacts: 'Демо: приёмная +375 17 209-22-20. Официальные сведения — на сайте гимназии.',
-    indicators: [
-      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 7, 'городской'),
-      indicator('Физика', 'олимпиады', 'Подтверждённые результаты по олимпиадной физике', 3, 'городской'),
-    ],
-  },
-  {
-    id: 'sch-grodno',
-    name: 'СШ №4 Гродно',
-    type: 'Средняя школа',
-    region: 'Гродно',
-    directions: ['Химия', 'Биология'],
-    programs: ['Химическая лаборатория выходного дня', 'Биологический кружок'],
-    partnerships: ['ХимПрактикум'],
-    events: ['Олимпиада «Юный химик»'],
-    achievements: ['Сертификаты химической лаборатории, 2025'],
-    history: ['2025 — 2 подтверждённых результата по химии'],
-    admission: 'Обычный набор по микрорайону. Олимпиадных классов в открытых данных нет.',
-    contacts: 'Демо: приёмная +375 152 00-00-04. Официальные сведения — на сайте школы.',
-    indicators: [
-      indicator('Химия', 'олимпиады', 'Подтверждённые результаты по олимпиадной химии', 5, 'областной'),
-      indicator('Биология', 'олимпиады', 'Подтверждённые результаты по олимпиадной биологии', 4, 'областной'),
-      indicator('Химия', 'проектная деятельность', 'Подтверждённые проектные результаты по химии', 2, 'городской'),
-    ],
-  },
-  {
-    id: 'sch-brest',
-    name: 'Гимназия №2 Брест',
-    type: 'Гимназия',
-    region: 'Брест',
-    directions: ['Математика', 'Информатика', 'Проектная работа'],
-    programs: ['Математический макет, 8–10 классы', 'Кружок информатики'],
-    partnerships: [],
-    events: ['Городская олимпиада по математике', 'Конкурс «Математический макет»'],
-    achievements: ['Дипломы конкурса «Математический макет», 2025'],
-    history: ['2025 — 2 подтверждённых результата по математике'],
-    admission: 'Набор в гимназические классы по правилам учреждения.',
-    contacts: 'Демо: приёмная +375 162 00-00-02. Официальные сведения — на сайте гимназии.',
-    indicators: [
-      indicator('Математика', 'олимпиады', 'Подтверждённые результаты по олимпиадной математике', 5, 'городской'),
-      indicator('Информатика', 'олимпиады', 'Подтверждённые результаты по олимпиадной информатике', 2, 'городской'),
-      indicator('Математика', 'проектная деятельность', 'Подтверждённые проектные результаты по математике', 3, 'областной'),
-    ],
-  },
-  {
-    id: 'sch-new',
-    name: 'Школа «Новая линия»',
-    type: 'Средняя школа',
-    region: 'Минск',
-    directions: ['Проектная работа'],
-    programs: [],
-    partnerships: [],
-    events: [],
-    achievements: [],
-    history: [],
-    admission: 'Учреждение недавно в каталоге. Данных о поступлении нет.',
-    contacts: 'Официальный контакт в каталоге ещё не указан.',
-    indicators: [],
-    gap: 'Недостаточно подтверждённых данных за 2024–2026. Это не значит, что школа слабее остальных.',
-  },
-]
-
-function indicator(subject, direction, criterion, count, level) {
-  return {
-    subject,
-    direction,
-    criterion,
-    source: 'Протоколы и подтверждения школы',
-    period: '2024–2026',
-    count,
-    level,
-    updated: '2026-10-01',
-    confirmation: 'подтверждено',
-  }
+export let GRADES = []
+export let CITIES = []
+export let INTERESTS = []
+export let COMPANIES = []
+const empty = () => ({ ready: false, error: '', user: null, rawUser: null, profile: null,
+  organizations: [], reference: null, catalog: [], events: [], upcoming: [], recommendations: [],
+  applications: [], notifications: [], student: null, students: [], participants: {}, dashboard: null,
+  partnerships: [], marketplace: [], children: [], activeId: null, suggestions: [], schools: [], queue: null })
+let state = empty()
+let revision = 0
+let epoch = 0
+let initialization
+let refreshPromise
+let authentication
+const listeners = new Set()
+const pendingMutations = new Map()
+const emit = () => { revision += 1; for (const listener of listeners) listener() }
+export const subscribe = listener => { listeners.add(listener); return () => listeners.delete(listener) }
+export const getRevision = () => revision
+export const getState = () => state
+export const currentUser = () => state.user
+export const listSchools = () => state.organizations.filter(o => o.kind === 'school').map(o => o.name)
+export const listEvents = () => state.events
+export const listUpcoming = () => state.upcoming
+export const listPartnerships = () => state.partnerships
+export const listMarketplace = () => state.marketplace
+export const schoolStudents = () => state.students
+export const eventRegistrations = id => state.participants[id] || []
+export const moderationQueue = () => state.queue
+export const dashboard = () => state.dashboard
+export const studentCabinet = () => ({ demo: false, loggedIn: state.user?.role === 'student',
+  user: state.user?.role === 'student' ? state.user : null, student: state.student,
+  applications: state.applications, notifications: state.notifications })
+export const parentCabinet = () => ({ loggedIn: state.user?.role === 'parent', role: state.user?.role,
+  user: state.user, children: state.children, activeId: state.activeId,
+  suggestions: state.suggestions, events: state.events, schools: state.schools })
+function clearSession() {
+  epoch += 1; refreshPromise = null; setToken(null)
+  state = { ...empty(), ready: true, organizations: state.organizations, reference: state.reference,
+    catalog: state.catalog.map(e => ({ ...e, my_registration: null })), events: state.catalog.map(e => ({ ...e, my_registration: null })), upcoming: state.upcoming }
+  emit()
 }
+onUnauthorized(clearSession)
+export const logout = () => clearSession()
 
-const memory = { raw: null }
-
-function clone(value) {
-  return JSON.parse(JSON.stringify(value))
+async function publicData() {
+  const [reference, organizations, catalog, upcoming] = await Promise.all([
+    request('/reference-data', { auth: false }), request('/organizations', { auth: false }),
+    request('/events'), request('/events?upcoming=true'),
+  ])
+  return { reference, organizations: organizations.items,
+    catalog: catalog.items.map(eventView), upcoming: upcoming.items.map(eventView) }
 }
-
-function signupLabel(item) {
-  if (item == null || item === '') return ''
-  if (typeof item === 'string') return item
-  const title = item.title || item.name || ''
-  return item.status ? `${title} (${item.status})` : String(title)
+function references(data) {
+  GRADES = data.reference.grades.map(String); CITIES = data.reference.cities
+  INTERESTS = data.reference.interests.map(i => i.name)
+  COMPANIES = data.organizations.filter(o => o.kind !== 'school').map(o => o.name)
 }
-
-function presentStudent(student) {
-  if (!student) return null
-  const copy = clone(student)
-  copy.name = [copy.firstName, copy.lastName].filter(Boolean).join(' ')
-  copy.registered = (copy.signedUp || []).map(signupLabel).filter(Boolean)
-  return copy
-}
-
-function norm(value) {
-  return String(value ?? '').trim().toLowerCase()
-}
-
-function nextId(prefix) {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
-}
-
-function readRaw() {
-  try {
-    return localStorage.getItem(KEY)
-  } catch {
-    return memory.raw
-  }
-}
-
-function writeRaw(raw) {
-  memory.raw = raw
-  try {
-    localStorage.setItem(KEY, raw)
-  } catch {
-    /* demo keeps working in memory */
-  }
-}
-
-function event(fields) {
-  return {
-    projectKind: '',
-    interests: [],
-    description: '',
-    place: '',
-    format: 'очно',
-    terms: '',
-    deadline: '',
-    seats: 0,
-    status: 'published',
-    ...fields,
-  }
-}
-
-function demoNotifications() {
-  return [
-    {
-      id: 'n1',
-      studentId: 's1',
-      type: 'confirmation',
-      title: 'Заявка подтверждена',
-      body: 'Лицей БГУ подтвердил заявку на «Республиканскую олимпиаду по математике».',
-      date: '2026-11-05',
-      read: false,
-    },
-    {
-      id: 'n2',
-      studentId: 's1',
-      type: 'deadline',
-      title: 'Напоминание о дедлайне',
-      body: 'Регистрация на олимпиаду по информатике «КодБел» закрывается 25 ноября.',
-      date: '2026-11-06',
-      read: false,
-    },
-    {
-      id: 'n6',
-      studentId: 's1',
-      type: 'interest',
-      title: 'Новое мероприятие по интересам',
-      body: 'По математике открыта запись на «Открытую олимпиаду по физике и математике».',
-      date: '2026-11-02',
-      read: false,
-    },
-    {
-      id: 'n5',
-      studentId: 's1',
-      type: 'invite',
-      title: 'Приглашение на мероприятие',
-      body: 'КодМастер приглашает на олимпиаду по информатике для 7–8 классов.',
-      date: '2026-11-01',
-      read: true,
-    },
-  ]
-}
-
-function demoMarketplacePartnerships() {
-  return [
-    {
-      id: 'market-company-mentors',
-      from: 'КодМастер',
-      to: '',
-      title: 'Наставники для школьных IT-проектов',
-      description: 'Ищем школы для совместной проектной программы: предоставим практикующих разработчиков, проведём вводные занятия и поможем командам довести проекты до презентации. Для 8–11 классов, бесплатно.',
-      text: 'Ищем школы для совместной проектной программы: предоставим практикующих разработчиков, проведём вводные занятия и поможем командам довести проекты до презентации. Для 8–11 классов, бесплатно.',
-      visibility: 'public',
-      audience: 'all_schools',
-      status: 'pending',
-      date: '2026-11-06',
-    },
-    {
-      id: 'market-company-lab',
-      from: 'НаноСофт',
-      to: '',
-      title: 'Партнёрство для инженерной лаборатории',
-      description: 'Готовы предоставить оборудование и наставников для серии практических занятий по робототехнике и электронике. Рассматриваем школы Минска и регионов.',
-      text: 'Готовы предоставить оборудование и наставников для серии практических занятий по робототехнике и электронике. Рассматриваем школы Минска и регионов.',
-      visibility: 'public',
-      audience: 'all_schools',
-      status: 'pending',
-      date: '2026-11-05',
-    },
-    {
-      id: 'market-company-career',
-      from: 'БелТехКарьер',
-      to: '',
-      title: 'Профориентационные встречи с инженерами',
-      description: 'Предлагаем организовать открытые встречи школьников с инженерами и специалистами производства, экскурсию на предприятие и разбор реальных технических задач.',
-      text: 'Предлагаем организовать открытые встречи школьников с инженерами и специалистами производства, экскурсию на предприятие и разбор реальных технических задач.',
-      visibility: 'public',
-      audience: 'all_schools',
-      status: 'pending',
-      date: '2026-11-04',
-    },
-    {
-      id: 'market-school-experts',
-      from: 'Лицей БГУ',
-      to: '',
-      title: 'Ищем компании для проектной мастерской',
-      description: 'Приглашаем технологические компании предоставить экспертам роль наставников для ученических проектов по математике, программированию и инженерии. Формат и график согласуем совместно.',
-      text: 'Приглашаем технологические компании предоставить экспертам роль наставников для ученических проектов по математике, программированию и инженерии. Формат и график согласуем совместно.',
-      visibility: 'public',
-      audience: 'all_companies',
-      status: 'pending',
-      date: '2026-11-06',
-    },
-    {
-      id: 'market-school-lab',
-      from: 'СШ №4 Гродно',
-      to: '',
-      title: 'Партнёр для химической лаборатории выходного дня',
-      description: 'Ищем профильную организацию, которая поможет провести практические занятия по химии: экспертное сопровождение, безопасные демонстрации и материалы для школьников 8–10 классов.',
-      text: 'Ищем профильную организацию, которая поможет провести практические занятия по химии: экспертное сопровождение, безопасные демонстрации и материалы для школьников 8–10 классов.',
-      visibility: 'public',
-      audience: 'all_companies',
-      status: 'pending',
-      date: '2026-11-03',
-    },
-    {
-      id: 'market-school-joint',
-      from: 'Гимназия №2 Брест',
-      to: '',
-      title: 'Совместный городской конкурс инженерных идей',
-      description: 'Ищем партнёров для организации конкурса инженерных идей среди учащихся 8–11 классов. Нужны эксперты в жюри, практические кейсы и поддержка призового фонда.',
-      text: 'Ищем партнёров для организации конкурса инженерных идей среди учащихся 8–11 классов. Нужны эксперты в жюри, практические кейсы и поддержка призового фонда.',
-      visibility: 'public',
-      audience: 'all_companies',
-      status: 'pending',
-      date: '2026-11-02',
-    },
-  ]
-}
-
-function seed() {
-  return {
-    version: VERSION,
-    sessionUserId: null,
-    users: [
-      {
-        id: 'u-alina',
-        email: 'alina@demo.by',
-        password: 'demo1234',
-        role: 'student',
-        firstName: 'Алина',
-        lastName: 'Коваль',
-        birthDate: '2010-04-12',
-        school: 'Лицей БГУ',
-        grade: '10',
-        city: 'Минск',
-        interests: ['Математика', 'Информатика'],
-        profileComplete: true,
-        catalogId: 's1',
-      },
-      {
-        id: 'u-mark',
-        email: 'mark@demo.by',
-        password: 'demo1234',
-        role: 'student',
-        firstName: 'Марк',
-        lastName: 'Левин',
-        birthDate: '2011-09-03',
-        school: 'Гимназия №1 Минск',
-        grade: '',
-        city: '',
-        interests: [],
-        profileComplete: false,
-        catalogId: 's5',
-      },
-      {
-        id: 'u-olga',
-        email: 'olga@demo.by',
-        password: 'demo1234',
-        role: 'parent',
-        firstName: 'Ольга',
-        lastName: 'Коваль',
-        childId: 's1',
-        childIds: ['s1'],
-        activeChildId: 's1',
-      },
-      {
-        id: 'u-school',
-        email: 'school@demo.by',
-        password: 'demo1234',
-        role: 'school',
-        firstName: 'Елена',
-        lastName: 'Брик',
-        orgName: 'Лицей БГУ',
-      },
-      {
-        id: 'u-admin',
-        email: 'admin@demo.by',
-        password: 'demo1234',
-        role: 'admin',
-        firstName: 'Админ',
-        lastName: 'TalentHub',
-      },
-      {
-        id: 'u-company',
-        email: 'company@demo.by',
-        password: 'demo1234',
-        role: 'company',
-        firstName: 'Павел',
-        lastName: 'Мороз',
-        orgName: 'КодМастер',
-      },
-    ],
-    students: [
-      {
-        id: 's1',
-        firstName: 'Алина',
-        lastName: 'Коваль',
-        birthDate: '2010-04-12',
-        school: 'Лицей БГУ',
-        grade: '10',
-        city: 'Минск',
-        interests: ['Математика', 'Информатика'],
-        signedUp: [
-          { title: 'Республиканская олимпиада по математике', status: 'подтверждена', eventId: 'e1' },
-          { title: 'Олимпиада по информатике «КодБел»', status: 'подана', eventId: 'e2' },
-        ],
-        attended: [{ title: 'Городская олимпиада по математике', eventId: 'e6' }],
-        achievements: [{ title: 'Диплом II степени, городская олимпиада по математике', status: 'confirmed' }],
-      },
-      {
-        id: 's2',
-        firstName: 'Илья',
-        lastName: 'Савич',
-        birthDate: '2009-02-11',
-        school: 'Лицей БГУ',
-        grade: '11',
-        city: 'Минск',
-        interests: ['Физика'],
-        signedUp: [{ title: 'Областная олимпиада по физике', status: 'подана', eventId: 'e3' }],
-        attended: [{ title: 'Проектная смена «Физическая лаборатория»', eventId: 'e12' }],
-        achievements: [{ title: 'Сертификат участника смены', status: 'confirmed' }],
-      },
-      {
-        id: 's3',
-        firstName: 'Мария',
-        lastName: 'Гуд',
-        birthDate: '2011-06-19',
-        school: 'Лицей БГУ',
-        grade: '9',
-        city: 'Минск',
-        interests: ['Биология'],
-        signedUp: [{ title: 'Биологическая интернет-олимпиада', status: 'подана', eventId: 'e4' }],
-        attended: [],
-        achievements: [],
-      },
-      {
-        id: 's4',
-        firstName: 'Тимофей',
-        lastName: 'Орлов',
-        birthDate: '2010-12-01',
-        school: 'Лицей БГУ',
-        grade: '10',
-        city: 'Минск',
-        interests: ['Робототехника'],
-        signedUp: [{ title: 'Мастерская роботов', status: 'подана', eventId: 'e11' }],
-        attended: [{ title: 'Смена «Инженерные каникулы»', eventId: 'e9' }],
-        achievements: [],
-      },
-      {
-        id: 's5',
-        firstName: 'Марк',
-        lastName: 'Левин',
-        birthDate: '2011-09-03',
-        school: 'Гимназия №1 Минск',
-        grade: '',
-        city: '',
-        interests: [],
-        signedUp: [],
-        attended: [],
-        achievements: [],
-      },
-    ],
-    events: [
-      event({
-        id: 'e1',
-        title: 'Республиканская олимпиада по математике',
-        category: 'olympiad',
-        interests: ['Математика'],
-        organizer: 'Лицей БГУ',
-        description: 'Письменный тур республиканской олимпиады по математике для 10–11 классов.',
-        grade: '10–11',
-        date: '2026-11-20',
-        city: 'Минск',
-        place: 'Лицей БГУ, актовый зал',
-        format: 'очно',
-        terms: 'Паспорт и справка из школы.',
-        deadline: '2026-11-12',
-        seats: 80,
-      }),
-      event({
-        id: 'e2',
-        title: 'Олимпиада по информатике «КодБел»',
-        category: 'olympiad',
-        interests: ['Информатика'],
-        organizer: 'КодМастер',
-        description: 'Онлайн-олимпиада по алгоритмам и программированию для 9–11 классов.',
-        grade: '9–11',
-        date: '2026-12-02',
-        city: 'Онлайн',
-        place: 'Экосистема КодМастер',
-        format: 'онлайн',
-        terms: 'Нужен компьютер и доступ к экосистеме в день тура.',
-        deadline: '2026-11-25',
-        seats: 200,
-      }),
-      event({
-        id: 'e3',
-        title: 'Областная олимпиада по физике',
-        category: 'olympiad',
-        interests: ['Физика'],
-        organizer: 'Лицей БГУ',
-        description: 'Областной очный тур по физике для учащихся 8–11 классов.',
-        grade: '8–11',
-        date: '2026-11-28',
-        city: 'Минск',
-        place: 'Лицей БГУ, кабинет физики',
-        format: 'очно',
-        terms: 'Письменный тур без калькулятора.',
-        deadline: '2026-11-18',
-        seats: 60,
-      }),
-      event({
-        id: 'e4',
-        title: 'Биологическая интернет-олимпиада',
-        category: 'olympiad',
-        interests: ['Биология'],
-        organizer: 'Академия биологии',
-        description: 'Дистанционная олимпиада по биологии для школьников 7–11 классов.',
-        grade: '7–11',
-        date: '2026-12-15',
-        city: 'Онлайн',
-        place: 'Сайт Академии биологии',
-        format: 'онлайн',
-        terms: 'Регистрация на сайте и самостоятельный онлайн-тур.',
-        deadline: '2026-12-01',
-        seats: 300,
-      }),
-      event({
-        id: 'e5',
-        title: 'Олимпиада «Юный химик»',
-        category: 'olympiad',
-        interests: ['Химия'],
-        organizer: 'ХимПрактикум',
-        description: 'Очная олимпиада по химии для учащихся 9–10 классов.',
-        grade: '9–10',
-        date: '2026-11-18',
-        city: 'Гродно',
-        place: 'ХимПрактикум, лаборатория',
-        format: 'очно',
-        terms: 'Очный письменный и практический тур.',
-        deadline: '2026-11-10',
-        seats: 40,
-      }),
-      event({
-        id: 'e6',
-        title: 'Городская олимпиада по математике',
-        category: 'olympiad',
-        interests: ['Математика'],
-        organizer: 'Гимназия №2 Брест',
-        description: 'Городской очный тур по математике для 8–9 классов.',
-        grade: '8–9',
-        date: '2026-11-25',
-        city: 'Брест',
-        place: 'Гимназия №2 Брест',
-        format: 'очно',
-        terms: 'Справка из школы и паспорт.',
-        deadline: '2026-11-15',
-        seats: 50,
-      }),
-      event({
-        id: 'e7',
-        title: 'Олимпиада по информатике для 7–8 классов',
-        category: 'olympiad',
-        interests: ['Информатика'],
-        organizer: 'КодМастер',
-        description: 'Очный тур по информатике для учеников 7–8 классов.',
-        grade: '7–8',
-        date: '2026-12-05',
-        city: 'Гомель',
-        place: 'Площадка КодМастер в Гомеле',
-        format: 'очно',
-        terms: 'Очный тур в компьютерном классе.',
-        deadline: '2026-11-28',
-        seats: 70,
-      }),
-      event({
-        id: 'e8',
-        title: 'Открытая олимпиада по физике и математике',
-        category: 'olympiad',
-        interests: ['Физика', 'Математика'],
-        organizer: 'Лицей БГУ',
-        description: 'Совместный очный тур по физике и математике для 10–11 классов.',
-        grade: '10–11',
-        date: '2026-12-10',
-        city: 'Минск',
-        place: 'Лицей БГУ',
-        format: 'очно',
-        terms: 'Два письменных тура в один день.',
-        deadline: '2026-12-01',
-        seats: 90,
-      }),
-      event({
-        id: 'e9',
-        title: 'Смена «Инженерные каникулы»',
-        category: 'project',
-        projectKind: 'смена',
-        interests: ['Информатика', 'Робототехника'],
-        organizer: 'НаноСофт',
-        description: 'Короткая смена, где школьники собирают и программируют устройства.',
-        grade: '8–11',
-        date: '2026-11-30',
-        city: 'Минск',
-        place: 'НаноСофт, учебный класс',
-        format: 'очно',
-        terms: 'Согласие родителей, смена идёт несколько дней.',
-        deadline: '2026-11-20',
-        seats: 24,
-      }),
-      event({
-        id: 'e10',
-        title: 'НПК: конкурс исследовательских проектов',
-        category: 'project',
-        projectKind: 'конкурс',
-        interests: ['Проектная работа', 'Биология'],
-        organizer: 'Лицей БГУ',
-        description: 'Конкурс исследовательских работ с очной защитой проектов.',
-        grade: '9–11',
-        date: '2026-12-12',
-        city: 'Минск',
-        place: 'Лицей БГУ, конференц-зал',
-        format: 'очно',
-        terms: 'Тезисы до дедлайна, защита очно.',
-        deadline: '2026-12-01',
-        seats: 40,
-      }),
-      event({
-        id: 'e11',
-        title: 'Мастерская роботов',
-        category: 'project',
-        projectKind: 'мастерская',
-        interests: ['Робототехника'],
-        organizer: 'РобоЛаб',
-        description: 'Практическая мастерская по сборке роботов для 7–10 классов.',
-        grade: '7–10',
-        date: '2026-11-21',
-        city: 'Гомель',
-        place: 'РобоЛаб, мастерская',
-        format: 'очно',
-        terms: 'Материалы выдают на месте, группа небольшая.',
-        deadline: '2026-11-14',
-        seats: 16,
-      }),
-      event({
-        id: 'e12',
-        title: 'Проектная смена «Физическая лаборатория»',
-        category: 'project',
-        projectKind: 'смена',
-        interests: ['Физика', 'Проектная работа'],
-        organizer: 'Лицей БГУ',
-        description: 'Смена с опытами и мини-проектами по физике для 10–11 классов.',
-        grade: '10–11',
-        date: '2026-12-06',
-        city: 'Минск',
-        place: 'Лицей БГУ, лаборатория физики',
-        format: 'очно',
-        terms: 'Зачисление по заявке, опыты в лаборатории лицея.',
-        deadline: '2026-11-26',
-        seats: 30,
-      }),
-      event({
-        id: 'e13',
-        title: 'Конкурс «Математический макет»',
-        category: 'project',
-        projectKind: 'конкурс',
-        interests: ['Математика', 'Проектная работа'],
-        organizer: 'Гимназия №2 Брест',
-        description: 'Конкурс макетов, которые объясняют математическую идею.',
-        grade: '8–10',
-        date: '2026-11-27',
-        city: 'Витебск',
-        place: 'Площадка в Витебске',
-        format: 'смешанный',
-        terms: 'Макет или видеозащита, один участник или пара.',
-        deadline: '2026-11-18',
-        seats: 45,
-      }),
-      event({
-        id: 'e14',
-        title: 'Химическая лаборатория выходного дня',
-        category: 'project',
-        projectKind: 'мастерская',
-        interests: ['Химия'],
-        organizer: 'ХимПрактикум',
-        description: 'Однодневная лаборатория с безопасными опытами по химии.',
-        grade: '9–11',
-        date: '2026-11-16',
-        city: 'Минск',
-        place: 'ХимПрактикум, учебная лаборатория',
-        format: 'очно',
-        terms: 'Халат выдают, нужно согласие родителей.',
-        deadline: '2026-11-12',
-        seats: 20,
-      }),
-      event({
-        id: 'e15',
-        title: 'Смена «Сделай устройство»',
-        category: 'project',
-        projectKind: 'смена',
-        interests: ['Робототехника', 'Проектная работа'],
-        organizer: 'РобоЛаб',
-        description: 'Смена, где команды собирают полезное устройство и защищают его.',
-        grade: '9–11',
-        date: '2026-12-18',
-        city: 'Минск',
-        place: 'РобоЛаб, Минск',
-        format: 'смешанный',
-        terms: 'Команда до четырёх человек, идея до старта.',
-        deadline: '2026-12-08',
-        seats: 32,
-      }),
-      event({
-        id: 'e16',
-        title: 'Олимпиада по математике «Шаг в БГУ»',
-        category: 'olympiad',
-        interests: ['Математика'],
-        organizer: 'Лицей БГУ',
-        description: 'Олимпиада для одиннадцатиклассников, которые готовятся к поступлению.',
-        grade: '11',
-        date: '2026-12-20',
-        city: 'Минск',
-        place: 'Лицей БГУ',
-        format: 'очно',
-        terms: 'Только 11 класс, при себе паспорт.',
-        deadline: '2026-12-10',
-        seats: 100,
-        status: 'pending',
-      }),
-      event({
-        id: 'e17',
-        title: 'Хакатон «Школьный код»',
-        category: 'project',
-        projectKind: 'хакатон',
-        interests: ['Информатика', 'Проектная работа'],
-        organizer: 'КодМастер',
-        description: 'Однодневный хакатон школьных команд с задачей от компании.',
-        grade: '9–11',
-        date: '2026-11-22',
-        city: 'Минск',
-        place: 'Офис КодМастер, Минск',
-        format: 'очно',
-        terms: 'Команда из 2–4 человек, ноутбуки свои.',
-        deadline: '2026-11-18',
-        seats: 48,
-        status: 'pending',
-      }),
-    ],
-    partnerships: [
-      {
-        id: 'p1',
-        from: 'КодМастер',
-        to: 'Лицей БГУ',
-        title: 'Мастер-класс по программированию',
-        description: 'КодМастер предлагает провести мастер-класс по программированию для учеников лицея.',
-        status: 'incoming',
-      },
-      {
-        id: 'p2',
-        from: 'РобоЛаб',
-        to: 'Лицей БГУ',
-        title: 'Оборудование для мастерской',
-        description: 'РобоЛаб предлагает комплект оборудования для школьной мастерской робототехники.',
-        status: 'incoming',
-      },
-      {
-        id: 'p3',
-        from: 'Лицей БГУ',
-        to: 'ХимПрактикум',
-        title: 'Лабораторная смена',
-        description: 'Лицей просит ХимПрактикум провести лабораторную смену для своих учеников.',
-        status: 'pending',
-      },
-      {
-        id: 'p4',
-        from: 'НаноСофт',
-        to: 'Лицей БГУ',
-        title: 'IT-каникулы',
-        description: 'НаноСофт и лицей согласовали IT-каникулы для школьников.',
-        status: 'accepted',
-      },
-      ...demoMarketplacePartnerships(),
-    ],
-    achievements: [
-      {
-        id: 'a1',
-        studentId: 's4',
-        student: 'Тимофей Орлов',
-        firstName: 'Тимофей',
-        lastName: 'Орлов',
-        title: 'Внешний диплом конкурса роботов',
-        school: 'Лицей БГУ',
-        status: 'pending',
-      },
-    ],
-    notifications: demoNotifications(),
-  }
-}
-
-function load() {
-  const raw = readRaw()
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw)
-      if (parsed && parsed.version === VERSION && Array.isArray(parsed.users)) {
-        const stale = !Array.isArray(parsed.notifications)
-          || parsed.notifications.some((item) => item.type === 'school' || item.type === 'admin')
-        if (stale) {
-          parsed.notifications = demoNotifications()
-          writeRaw(JSON.stringify(parsed))
-        }
-        if (!parsed.users.some((item) => item && item.role === 'company')) {
-          parsed.users.push({
-            id: 'u-company',
-            email: 'company@demo.by',
-            password: 'demo1234',
-            role: 'company',
-            firstName: 'Павел',
-            lastName: 'Мороз',
-            orgName: 'КодМастер',
-          })
-          writeRaw(JSON.stringify(parsed))
-        }
-        if (!Array.isArray(parsed.partnerships)) parsed.partnerships = []
-        const marketplaceIds = new Set(parsed.partnerships.map((item) => item.id))
-        const missingMarketplaceOffers = demoMarketplacePartnerships().filter((item) => !marketplaceIds.has(item.id))
-        if (missingMarketplaceOffers.length) {
-          parsed.partnerships.push(...missingMarketplaceOffers)
-          writeRaw(JSON.stringify(parsed))
-        }
-        const demoParent = parsed.users.find((item) => item && item.id === 'u-olga' && item.role === 'parent')
-        const demoChildExists = Array.isArray(parsed.students) && parsed.students.some((item) => item && item.id === 's1')
-        if (demoParent && demoChildExists && linkedChildIds(demoParent).length === 0) {
-          demoParent.childIds = ['s1']
-          demoParent.childId = 's1'
-          demoParent.activeChildId = 's1'
-          writeRaw(JSON.stringify(parsed))
-        }
-        const demoStudent = parsed.students?.find((item) => item.id === 's1')
-        if (demoStudent) {
-          if (!Array.isArray(demoStudent.attended)) demoStudent.attended = []
-          if (!Array.isArray(demoStudent.achievements)) demoStudent.achievements = []
-          const demoVisits = [
-            { title: 'Городская олимпиада по математике', eventId: 'e6', date: '2026-10-18', place: 'Гимназия №2 Брест', note: 'Очный городской тур по математике. Участие подтверждено организатором.' },
-            { title: 'Смена «Инженерные каникулы»', eventId: 'e9', date: '2026-08-14', place: 'Учебная площадка НаноСофт', note: 'Командная работа: сборка и программирование учебного устройства.' },
-            { title: 'Проектная смена «Физическая лаборатория»', eventId: 'e12', date: '2026-06-22', place: 'Лицей БГУ', note: 'Практические занятия и экспериментальная работа по физике.' },
-          ]
-          demoVisits.forEach((visit) => {
-            if (!demoStudent.attended.some((item) => (item.eventId && item.eventId === visit.eventId) || item.title === visit.title)) demoStudent.attended.push(visit)
-          })
-          const demoAchievements = [
-            { title: 'Диплом II степени, городская олимпиада по математике', status: 'confirmed', eventId: 'e6', date: '2026-10-18', level: 'Городской', description: 'Второе место по итогам городского тура олимпиады по математике.' },
-            { title: 'Сертификат участника смены «Инженерные каникулы»', status: 'confirmed', eventId: 'e9', date: '2026-08-14', level: 'Образовательный проект', description: 'Подтверждено участие в инженерной проектной смене.' },
-            { title: 'Сертификат проекта «Физическая лаборатория»', status: 'confirmed', eventId: 'e12', date: '2026-06-22', level: 'Лицейский', description: 'Завершён практический проект по экспериментальной физике.' },
-            { title: 'Финалист командного инженерного задания', status: 'confirmed', eventId: 'e9', date: '2026-08-14', level: 'Командный проект', description: 'Команда представила работающий прототип учебного устройства.' },
-          ]
-          demoAchievements.forEach((achievement) => {
-            if (!demoStudent.achievements.some((item) => (item.title || item) === achievement.title)) demoStudent.achievements.push(achievement)
-          })
-          writeRaw(JSON.stringify(parsed))
-        }
-        return parsed
-      }
-    } catch {
-      /* reseed */
+async function roleData(rawUser, data) {
+  const next = { ...empty(), ...data, rawUser, ready: true }
+  next.events = [...data.catalog]
+  next.user = userView(rawUser)
+  if (!rawUser) return next
+  if (rawUser.role === 'student') {
+    const [profile, applications, success, notifications, recommendations] = await Promise.all([
+      request('/students/me'), request('/registrations/me'), request('/students/me/success'),
+      request('/notifications/me'), request('/recommendations'),
+    ])
+    next.profile = profile; next.user = userView(rawUser, profile)
+    next.applications = applications.items.map(registrationView)
+    next.student = studentView(profile, applications.items, success)
+    next.notifications = notifications.items.map(notificationView)
+    next.recommendations = recommendations.items.map(eventView)
+    const historical = applications.items.map(r => r.event_id).filter(id => !next.events.some(e => e.id === id))
+    const details = await Promise.all([...new Set(historical)].map(id => request(`/events/${id}`)))
+    next.events.push(...details.map(eventView))
+  } else if (rawUser.role === 'parent') {
+    const [active, children, suggestions, schools] = await Promise.all([
+      request('/parents/me/child'), request('/parents/me/children'), request('/parents/me/suggestions'), request('/schools'),
+    ])
+    next.children = children.items.map(childView)
+    next.activeId = children.active_child_id || active.child?.profile.id || null
+    next.suggestions = suggestions.items.map(s => ({ ...s, childId: s.student_user_id, eventId: s.event_id, date: s.created_at.slice(0, 10), status: 'предложено' }))
+    next.schools = schools.items
+    for (const child of children.items) for (const registration of child.applications) {
+      if (!next.events.some(e => e.id === registration.event_id)) next.events.push(eventView(registration.event))
     }
+  } else if (['school', 'company'].includes(rawUser.role)) {
+    const [dashboard, events, mine, market, students, schools] = await Promise.all([
+      request('/organizations/me/dashboard'), request('/organizations/me/events'), request('/partnership-requests?view=mine'),
+      request('/partnership-requests?view=marketplace'), rawUser.role === 'school' ? request('/organizations/me/students') : Promise.resolve({ items: [] }), request('/schools'),
+    ])
+    next.dashboard = dashboard; next.user = userView(rawUser, null, dashboard.organization)
+    next.events = events.items.map(eventView); next.marketplace = partnershipViews(market.items, rawUser).filter(row => !row.parentRequestId)
+    next.partnerships = partnershipViews(mine.items, rawUser)
+    next.schools = schools.items
+    next.students = students.items.map(s => ({ ...s, firstName: s.first_name, lastName: s.last_name,
+      grade: String(s.grade ?? ''), signedUp: s.applications.map(registrationView),
+      attended: s.attendances.map(a => ({ ...a, eventId: a.event_id })), achievements: s.achievements }))
+    const participants = await Promise.all(events.items.map(e => request(`/events/${e.id}/registrations`)))
+    next.participants = Object.fromEntries(events.items.map((event, i) => [event.id, participants[i].items.map(r => ({ ...registrationView(r),
+      studentId: r.student_user_id, name: [r.first_name, r.last_name].join(' '), grade: String(r.grade ?? '') }))]))
+  } else if (rawUser.role === 'moderator') {
+    const queue = await request('/moderation/queue')
+    next.queue = { events: queue.events.items.map(eventView), partnerships: queue.partnership_requests.items.map(p => ({ ...partnershipViews([p], rawUser)[0], status: 'pending' })),
+      achievements: queue.achievements.items.map(a => ({ ...a, student: `${a.student.first_name} ${a.student.last_name}`, school: a.student.school.name, categoryLabel: 'Внешнее достижение', date: '', text: a.title })),
+      decided: { events: queue.events.decided_count, partnerships: queue.partnership_requests.decided_count, achievements: queue.achievements.decided_count } }
   }
-  const db = seed()
-  writeRaw(JSON.stringify(db))
-  return db
+  return next
 }
-
-function save(db) {
-  writeRaw(JSON.stringify(db))
+export async function refresh() {
+  if (refreshPromise) return refreshPromise
+  const ownEpoch = epoch
+  refreshPromise = (async () => {
+    const data = await publicData()
+    const rawUser = getToken() ? await request('/auth/me') : null
+    const next = await roleData(rawUser, data)
+    if (ownEpoch !== epoch) return
+    references(data); state = next; emit()
+  })().finally(() => { if (ownEpoch === epoch) refreshPromise = null })
+  return refreshPromise
 }
-
-function linkedChildIds(user) {
-  const ids = []
-  const list = Array.isArray(user?.childIds) ? user.childIds : []
-  list.forEach((id) => {
-    if (id && !ids.includes(id)) ids.push(id)
+export function initialize() {
+  if (!initialization) initialization = refresh().catch(async error => {
+    if (error.status === 401) { await refresh(); return }
+    state = { ...state, ready: true, error: error.message }; emit()
   })
-  if (user?.childId && !ids.includes(user.childId)) ids.push(user.childId)
-  return ids
+  return initialization
 }
-
-function viewUser(db, user) {
-  const copy = clone(user)
-  delete copy.password
-  if (copy.role === 'parent') {
-    const children = linkedChildIds(copy)
-      .map((id) => presentStudent(db.students.find((student) => student.id === id)))
-      .filter(Boolean)
-    const childIds = children.map((student) => student.id)
-    const active = childIds.includes(copy.activeChildId)
-      ? copy.activeChildId
-      : (childIds.includes(copy.childId) ? copy.childId : (childIds[0] || null))
-    copy.childIds = childIds
-    copy.children = children
-    copy.activeChildId = active
-    copy.childId = active
-    copy.child = children.find((student) => student.id === active) || null
-  }
-  return copy
+export async function retry() { initialization = null; state = { ...state, ready: false, error: '' }; emit(); return initialize() }
+function authenticate(path, body) {
+  if (authentication) return authentication
+  authentication = authenticateOnce(path, body).finally(() => { authentication = null })
+  return authentication
 }
-
-export function listSchools() {
-  return SCHOOLS.slice()
+async function authenticateOnce(path, body) {
+  const authEpoch = ++epoch; refreshPromise = null
+  const session = await request(path, { method: 'POST', body, auth: false })
+  if (authEpoch !== epoch) throw new ApiError('Запрос входа отменён. Повторите вход.')
+  clearSession(); setToken(session.access_token)
+  await refresh()
+  return state.user
 }
-
-export function changeSchool(school) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || user.role !== 'student') return null
-  const name = String(school || '').trim()
-  if (!name) return null
-  user.school = name
-  const student = db.students.find((item) => item.id === user.catalogId)
-  if (student) student.school = name
-  save(db)
-  return viewUser(db, user)
+export const login = (email, password, expectedRole) => authenticate('/auth/login', { email, password, ...(expectedRole ? { expected_role: expectedRole } : {}) })
+export const registerStudent = data => authenticate('/auth/register', { role: data.role || 'student',
+  first_name: data.firstName, last_name: data.lastName, email: data.email, password: data.password,
+  ...(data.role === 'parent' ? {} : { birth_date: data.birthDate, school_id: organizationId(data.school, 'school') }) })
+function organizationId(value, kind) {
+  const matches = state.organizations.filter(o => (o.id === value || o.name === value) && (!kind || o.kind === kind))
+  if (matches.length !== 1) throw new ApiError('Выберите организацию из справочника.', 422, 'invalid_organization')
+  return matches[0].id
 }
-
-export function login(email, password) {
-  const db = load()
-  const user = db.users.find((item) => norm(item.email) === norm(email) && item.password === password)
-  if (!user) return null
-  db.sessionUserId = user.id
-  save(db)
-  return viewUser(db, user)
+async function mutate(key, callback) {
+  if (pendingMutations.has(key)) return pendingMutations.get(key)
+  const ownEpoch = epoch
+  const promise = (async () => {
+    const result = await callback()
+    if (epoch === ownEpoch) await refresh()
+    return result
+  })().finally(() => pendingMutations.delete(key))
+  pendingMutations.set(key, promise)
+  return promise
 }
-
-export function logout() {
-  const db = load()
-  db.sessionUserId = null
-  save(db)
-}
-
-export function currentUser() {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  return user ? viewUser(db, user) : null
-}
-
-export function registerStudent({ firstName, lastName, birthDate, email, password, school } = {}) {
-  const db = load()
-  const cleanEmail = norm(email)
-  if (!cleanEmail || !password) return { ok: false }
-  if (db.users.some((item) => norm(item.email) === cleanEmail)) return { ok: false }
-
-  const fn = String(firstName ?? '').trim()
-  const ln = String(lastName ?? '').trim()
-  const bd = String(birthDate ?? '').trim()
-  const sch = String(school ?? '').trim()
-
-  let student = db.students.find((item) => norm(item.firstName) === norm(fn) && norm(item.lastName) === norm(ln) && item.birthDate === bd)
-  if (!student) {
-    student = {
-      id: nextId('s'),
-      firstName: fn,
-      lastName: ln,
-      birthDate: bd,
-      school: sch,
-      grade: '',
-      city: '',
-      interests: [],
-      signedUp: [],
-      attended: [],
-      achievements: [],
-    }
-    db.students.push(student)
-  }
-
-  const user = {
-    id: nextId('u'),
-    email: cleanEmail,
-    password,
-    role: 'student',
-    firstName: fn,
-    lastName: ln,
-    birthDate: bd,
-    school: sch,
-    grade: '',
-    city: '',
-    interests: [],
-    profileComplete: false,
-    catalogId: student.id,
-  }
-  db.users.push(user)
-  db.sessionUserId = user.id
-  save(db)
-  return viewUser(db, user)
-}
-
-export function completeProfile({ grade, city, interests } = {}) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || user.role !== 'student') return null
-  user.grade = grade == null ? '' : String(grade)
-  user.city = city == null ? '' : String(city)
-  user.interests = Array.isArray(interests) ? interests.map((item) => String(item)) : []
-  user.profileComplete = true
-  const student = db.students.find((item) => item.id === user.catalogId)
-  if (student) {
-    student.grade = user.grade
-    student.city = user.city
-    student.interests = user.interests.slice()
-  }
-  save(db)
-  return viewUser(db, user)
-}
-
-export function listEvents() {
-  return clone(load().events)
-}
-
-export function listUpcoming() {
-  return clone(load().events.filter((item) => item.status === 'published' && item.date >= TODAY))
-}
-
-export function publishEvent(payload = {}) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  const created = {
-    title: '',
-    category: 'olympiad',
-    projectKind: '',
-    interests: [],
-    description: '',
-    grade: '',
-    date: '',
-    city: '',
-    place: '',
-    format: 'очно',
-    terms: '',
-    deadline: '',
-    seats: 0,
-    ...payload,
-    id: nextId('e'),
-    status: 'pending',
-  }
-  if (!created.organizer) created.organizer = user?.orgName || user?.school || ''
-  if (typeof created.interests === 'string') {
-    created.interests = created.interests.split(',').map((item) => item.trim()).filter(Boolean)
-  }
-  if (!Array.isArray(created.interests)) created.interests = []
-  if (created.interests.length === 0 && created.interest) created.interests = [String(created.interest)]
-  if (created.seats != null && created.seats !== '') created.seats = Number(created.seats) || 0
-  db.events.push(created)
-  save(db)
-  return clone(created)
-}
-
-export function moderateEvent(id, decision) {
-  if (decision !== 'published' && decision !== 'rejected') return null
-  const db = load()
-  const item = db.events.find((eventItem) => eventItem.id === id)
-  if (!item) return null
-  item.status = decision
-  save(db)
-  return clone(item)
-}
-
-
-// Организационные инструменты кабинетов: регистрация, посещение и жизненный цикл мероприятия.
-export function updateEvent(id, payload = {}) {
-  const db = load()
-  const item = db.events.find((eventItem) => eventItem.id === id)
-  if (!item) return null
-  Object.assign(item, payload)
-  save(db)
-  return clone(item)
-}
-
-export function eventRegistrations(eventId) {
-  const db = load()
-  const rows = []
-  for (const student of db.students) {
-    for (const registration of (student.signedUp || [])) {
-      if (registration && registration.eventId === eventId && registration.status !== 'отменена') {
-        rows.push({
-          studentId: student.id,
-          name: [student.firstName, student.lastName].filter(Boolean).join(' '),
-          grade: student.grade || '',
-          status: registration.status || 'подана',
-          attended: (student.attended || []).some((item) => item && item.eventId === eventId),
-          result: registration.result || '',
-        })
-      }
-    }
-  }
-  return rows
-}
-
-export function updateEventRegistration(eventId, studentId, payload = {}) {
-  const db = load()
-  const student = db.students.find((item) => item.id === studentId)
-  if (!student) return null
-  const registration = (student.signedUp || []).find((item) => item && item.eventId === eventId)
-  if (!registration) return null
-  if (payload.status) registration.status = payload.status
-  if (payload.result !== undefined) registration.result = String(payload.result)
-  if (payload.attended === true) {
-    if (!Array.isArray(student.attended)) student.attended = []
-    if (!student.attended.some((item) => item && item.eventId === eventId)) {
-      const event = db.events.find((item) => item.id === eventId)
-      student.attended.push({ title: event?.title || registration.title, eventId })
-    }
-    registration.status = 'подтверждена'
-    if (payload.result && !student.achievements.some((item) => (item.title || item) === payload.result)) {
-      student.achievements.push({ title: String(payload.result), status: 'confirmed', eventId })
-    }
-  }
-  save(db)
-  return clone(registration)
-}
-
-export function updateOrganizationProfile(payload = {}) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || !['school', 'company'].includes(user.role)) return null
-  for (const key of ['orgName', 'orgCity', 'orgDescription', 'orgDirections', 'orgWebsite', 'orgContact']) {
-    if (payload[key] !== undefined) user[key] = String(payload[key]).trim()
-  }
-  save(db)
-  return viewUser(db, user)
-}
-
-export function schoolStudents() {
-  return load().students.filter((item) => item.school === 'Лицей БГУ').map(presentStudent)
-}
-
-export function listPartnerships() {
-  return clone(load().partnerships)
-}
-
-export function sendPartnership(payload = {}) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  const created = {
-    from: user?.orgName || '',
-    to: '',
-    title: '',
-    description: '',
-    ...payload,
-    id: nextId('p'),
-    status: payload.status || 'pending',
-  }
-  if (!created.description && created.text) created.description = created.text
-  if (!created.text && created.description) created.text = created.description
-  db.partnerships.push(created)
-  save(db)
-  return clone(created)
-}
-
-export function respondPartnership(id, decision) {
-  if (decision !== 'accepted' && decision !== 'declined') return null
-  const db = load()
-  const item = db.partnerships.find((partnership) => partnership.id === id)
-  if (!item) return null
-  item.status = decision
-  save(db)
-  return clone(item)
-}
-
-export function moderatePartnership(id, decision) {
-  if (decision !== 'incoming' && decision !== 'rejected') return null
-  const db = load()
-  const item = db.partnerships.find((partnership) => partnership.id === id)
-  if (!item) return null
-  item.status = decision
-  save(db)
-  return clone(item)
-}
-
-export function listAchievementsQueue() {
-  return clone(load().achievements)
-}
-
-export function moderateAchievement(id, decision) {
-  if (decision !== 'confirmed' && decision !== 'rejected') return null
-  const db = load()
-  const item = db.achievements.find((achievement) => achievement.id === id)
-  if (!item) return null
-  item.status = decision
-  if (decision === 'confirmed') {
-    const student = db.students.find((entry) => entry.id === item.studentId)
-      || db.students.find((entry) => norm(entry.firstName) === norm(item.firstName) && norm(entry.lastName) === norm(item.lastName))
-    if (student && !student.achievements.some((achievement) => (achievement.title || achievement) === item.title)) {
-      student.achievements.push({ title: item.title, status: 'confirmed' })
-    }
-  }
-  save(db)
-  return clone(item)
-}
-
-function resolveStudent(db, user) {
-  if (!user) return null
-  return db.students.find((item) => item.id === user.catalogId)
-    || db.students.find((item) =>
-      norm(item.firstName) === norm(user.firstName)
-      && norm(item.lastName) === norm(user.lastName)
-      && item.birthDate === user.birthDate
-    )
-    || null
-}
-
-function notificationsOf(db, student) {
-  if (!student) return []
-  return (db.notifications || [])
-    .filter((item) => item.studentId === student.id)
-    .slice()
-    .sort((a, b) => String(b.date).localeCompare(String(a.date)))
-}
-
-function applicationsOf(db, student) {
-  if (!student) return []
-  return (student.signedUp || []).map((item) => {
-    const title = typeof item === 'string' ? item : (item.title || '')
-    const status = typeof item === 'string' ? 'подана' : (item.status || 'подана')
-    const eventId = typeof item === 'string' ? '' : (item.eventId || '')
-    const event = db.events.find((entry) => (eventId && entry.id === eventId) || entry.title === title)
-    return {
-      eventId: event?.id || eventId,
-      title: title || event?.title || 'Мероприятие',
-      status,
-      date: event?.date || '',
-      city: event?.city || '',
-      organizer: event?.organizer || '',
-      category: event?.category || '',
-      format: event?.format || '',
-    }
-  })
-}
-
-export function studentCabinet() {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  if (session?.role === 'student') {
-    const student = resolveStudent(db, session)
-    return {
-      demo: false,
-      loggedIn: true,
-      user: viewUser(db, session),
-      student: presentStudent(student),
-      applications: applicationsOf(db, student),
-      notifications: notificationsOf(db, student),
-    }
-  }
-  if (session) {
-    return { demo: false, loggedIn: false, foreign: true, user: null, student: null, applications: [], notifications: [] }
-  }
-  const alinaUser = db.users.find((item) => item.id === 'u-alina')
-  const alina = db.students.find((item) => item.id === 's1')
-  return {
-    demo: true,
-    loggedIn: false,
-    user: alinaUser ? viewUser(db, alinaUser) : null,
-    student: presentStudent(alina),
-    applications: applicationsOf(db, alina),
-    notifications: notificationsOf(db, alina),
-  }
-}
-
-export function markNotificationRead(notificationId) {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  const student = session?.role === 'student' ? resolveStudent(db, session) : db.students.find((item) => item.id === 's1')
-  if (!student) return false
-  const notification = (db.notifications || []).find((item) => item.id === notificationId && item.studentId === student.id)
-  if (!notification) return false
-  notification.read = true
-  save(db)
+export const completeProfile = values => mutate('profile', async () => {
+  await request('/students/me', { method: 'PATCH', body: { grade: Number(values.grade), city: values.city, interests: values.interests } })
   return true
+})
+export const changeSchool = school => mutate('profile', async () => { await request('/students/me', { method: 'PATCH', body: { school_id: organizationId(school, 'school') } }); return true })
+export const registerForEvent = id => mutate(`registration:${id}`, async () => {
+  const result = await request(`/events/${id}/registrations`, { method: 'POST', raw: true })
+  const row = registrationView(result.data)
+  return { ok: true, already: result.status === 200, status: row.status }
+})
+export const cancelRegistration = eventId => mutate(`registration:${eventId}`, async () => {
+  const application = state.applications.find(r => r.eventId === eventId)
+  if (!application) throw new ApiError('Заявка не найдена.', 404, 'not_found')
+  await request(`/registrations/${application.id}/cancel`, { method: 'POST' }); return { ok: true }
+})
+export const publishEvent = data => mutate('create-event', async () => {
+  const range = String(data.grade).match(/\d+/g)?.map(Number) || []
+  return request('/events', { method: 'POST', body: { title: data.title, description: data.description, kind: data.category,
+    ...(data.category === 'project' && data.projectKind ? { project_kind: data.projectKind } : {}), interests: data.interests,
+    grade_min: range[0], grade_max: range.at(-1), event_date: data.date, registration_deadline: data.deadline,
+    city: data.city, venue: data.place, format: FORMAT_VALUES[data.format] || data.format, terms: data.terms, capacity: Number(data.seats) } })
+})
+export const updateEvent = (id, values) => mutate(`event:${id}`, () => {
+  const action = { registration_closed: 'close-registration', published: 'open-registration', completed: 'complete' }[values.status]
+  if (!action) throw new ApiError('Недопустимое действие с мероприятием.')
+  return request(`/events/${id}/${action}`, { method: 'POST' })
+})
+export const updateEventRegistration = (eventId, studentId, values) => mutate(`participant:${eventId}:${studentId}`, () => {
+  const row = eventRegistrations(eventId).find(r => r.studentId === studentId)
+  if (!row) throw new ApiError('Заявка не найдена.')
+  return values.attended ? request(`/registrations/${row.id}/attendance`, { method: 'PUT' })
+    : request(`/registrations/${row.id}/decision`, { method: 'PATCH', body: { decision: REGISTRATION_VALUES[values.status] || values.status } })
+})
+export const sendPartnership = data => mutate(`partnership:${data.parentRequestId || 'create'}`, () => {
+  if (data.parentRequestId) return request(`/partnership-requests/${data.parentRequestId}/responses`, { method: 'POST' })
+  const visibility = data.visibility === 'public' ? data.audience : 'direct'
+  return request('/partnership-requests', { method: 'POST', body: { visibility, title: data.title, description: data.description || data.text,
+    ...(visibility === 'direct' ? { target_org_id: organizationId(data.to) } : {}) } })
+})
+export const respondPartnership = (id, decision) => mutate(`partnership-decision:${id}`, () => request(id.startsWith('response:')
+  ? `/partnership-responses/${id.slice(9)}/decision` : `/partnership-requests/${id}/decision`, { method: 'PATCH', body: { decision } }))
+export const linkChild = data => mutate('children', async () => {
+  const result = await request('/parents/me/children', { method: 'POST', body: { first_name: data.firstName, last_name: data.lastName, birth_date: data.birthDate } })
+  return { ok: true, child: childView(result.child) }
+})
+export const selectChild = id => mutate('children', async () => { await request(`/parents/me/children/${id}/select`, { method: 'PUT' }); return { ok: true } })
+export const suggestToChild = ({ childId, eventId }) => mutate(`suggestion:${childId}:${eventId}`, async () => {
+  const already = state.suggestions.some(s => s.childId === childId && s.eventId === eventId)
+  await request(`/parents/me/children/${childId}/suggestions`, { method: 'POST', body: { event_id: eventId } })
+  return { ok: true, already }
+})
+export const markNotificationRead = id => mutate(`notification:${id}`, () => request(`/notifications/${id}/read`, { method: 'PUT' }))
+export const moderate = (kind, id, status) => mutate(`moderation:${kind}:${id}`, () => request(`/moderation/${kind === 'partnerships' ? 'partnership-requests' : kind}/${id}/decision`,
+  { method: 'POST', body: { decision: status === 'rejected' ? 'reject' : 'approve' } }))
+export async function fetchCatalog(filters, signal) {
+  const isStudent = state.user?.role === 'student'
+  const query = { q: filters.query, kind: filters.category, interest: filters.directions,
+    ...(isStudent ? { application_status: REGISTRATION_VALUES[filters.status] || filters.status } : {}) }
+  return (await request(`/events${queryString(query)}`, { signal })).items.map(eventView)
 }
+export async function fetchRecommendations(directions = [], childId, signal) {
+  if (state.user?.role !== 'student' && !childId) return []
+  const path = childId ? `/parents/me/children/${childId}/recommendations` : '/recommendations'
+  return (await request(`${path}${queryString({ interest: directions })}`, { signal })).items.map(eventView)
+}
+export async function fetchEvent(id) { return eventView(await request(`/events/${id}`)) }
 
-export function registerForEvent(eventId) {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  if (!session || session.role !== 'student') return { ok: false, reason: 'auth' }
-  const student = resolveStudent(db, session)
-  if (!student) return { ok: false, reason: 'profile' }
-  const event = db.events.find((item) => item.id === eventId)
-  if (!event || event.status !== 'published') return { ok: false, reason: 'closed' }
-  if (!Array.isArray(student.signedUp)) student.signedUp = []
-  const existing = student.signedUp.find((item) => item && item.eventId === event.id)
-  if (existing && existing.status !== 'отменена') {
-    return { ok: true, already: true, status: existing.status }
-  }
-  if (existing) {
-    existing.status = 'подана'
-    existing.title = event.title
-  } else {
-    student.signedUp.push({ title: event.title, status: 'подана', eventId: event.id })
-  }
-  save(db)
-  return { ok: true, status: 'подана' }
-}
-
-export function cancelRegistration(eventId) {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  if (!session || session.role !== 'student') return { ok: false, reason: 'auth' }
-  const student = resolveStudent(db, session)
-  if (!student) return { ok: false, reason: 'profile' }
-  const existing = (student.signedUp || []).find((item) => item && item.eventId === eventId)
-  if (!existing || existing.status === 'отменена' || existing.status === 'отклонена') {
-    return { ok: false, reason: 'missing' }
-  }
-  existing.status = 'отменена'
-  save(db)
-  return { ok: true, status: 'отменена' }
-}
-
-export function linkChild({ firstName, lastName, birthDate } = {}) {
-  const db = load()
-  const child = db.students.find((item) =>
-    norm(item.firstName) === norm(firstName)
-    && norm(item.lastName) === norm(lastName)
-    && item.birthDate === String(birthDate ?? '').trim()
-  )
-  if (!child) return { ok: false, child: null }
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || user.role !== 'parent') return { ok: false, child: null, reason: 'auth' }
-  if (!Array.isArray(user.childIds)) user.childIds = []
-  if (user.childId && !user.childIds.includes(user.childId)) user.childIds.push(user.childId)
-  const already = user.childIds.includes(child.id)
-  if (!already) user.childIds.push(child.id)
-  user.childId = child.id
-  user.activeChildId = child.id
-  save(db)
-  return { ok: true, already, child: presentStudent(child) }
-}
-
-export function selectChild(childId) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || user.role !== 'parent') return { ok: false }
-  const ids = linkedChildIds(user)
-  if (!ids.includes(childId)) return { ok: false }
-  user.childId = childId
-  user.activeChildId = childId
-  save(db)
-  return { ok: true }
-}
-
-export function suggestToChild({ childId, eventId } = {}) {
-  const db = load()
-  const user = db.users.find((item) => item.id === db.sessionUserId)
-  if (!user || user.role !== 'parent') return { ok: false, reason: 'auth' }
-  if (!linkedChildIds(user).includes(childId)) return { ok: false, reason: 'child' }
-  const found = db.events.find((item) => item.id === eventId && (!item.status || item.status === 'published'))
-  if (!found) return { ok: false, reason: 'event' }
-  if (!Array.isArray(db.suggestions)) db.suggestions = []
-  const existing = db.suggestions.find((item) => item.parentId === user.id && item.childId === childId && item.eventId === eventId)
-  if (existing) return { ok: true, already: true, suggestion: clone(existing) }
-  const suggestion = {
-    id: nextId('sg'),
-    parentId: user.id,
-    childId,
-    eventId,
-    title: found.title,
-    date: TODAY,
-    status: 'предложено',
-  }
-  db.suggestions.push(suggestion)
-  save(db)
-  return { ok: true, suggestion }
-}
-
-export function parentCabinet() {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  if (!session || session.role !== 'parent') {
-    return {
-      loggedIn: false,
-      role: session?.role || null,
-      user: null,
-      children: [],
-      activeId: null,
-      suggestions: [],
-      events: [],
-      schools: [],
-    }
-  }
-  const user = viewUser(db, session)
-  const suggestions = (db.suggestions || [])
-    .filter((item) => item.parentId === session.id)
-    .map((item) => clone(item))
-  const events = db.events.filter((item) => !item.status || item.status === 'published')
-  return {
-    loggedIn: true,
-    role: 'parent',
-    user,
-    children: user.children,
-    activeId: user.activeChildId,
-    suggestions,
-    events: clone(events),
-    schools: clone(SCHOOL_DIRECTORY),
-  }
-}
+export const schoolInfo = name => state.organizations.find(o => o.name === name)

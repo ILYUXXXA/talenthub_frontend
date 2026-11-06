@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { getState, fetchEvent } from '../data/store.js'
+import { useCatalog, useRecommendations } from '../data/hooks.js'
+import { useStoreRevision } from '../data/hooks.js'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listEvents, registerForEvent, studentCabinet } from '../data/store.js'
 
-const OLYMPIAD_DIRECTIONS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия']
-const PROJECT_DIRECTIONS = ['Робототехника', 'Дизайн', 'Медиа', 'Экология']
 
 const STATUSES = [
   { id: 'none', label: 'Без заявки' },
@@ -39,6 +40,9 @@ function activeApplication(applications, eventId) {
 }
 
 function directionGroups(category) {
+  const groups = getState().reference?.direction_groups || {}
+  const OLYMPIAD_DIRECTIONS = groups.olympiad || []
+  const PROJECT_DIRECTIONS = groups.project || []
   if (category === 'olympiad') return [{ title: 'Олимпиады', names: OLYMPIAD_DIRECTIONS }]
   if (category === 'project') return [{ title: 'Проектная деятельность', names: PROJECT_DIRECTIONS }]
   return [
@@ -64,26 +68,9 @@ function matchesQuery(event, query) {
 }
 
 export default function Events() {
+  const apiRevision = useStoreRevision()
   const navigate = useNavigate()
-  const catalog = useMemo(() => {
-    try {
-      const loaded = listEvents()
-      return Array.isArray(loaded) ? loaded : []
-    } catch {
-      return []
-    }
-  }, [])
-  const published = useMemo(
-    () => catalog.filter((event) => !event.status || event.status === 'published'),
-    [catalog],
-  )
-  const [cabinet, setCabinet] = useState(() => {
-    try {
-      return studentCabinet()
-    } catch {
-      return { demo: true, loggedIn: false, user: null, applications: [] }
-    }
-  })
+  const cabinet = studentCabinet()
   const [directions, setDirections] = useState([])
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('none')
@@ -92,6 +79,8 @@ export default function Events() {
   const [listOpen, setListOpen] = useState(false)
   const [open, setOpen] = useState(null)
   const [message, setMessage] = useState('')
+  const catalog = useCatalog({ query, category, directions, status }, setMessage)
+  const published = catalog
 
   useEffect(() => {
     if (!open) return undefined
@@ -102,36 +91,17 @@ export default function Events() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  async function openEvent(event) {
+    try { setOpen(await fetchEvent(event.id)) } catch (error) { setMessage(error.message) }
+  }
+
   function toggleDirection(name) {
     setDirections((prev) => (prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]))
   }
 
-  const visible = useMemo(() => {
-    return published.filter((event) => {
-      if (category === 'olympiad' && event.category !== 'olympiad') return false
-      if (category === 'project' && event.category !== 'project') return false
-      const application = applicationFor(cabinet.applications, event.id)
-      const applicationStatus = application?.status || 'none'
-      if (applicationStatus !== status) return false
-      if (!matchesQuery(event, query)) return false
-      if (directions.length === 0) return true
-      const interests = Array.isArray(event.interests) ? event.interests : []
-      return directions.some((name) => interests.includes(name))
-    })
-  }, [published, category, status, directions, query, cabinet.applications])
+  const visible = catalog
 
-  const profileDirections = (cabinet.user?.interests || []).filter((name) => (
-    OLYMPIAD_DIRECTIONS.includes(name) || PROJECT_DIRECTIONS.includes(name)
-  ))
-  const suggestionBasis = directions.length > 0 ? directions : profileDirections
-  const recommended = useMemo(() => {
-    if (suggestionBasis.length === 0) return []
-    return published.filter((event) => {
-      if (activeApplication(cabinet.applications, event.id)) return false
-      const interests = Array.isArray(event.interests) ? event.interests : []
-      return suggestionBasis.some((name) => interests.includes(name))
-    }).slice(0, 3)
-  }, [published, suggestionBasis, cabinet.applications])
+  const recommended = useRecommendations(directions, undefined, setMessage)
 
   function changeCategory(value) {
     setCategory(value)
@@ -149,18 +119,20 @@ export default function Events() {
 
   function refresh() {
     try {
-      setCabinet(studentCabinet())
+      studentCabinet()
     } catch {
       /* оставляем текущий снимок */
     }
   }
 
-  function onRegister(event) {
+  async function onRegister(event) {
     let result
     try {
-      result = registerForEvent(event.id)
-    } catch {
-      setMessage('Не удалось отправить заявку.')
+      result = await registerForEvent(event.id)
+    } catch (error) {
+      if (error.status === 401) { navigate('/auth'); return }
+      if (error.code === 'profile_incomplete') { navigate('/welcome'); return }
+      setMessage(error.message || 'Не удалось отправить заявку.')
       return
     }
     if (!result.ok && result.reason === 'auth') {
@@ -181,7 +153,7 @@ export default function Events() {
     const existing = activeApplication(cabinet.applications, event.id)
     if (existing) {
       return (
-        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); setOpen(event) }}>
+        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); openEvent(event) }}>
           {existing.status}
         </button>
       )
@@ -244,7 +216,7 @@ export default function Events() {
               </label>
               <label className="field">
                 <span>Статус заявки</span>
-                <select value={status} onChange={(event) => setStatus(event.target.value)}>
+                <select disabled={getState().user?.role !== 'student'} value={status} onChange={(event) => setStatus(event.target.value)}>
                   {STATUSES.map((item) => (
                     <option key={item.id} value={item.id}>{item.label}</option>
                   ))}
@@ -279,7 +251,7 @@ export default function Events() {
               <h2>Рекомендуем для тебя</h2>
               <div className="event-grid">
                 {recommended.map((event) => (
-                  <article key={event.id} className="card event-card" onClick={() => setOpen(event)}>
+                  <article key={event.id} className="card event-card" onClick={() => openEvent(event)}>
                     <span className="badge badge-muted">{categoryLabel(event)}</span>
                     <h2 className="card-title">{event.title}</h2>
                     <p className="muted">{event.organizer}</p>
@@ -310,7 +282,7 @@ export default function Events() {
               <article
                 key={event.id}
                 className="card event-card"
-                onClick={() => setOpen(event)}
+                onClick={() => openEvent(event)}
               >
                 <span className="badge badge-muted">{categoryLabel(event)}</span>
                 <h2 className="card-title">{event.title}</h2>

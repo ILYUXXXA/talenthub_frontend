@@ -1,3 +1,4 @@
+import { ApiBoundary, RequireRole, CatalogGuard } from './components/ApiBoundary.jsx'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppHeader from './components/AppHeader.jsx'
 import StudentShell from './components/StudentShell.jsx'
@@ -20,21 +21,21 @@ function WithHeader({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ApiBoundary><BrowserRouter>
       <Routes>
-        <Route path="/events" element={<StudentShell><Events /></StudentShell>} />
-        <Route path="/applications" element={<StudentShell><Applications /></StudentShell>} />
-        <Route path="/notifications" element={<StudentShell><Notifications /></StudentShell>} />
-        <Route path="/success" element={<StudentShell><Success /></StudentShell>} />
-        <Route path="/profile" element={<StudentShell><Profile /></StudentShell>} />
+        <Route path="/events" element={<CatalogGuard><StudentShell><Events /></StudentShell></CatalogGuard>} />
+        <Route path="/applications" element={<RequireRole role="student"><StudentShell><Applications /></StudentShell></RequireRole>} />
+        <Route path="/notifications" element={<RequireRole role="student"><StudentShell><Notifications /></StudentShell></RequireRole>} />
+        <Route path="/success" element={<RequireRole role="student"><StudentShell><Success /></StudentShell></RequireRole>} />
+        <Route path="/profile" element={<RequireRole role="student"><StudentShell><Profile /></StudentShell></RequireRole>} />
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<WithHeader><Auth /></WithHeader>} />
-        <Route path="/welcome" element={<WithHeader><FirstLogin /></WithHeader>} />
-        <Route path="/school" element={<SchoolCabinet />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/parent" element={<ParentLink />} />
-        <Route path="/company" element={<Company />} />
+        <Route path="/welcome" element={<RequireRole role="student" onboarding><WithHeader><FirstLogin /></WithHeader></RequireRole>} />
+        <Route path="/school" element={<RequireRole role="school"><SchoolCabinet /></RequireRole>} />
+        <Route path="/admin" element={<RequireRole role="moderator"><Admin /></RequireRole>} />
+        <Route path="/parent" element={<RequireRole role="parent"><ParentLink /></RequireRole>} />
+        <Route path="/company" element={<RequireRole role="company"><Company /></RequireRole>} />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></ApiBoundary>
   )
 }

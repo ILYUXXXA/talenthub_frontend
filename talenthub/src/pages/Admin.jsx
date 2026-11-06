@@ -1,4 +1,7 @@
+import { moderationQueue, moderate } from '../data/store.js'
+import { useStoreRevision } from '../data/hooks.js'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function TabIcon({ children }) {
   return (
@@ -41,70 +44,6 @@ const TABS = [
   },
 ]
 
-const SEED = {
-  events: [
-    {
-      id: 'mod-event-1',
-      title: 'Республиканская олимпиада по математике',
-      category: 'olympiad',
-      organizer: 'Лицей БГУ',
-      date: '2026-03-12',
-      city: 'Минск',
-      place: 'Лицей БГУ',
-      format: 'Очно',
-      grade: '9–11',
-      interests: ['Математика'],
-      terms: 'Заявку подаёт школа',
-      deadline: '2026-03-01',
-      seats: 80,
-      description: 'Лицей БГУ просит опубликовать очный тур для 9–11 классов. Заявку подаёт школа, интерес — математика. После проверки мероприятие появится в каталоге.',
-      status: 'pending',
-    },
-    {
-      id: 'mod-event-2',
-      title: 'Проектная смена «Своими руками»',
-      category: 'project',
-      organizer: 'Гимназия №1 Минск',
-      date: '2026-06-22',
-      city: 'Минск',
-      place: 'Учебный корпус',
-      format: 'Очно',
-      grade: '8–11',
-      interests: ['Проектная работа', 'Робототехника'],
-      terms: 'Команда до 4 человек, свой прототип',
-      deadline: '2026-06-01',
-      seats: 40,
-      description: 'Гимназия №1 Минск просит добавить смену, где школьники собирают прототип руками. Команды до 4 человек, интересы — проектная работа и робототехника.',
-      status: 'pending',
-    },
-  ],
-  partnerships: [
-    {
-      id: 'mod-partner-1',
-      title: 'Мастер-класс по разработке',
-      from: 'EPAM Systems',
-      to: 'Лицей БГУ',
-      date: '2026-04-18',
-      city: 'Минск',
-      format: 'Очно',
-      text: 'EPAM Systems просит допустить один очный мастер-класс по разработке для 10–11 классов. После допуска Лицей БГУ увидит запрос и сможет ответить.',
-      status: 'pending',
-    },
-  ],
-  achievements: [
-    {
-      id: 'mod-ach-1',
-      title: 'Диплом III степени, городская олимпиада по информатике',
-      student: 'Алина Коваль',
-      school: 'Лицей БГУ',
-      date: '2026-02-20',
-      categoryLabel: 'Олимпиада',
-      text: 'Лицей БГУ просит подтвердить диплом Алины Коваль за городскую олимпиаду по информатике. После подтверждения запись добавится в профиль ученика.',
-      status: 'pending',
-    },
-  ],
-}
-
 function formatDate(value) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value || '—'
   const [year, month, day] = value.split('-')
@@ -124,7 +63,7 @@ function ModeratorBar({ section, onSection, counts }) {
   return (
     <header className="header student-header">
       <div className="header-inner parent-bar">
-        <span className="logo">TalentHub</span>
+        <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
         <p className="header-greet">Здравствуйте!</p>
         <nav className="nav student-tabs mod-tabs">
           {TABS.map((tab) => {
@@ -287,9 +226,9 @@ function Detail({ item, kind, onClose, onDecide }) {
 }
 
 export default function Admin() {
-  const [events, setEvents] = useState(SEED.events)
-  const [partnerships, setPartnerships] = useState(SEED.partnerships)
-  const [achievements, setAchievements] = useState(SEED.achievements)
+  const apiRevision = useStoreRevision()
+  const { events = [], partnerships = [], achievements = [] } = moderationQueue() || {}
+  const [error, setError] = useState('')
   const [section, setSection] = useState('events')
   const [open, setOpen] = useState(null)
 
@@ -319,13 +258,10 @@ export default function Admin() {
     setOpen(null)
   }
 
-  function onDecide(status) {
+  async function onDecide(status) {
     if (!open) return
-    const mark = (list) => list.map((item) => (item.id === open.id ? { ...item, status } : item))
-    if (open.kind === 'events') setEvents(mark)
-    else if (open.kind === 'partnerships') setPartnerships(mark)
-    else setAchievements(mark)
-    setOpen(null)
+    try { await moderate(open.kind, open.id, status); setOpen(null); setError('') }
+    catch (error) { setError(error.message) }
   }
 
   return (
@@ -334,6 +270,7 @@ export default function Admin() {
       <main>
         <div className="container">
           
+          {error ? <p className="notice" role="alert">{error}</p> : null}
           {visible.length === 0 ? <p className="muted">Нет заявок</p> : (
             <div className="mod-grid">
               {visible.map((item) => (

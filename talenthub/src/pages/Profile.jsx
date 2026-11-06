@@ -1,3 +1,4 @@
+import { useStoreRevision } from '../data/hooks.js'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GRADES, INTERESTS, changeSchool, completeProfile, listSchools, logout, studentCabinet } from '../data/store.js'
@@ -17,8 +18,9 @@ function readCabinet() {
 }
 
 export default function Profile() {
+  const apiRevision = useStoreRevision()
   const navigate = useNavigate()
-  const [cabinet, setCabinet] = useState(readCabinet)
+  const cabinet = readCabinet()
   const user = cabinet.user
   const student = cabinet.student
   const profileName = [user?.firstName || student?.firstName, user?.lastName || student?.lastName].filter(Boolean).join(' ')
@@ -51,7 +53,7 @@ export default function Profile() {
     setInterests((prev) => prev.filter((item) => item !== name))
   }
 
-  function onSave(event) {
+  async function onSave(event) {
     event.preventDefault()
     if (!cabinet.loggedIn) {
       navigate('/auth')
@@ -61,12 +63,13 @@ export default function Profile() {
       setMessage('Добавьте хотя бы один интерес: по ним фильтруются мероприятия.')
       return
     }
-    const saved = completeProfile({ grade, city, interests })
+    let saved
+    try { saved = await completeProfile({ grade, city, interests }) } catch (error) { setMessage(error.message); return }
     if (!saved) {
       setMessage('Сохранить настройки может только вошедший школьник.')
       return
     }
-    setCabinet(readCabinet())
+    readCabinet()
     setMessage('Настройки сохранены. Список мероприятий подстроится под интересы.')
   }
 
@@ -75,17 +78,18 @@ export default function Profile() {
     navigate('/auth')
   }
 
-  function onChangeSchool() {
+  async function onChangeSchool() {
     if (!cabinet.loggedIn) {
       navigate('/auth')
       return
     }
-    const saved = changeSchool(schoolDraft)
+    let saved
+    try { saved = await changeSchool(schoolDraft) } catch (error) { setMessage(error.message); return }
     if (!saved) {
       setMessage('Сменить учреждение может только вошедший школьник.')
       return
     }
-    setCabinet(readCabinet())
+    readCabinet()
     setSchoolOpen(false)
     setMessage('Учреждение образования обновлено.')
   }

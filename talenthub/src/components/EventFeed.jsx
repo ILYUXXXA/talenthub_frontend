@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { getState, fetchEvent } from '../data/store.js'
+import { useCatalog, useRecommendations } from '../data/hooks.js'
+import { useEffect, useState } from 'react'
 import { listEvents } from '../data/store.js'
 
-const OLYMPIAD_DIRECTIONS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия']
-const PROJECT_DIRECTIONS = ['Робототехника', 'Дизайн', 'Медиа', 'Экология']
 
 const STATUSES = [
   { id: 'none', label: 'Без заявки' },
@@ -38,6 +38,9 @@ function activeApplication(applications, eventId) {
 }
 
 function directionGroups(category) {
+  const groups = getState().reference?.direction_groups || {}
+  const OLYMPIAD_DIRECTIONS = groups.olympiad || []
+  const PROJECT_DIRECTIONS = groups.project || []
   if (category === 'olympiad') return [{ title: 'Олимпиады', names: OLYMPIAD_DIRECTIONS }]
   if (category === 'project') return [{ title: 'Проектная деятельность', names: PROJECT_DIRECTIONS }]
   return [
@@ -64,6 +67,7 @@ function matchesQuery(event, query) {
 
 export default function EventFeed({
   interests = [],
+  childId,
   applications = [],
   actionLabel = 'Зарегистрироваться',
   recommendTitle = 'Рекомендуем для тебя',
@@ -71,18 +75,6 @@ export default function EventFeed({
   onAction,
   onAuthRequired,
 }) {
-  const catalog = useMemo(() => {
-    try {
-      const loaded = listEvents()
-      return Array.isArray(loaded) ? loaded : []
-    } catch {
-      return []
-    }
-  }, [])
-  const published = useMemo(
-    () => catalog.filter((event) => !event.status || event.status === 'published'),
-    [catalog],
-  )
   const [directions, setDirections] = useState([])
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('none')
@@ -91,6 +83,8 @@ export default function EventFeed({
   const [listOpen, setListOpen] = useState(false)
   const [open, setOpen] = useState(null)
   const [message, setMessage] = useState('')
+  const catalog = useCatalog({ query, category, directions, status }, setMessage)
+  const published = catalog
 
   useEffect(() => {
     if (!open) return undefined
@@ -101,36 +95,17 @@ export default function EventFeed({
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  async function openEvent(event) {
+    try { setOpen(await fetchEvent(event.id)) } catch (error) { setMessage(error.message) }
+  }
+
   function toggleDirection(name) {
     setDirections((prev) => (prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]))
   }
 
-  const visible = useMemo(() => {
-    return published.filter((event) => {
-      if (category === 'olympiad' && event.category !== 'olympiad') return false
-      if (category === 'project' && event.category !== 'project') return false
-      const application = applicationFor(applications, event.id)
-      const applicationStatus = application?.status || 'none'
-      if (applicationStatus !== status) return false
-      if (!matchesQuery(event, query)) return false
-      if (directions.length === 0) return true
-      const names = Array.isArray(event.interests) ? event.interests : []
-      return directions.some((name) => names.includes(name))
-    })
-  }, [published, category, status, directions, query, applications])
+  const visible = catalog.filter(event => (applicationFor(applications, event.id)?.status || 'none') === status)
 
-  const profileDirections = (interests || []).filter((name) => (
-    OLYMPIAD_DIRECTIONS.includes(name) || PROJECT_DIRECTIONS.includes(name)
-  ))
-  const suggestionBasis = directions.length > 0 ? directions : profileDirections
-  const recommended = useMemo(() => {
-    if (suggestionBasis.length === 0) return []
-    return published.filter((event) => {
-      if (activeApplication(applications, event.id)) return false
-      const names = Array.isArray(event.interests) ? event.interests : []
-      return suggestionBasis.some((name) => names.includes(name))
-    }).slice(0, 3)
-  }, [published, suggestionBasis, applications])
+  const recommended = useRecommendations(directions, childId, setMessage)
 
   function changeCategory(value) {
     setCategory(value)
@@ -146,13 +121,13 @@ export default function EventFeed({
     + Number(status !== 'none')
     + Number(directions.length > 0)
 
-  function runAction(event) {
+  async function runAction(event) {
     if (!onAction) return
     let result
     try {
-      result = onAction(event)
-    } catch {
-      setMessage('Не удалось выполнить действие.')
+      result = await onAction(event)
+    } catch (error) {
+      setMessage(error.message || 'Не удалось выполнить действие.')
       return
     }
     if (!result || result.ok === false) {
@@ -169,7 +144,7 @@ export default function EventFeed({
     const existing = activeApplication(applications, event.id)
     if (existing) {
       return (
-        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); setOpen(event) }}>
+        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); openEvent(event) }}>
           {existing.status}
         </button>
       )
@@ -266,7 +241,7 @@ export default function EventFeed({
             <h2>{recommendTitle}</h2>
             <div className="event-grid">
               {recommended.map((event) => (
-                <article key={event.id} className="card event-card" onClick={() => setOpen(event)}>
+                <article key={event.id} className="card event-card" onClick={() => openEvent(event)}>
                   <span className="badge badge-muted">{categoryLabel(event)}</span>
                   <h2 className="card-title">{event.title}</h2>
                   <p className="muted">{event.organizer}</p>
@@ -297,7 +272,7 @@ export default function EventFeed({
             <article
               key={event.id}
               className="card event-card"
-              onClick={() => setOpen(event)}
+              onClick={() => openEvent(event)}
             >
               <span className="badge badge-muted">{categoryLabel(event)}</span>
               <h2 className="card-title">{event.title}</h2>

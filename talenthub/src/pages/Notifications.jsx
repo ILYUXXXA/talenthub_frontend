@@ -1,3 +1,4 @@
+import { useStoreRevision } from '../data/hooks.js'
 import { useState } from 'react'
 import { markNotificationRead, studentCabinet } from '../data/store.js'
 
@@ -29,30 +30,25 @@ function formatDate(value) {
 }
 
 export default function Notifications() {
-  const [items, setItems] = useState(() => {
-    try {
-      return studentCabinet().notifications || []
-    } catch {
-      return []
-    }
-  })
+  const apiRevision = useStoreRevision()
+  const items = studentCabinet().notifications || []
+  const [error, setError] = useState('')
   const unread = items.filter((item) => !item.read).length
 
-  function openNotification(item) {
+  async function openNotification(item) {
     if (item.read) return
-    markNotificationRead(item.id)
-    setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry))
+    try { await markNotificationRead(item.id); setError('') } catch (error) { setError(error.message) }
   }
 
   return (
     <main className="student-workspace">
       <div className="container">
         <p className="lead">
-          {items.length === 0
+          {error || (items.length === 0
             ? 'Сообщений пока нет.'
             : unread > 0
               ? `Непрочитанных: ${unread}. Нажмите на уведомление, чтобы отметить его прочитанным.`
-              : 'Все уведомления прочитаны.'}
+              : 'Все уведомления прочитаны.')}
         </p>
         {items.length === 0 ? (
           <p className="muted">Когда школа, администратор или организатор напишут, сообщение появится здесь.</p>

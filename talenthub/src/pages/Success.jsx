@@ -1,3 +1,4 @@
+import { useStoreRevision } from '../data/hooks.js'
 import { useMemo, useState } from 'react'
 import { listEvents, studentCabinet } from '../data/store.js'
 
@@ -68,13 +69,8 @@ function SuccessList({ title, empty, items, events, expanded, onToggle, kind }) 
 }
 
 export default function Success() {
-  const [cabinet] = useState(() => {
-    try {
-      return studentCabinet()
-    } catch {
-      return { demo: true, student: null }
-    }
-  })
+  const apiRevision = useStoreRevision()
+  const cabinet = studentCabinet()
   const [expanded, setExpanded] = useState(null)
   const events = useMemo(() => {
     try {
@@ -82,7 +78,7 @@ export default function Success() {
     } catch {
       return []
     }
-  }, [])
+  }, [apiRevision])
   const student = cabinet.student
   const attended = entries(student?.attended)
   const achievements = entries(student?.achievements)

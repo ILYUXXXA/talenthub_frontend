@@ -2,49 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listUpcoming, completeProfile, GRADES, CITIES, INTERESTS } from '../data/store.js';
 
-const FALLBACK_UPCOMING = [
-  {
-    title: 'Республиканская олимпиада по математике',
-    date: '12 марта 2026',
-    city: 'Минск',
-    category: 'olympiad',
-    categoryLabel: 'Олимпиада',
-  },
-  {
-    title: 'Олимпиада по информатике',
-    date: '4 апреля 2026',
-    city: 'Гродно',
-    category: 'olympiad',
-    categoryLabel: 'Олимпиада',
-  },
-  {
-    title: 'Мастерская робототехники',
-    date: '18 апреля 2026',
-    city: 'Брест',
-    category: 'project',
-    categoryLabel: 'Проектная деятельность',
-  },
-  {
-    title: 'Проектная смена «Своими руками»',
-    date: '22 июня 2026',
-    city: 'Гомель',
-    category: 'project',
-    categoryLabel: 'Проектная деятельность',
-  },
-];
-
-const FALLBACK_GRADES = [7, 8, 9, 10, 11];
-const FALLBACK_CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
-const FALLBACK_INTERESTS = [
-  'Математика',
-  'Информатика',
-  'Физика',
-  'Биология',
-  'Химия',
-  'Робототехника',
-  'Проектная работа',
-];
-
 function labelOf(item) {
   if (item != null && typeof item === 'object') {
     return String(item.label || item.name || item.title || item.id || item.value || '');
@@ -84,15 +41,15 @@ function loadUpcoming() {
   } catch {
     /* dimmed list still has to show */
   }
-  return FALLBACK_UPCOMING;
+  return [];
 }
 
 export default function FirstLogin() {
   const navigate = useNavigate();
   const [upcoming] = useState(loadUpcoming);
-  const grades = listOr(GRADES, FALLBACK_GRADES);
-  const cities = listOr(CITIES, FALLBACK_CITIES);
-  const interests = listOr(INTERESTS, FALLBACK_INTERESTS);
+  const grades = listOr(GRADES, []);
+  const cities = listOr(CITIES, []);
+  const interests = listOr(INTERESTS, []);
   const [grade, setGrade] = useState('');
   const [city, setCity] = useState('');
   const [selected, setSelected] = useState([]);
@@ -102,7 +59,7 @@ export default function FirstLogin() {
     setSelected((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]));
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     if (!grade || !city || selected.length < 1) {
       setError('Выберите класс, город и хотя бы один интерес.');
@@ -112,13 +69,13 @@ export default function FirstLogin() {
     const cityItem = cities.find((item) => valueOf(item) === city);
     const picked = interests.filter((item) => selected.includes(valueOf(item))).map(storedValue);
     try {
-      completeProfile({
+      await completeProfile({
         grade: gradeItem == null ? grade : storedValue(gradeItem),
         city: cityItem == null ? city : storedValue(cityItem),
         interests: picked,
       });
-    } catch {
-      setError('Не удалось сохранить профиль.');
+    } catch (error) {
+      setError(error.message || 'Не удалось сохранить профиль.');
       return;
     }
     navigate('/events');
