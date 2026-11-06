@@ -199,7 +199,7 @@ export default function Admin() {
         <div className="stack">
           <div>
             <h1>Модерация</h1>
-            <p className="muted">Отдельная роль администратора. Демо: admin@demo.by</p>
+            <p className="muted">Проверяйте публикации, партнёрские запросы и достижения в одном рабочем пространстве.</p>
           </div>
 
           <section className="card stack">
