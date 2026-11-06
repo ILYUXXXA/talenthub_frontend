@@ -136,9 +136,9 @@ function ParentBar({ section, onSection, greeting }) {
   return (
     <header className="header student-header">
       <div className="header-inner parent-bar">
-        <span className="logo">TalentHub</span>
+        <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
         <p className="header-greet">{greeting}</p>
-        <nav className="nav student-tabs">
+        <nav className="nav student-tabs org-shell-tabs">
           {PARENT_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -159,9 +159,9 @@ function ParentBar({ section, onSection, greeting }) {
 export default function ParentLink() {
   const [cabinet, setCabinet] = useState(readCabinet)
   const [adding, setAdding] = useState(false)
-  const [firstName, setFirstName] = useState('Алина')
-  const [lastName, setLastName] = useState('Коваль')
-  const [birthDate, setBirthDate] = useState('2010-04-12')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [birthDate, setBirthDate] = useState('')
   const [linkError, setLinkError] = useState('')
   const [linkNote, setLinkNote] = useState('')
   const [section, setSection] = useState('progress')
@@ -279,14 +279,14 @@ export default function ParentLink() {
     return (
       <>
         <ParentBar section={section} onSection={setSection} greeting="" />
-        <main>
+        <main className="parent-workspace">
         <div className="container narrow">
           <h1>Кабинет родителя</h1>
           <p className="lead">Сначала войдите в свой аккаунт. Детей в нём нет, пока вы сами не добавите ребёнка.</p>
           {cabinet.role ? (
-            <p className="notice">Сейчас открыт другой аккаунт. Кабинет родителя доступен для olga@demo.by.</p>
+            <p className="notice">Сейчас открыт профиль другой роли. Переключитесь на родительский профиль, чтобы продолжить.</p>
           ) : null}
-          <p className="muted">Демо-аккаунт из базы: olga@demo.by, пароль demo1234.</p>
+          <p className="muted">Войдите в родительский профиль, чтобы продолжить работу с кабинетом.</p>
           <Link className="btn btn-primary" to="/auth">Войти</Link>
         </div>
         </main>
@@ -337,7 +337,7 @@ export default function ParentLink() {
           {adding ? (
             <form className="card stack" onSubmit={onLink}>
               <h2 className="card-title">Добавить ребёнка</h2>
-              <p className="muted">Демо-запись уже подставлена: Алина Коваль, 12.04.2010. Второй ребёнок для переключения: Илья Савич, 11.02.2009.</p>
+              <p className="muted">Заполните данные ребёнка, чтобы найти его профиль и связать с вашим аккаунтом.</p>
               <div className="grid-2">
                 <label className="field">
                   <span>Имя</span>
