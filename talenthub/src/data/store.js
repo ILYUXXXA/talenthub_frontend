@@ -694,7 +694,6 @@ function seed() {
         status: 'pending',
       },
     ],
-    suggestions: [],
     notifications: demoNotifications(),
   }
 }
@@ -705,12 +704,11 @@ function load() {
     try {
       const parsed = JSON.parse(raw)
       if (parsed && parsed.version === VERSION && Array.isArray(parsed.users)) {
-        let dirty = false
         const stale = !Array.isArray(parsed.notifications)
           || parsed.notifications.some((item) => item.type === 'school' || item.type === 'admin')
         if (stale) {
           parsed.notifications = demoNotifications()
-          dirty = true
+          writeRaw(JSON.stringify(parsed))
         }
         if (!parsed.users.some((item) => item && item.role === 'company')) {
           parsed.users.push({
@@ -722,20 +720,8 @@ function load() {
             lastName: 'Мороз',
             orgName: 'КодМастер',
           })
-          dirty = true
+          writeRaw(JSON.stringify(parsed))
         }
-        if (!Array.isArray(parsed.suggestions)) {
-          parsed.suggestions = []
-          dirty = true
-        }
-        parsed.users.forEach((user) => {
-          if (!user || user.role !== 'parent' || Array.isArray(user.childIds)) return
-          user.childIds = []
-          user.childId = null
-          user.activeChildId = null
-          dirty = true
-        })
-        if (dirty) writeRaw(JSON.stringify(parsed))
         return parsed
       }
     } catch {
@@ -938,6 +924,71 @@ export function moderateEvent(id, decision) {
   return clone(item)
 }
 
+
+// Организационные инструменты кабинетов: регистрация, посещение и жизненный цикл мероприятия.
+export function updateEvent(id, payload = {}) {
+  const db = load()
+  const item = db.events.find((eventItem) => eventItem.id === id)
+  if (!item) return null
+  Object.assign(item, payload)
+  save(db)
+  return clone(item)
+}
+
+export function eventRegistrations(eventId) {
+  const db = load()
+  const rows = []
+  for (const student of db.students) {
+    for (const registration of (student.signedUp || [])) {
+      if (registration && registration.eventId === eventId && registration.status !== 'отменена') {
+        rows.push({
+          studentId: student.id,
+          name: [student.firstName, student.lastName].filter(Boolean).join(' '),
+          grade: student.grade || '',
+          status: registration.status || 'подана',
+          attended: (student.attended || []).some((item) => item && item.eventId === eventId),
+          result: registration.result || '',
+        })
+      }
+    }
+  }
+  return rows
+}
+
+export function updateEventRegistration(eventId, studentId, payload = {}) {
+  const db = load()
+  const student = db.students.find((item) => item.id === studentId)
+  if (!student) return null
+  const registration = (student.signedUp || []).find((item) => item && item.eventId === eventId)
+  if (!registration) return null
+  if (payload.status) registration.status = payload.status
+  if (payload.result !== undefined) registration.result = String(payload.result)
+  if (payload.attended === true) {
+    if (!Array.isArray(student.attended)) student.attended = []
+    if (!student.attended.some((item) => item && item.eventId === eventId)) {
+      const event = db.events.find((item) => item.id === eventId)
+      student.attended.push({ title: event?.title || registration.title, eventId })
+    }
+    registration.status = 'подтверждена'
+    if (payload.result && !student.achievements.some((item) => (item.title || item) === payload.result)) {
+      student.achievements.push({ title: String(payload.result), status: 'confirmed', eventId })
+    }
+  }
+  save(db)
+  return clone(registration)
+}
+
+export function updateOrganizationProfile(payload = {}) {
+  const db = load()
+  const user = db.users.find((item) => item.id === db.sessionUserId)
+  if (!user || !['school', 'company'].includes(user.role)) return null
+  for (const key of ['orgName', 'orgCity', 'orgDescription', 'orgDirections', 'orgWebsite', 'orgContact']) {
+    if (payload[key] !== undefined) user[key] = String(payload[key]).trim()
+  }
+  save(db)
+  return viewUser(db, user)
+}
+
 export function schoolStudents() {
   return load().students.filter((item) => item.school === 'Лицей БГУ').map(presentStudent)
 }
@@ -956,7 +1007,7 @@ export function sendPartnership(payload = {}) {
     description: '',
     ...payload,
     id: nextId('p'),
-    status: 'pending',
+    status: payload.status || 'pending',
   }
   if (!created.description && created.text) created.description = created.text
   if (!created.text && created.description) created.text = created.description
