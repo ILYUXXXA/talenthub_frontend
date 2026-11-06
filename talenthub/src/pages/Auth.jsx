@@ -99,7 +99,7 @@ export default function Auth() {
     return (
       <main className="auth-page">
         <div className="container narrow auth-container">
-          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ПЛАТФОРМА</span>
+          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ЭКОСИСТЕМА</span>
           <h1>Выберите профиль</h1>
           <p className="lead">Войдите в существующий аккаунт или создайте аккаунт школьника.</p>
           <div className="role-pick">
