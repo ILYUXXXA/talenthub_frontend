@@ -15,7 +15,7 @@ const roles = [
 ]
 
 function formatPreviewDate(value) {
-  if (!value || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return value || ''
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value || ''
   const parts = value.split('-')
   return parts[2] + '.' + parts[1]
 }
