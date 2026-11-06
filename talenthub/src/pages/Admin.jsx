@@ -204,8 +204,8 @@ export default function Admin() {
 
           <section className="card stack">
             <h2 className="card-title">Мероприятия</h2>
-            <p className="muted">Уже решено: {decidedCount(snapshot.events)}</p>
-            {pendingEvents.length === 0 ? <p className="muted">Нет заявок</p> : pendingEvents.map((event) => (
+            <p className="muted">Рассмотрено: {decidedCount(snapshot.events)}</p>
+            {pendingEvents.length === 0 ? <p className="muted">Нет элементов на проверке</p> : pendingEvents.map((event) => (
               <article className="card stack" key={event.id}>
                 <div className="row">
                   <h3 className="card-title">{labelOf(event.title)}</h3>
@@ -235,8 +235,8 @@ export default function Admin() {
 
           <section className="card stack">
             <h2 className="card-title">Запросы на партнёрство</h2>
-            <p className="muted">Уже решено: {decidedCount(snapshot.partnerships)}</p>
-            {pendingPartnerships.length === 0 ? <p className="muted">Нет заявок</p> : pendingPartnerships.map((item) => (
+            <p className="muted">Рассмотрено: {decidedCount(snapshot.partnerships)}</p>
+            {pendingPartnerships.length === 0 ? <p className="muted">Нет элементов на проверке</p> : pendingPartnerships.map((item) => (
               <article className="card stack" key={item.id}>
                 <div className="row">
                   <h3 className="card-title">{labelOf(item.title || item.name || 'Запрос на партнёрство')}</h3>
@@ -249,7 +249,7 @@ export default function Admin() {
                     className="btn btn-primary btn-small"
                     onClick={() => onModerate('partnerships', item.id, 'incoming')}
                   >
-                    Допустить
+                    Одобрить запрос
                   </button>
                   <button
                     type="button"
@@ -265,8 +265,8 @@ export default function Admin() {
 
           <section className="card stack">
             <h2 className="card-title">Прочее: достижения на проверке</h2>
-            <p className="muted">Уже решено: {decidedCount(snapshot.achievements)}</p>
-            {pendingAchievements.length === 0 ? <p className="muted">Нет заявок</p> : pendingAchievements.map((item) => (
+            <p className="muted">Рассмотрено: {decidedCount(snapshot.achievements)}</p>
+            {pendingAchievements.length === 0 ? <p className="muted">Нет элементов на проверке</p> : pendingAchievements.map((item) => (
               <article className="card stack" key={item.id}>
                 <div className="row">
                   <h3 className="card-title">{achievementTitle(item)}</h3>
