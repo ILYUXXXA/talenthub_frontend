@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api, mapRegistration } from '../api/client.js'
+import { cancelRegistration, listEvents, registerForEvent, studentCabinet } from '../data/store.js'
 
 function formatDate(value) {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value || '—'
@@ -32,19 +32,21 @@ function statusClass(status) {
 
 export default function Applications() {
   const navigate = useNavigate()
-  const [catalog, setCatalog] = useState([])
-  const [cabinet, setCabinet] = useState({ loggedIn: false, demo: false, applications: [] })
-  const [loading, setLoading] = useState(true)
-
-  async function refresh() {
-    const [events, registrations] = await Promise.all([api.events(), api.registrations()])
-    setCatalog(events)
-    setCabinet({ loggedIn: true, demo: false, applications: registrations })
-  }
-
-  useEffect(() => {
-    refresh().catch((cause) => setMessage(cause.message || 'Не удалось загрузить заявки.')).finally(() => setLoading(false))
+  const catalog = useMemo(() => {
+    try {
+      const loaded = listEvents()
+      return Array.isArray(loaded) ? loaded : []
+    } catch {
+      return []
+    }
   }, [])
+  const [cabinet, setCabinet] = useState(() => {
+    try {
+      return studentCabinet()
+    } catch {
+      return { loggedIn: false, demo: true, applications: [] }
+    }
+  })
   const [message, setMessage] = useState('')
   const [open, setOpen] = useState(null)
 
@@ -57,29 +59,54 @@ export default function Applications() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  async function onCancel(registrationId) {
+  function refresh() {
     try {
-      await api.cancelRegistration(registrationId)
-      setMessage('Заявка отменена.')
-      await refresh()
-      setOpen((current) => current && current.id === registrationId ? { ...current, status: 'отменена' } : current)
-    } catch (cause) {
-      setMessage(cause.message || 'Не удалось отменить заявку.')
+      setCabinet(studentCabinet())
+    } catch {
+      /* снимок остаётся */
     }
   }
 
-  async function onRegister(event) {
+  function onCancel(eventId) {
+    let result
     try {
-      await api.registerForEvent(event.id)
-      setMessage('Заявка подана.')
-      await refresh()
-    } catch (cause) {
-      if (cause.status === 401) {
-        navigate('/auth')
-        return
-      }
-      setMessage(cause.message || 'Не удалось отправить заявку.')
+      result = cancelRegistration(eventId)
+    } catch {
+      setMessage('Не удалось отменить заявку.')
+      return
     }
+    if (!result.ok && result.reason === 'auth') {
+      setMessage('Чтобы отменить заявку, войдите в свой аккаунт.')
+      return
+    }
+    if (!result.ok) {
+      setMessage('Эту заявку отменить нельзя.')
+      return
+    }
+    setMessage('Заявка отменена.')
+    setOpen((current) => (current && current.eventId === eventId ? { ...current, status: 'отменена' } : current))
+    refresh()
+  }
+
+  function onRegister(event) {
+    let result
+    try {
+      result = registerForEvent(event.id)
+    } catch {
+      setMessage('Не удалось отправить заявку.')
+      return
+    }
+    if (!result.ok && result.reason === 'auth') {
+      navigate('/auth')
+      return
+    }
+    if (!result.ok) {
+      setMessage('Регистрация на это мероприятие закрыта.')
+      return
+    }
+    setMessage(result.already ? `Заявка уже есть: ${result.status}.` : 'Заявка подана.')
+    setOpen((current) => (current ? { ...current, status: result.status || 'подана' } : current))
+    refresh()
   }
 
   const items = cabinet.applications || []
@@ -98,7 +125,6 @@ export default function Applications() {
   return (
     <main>
       <div className="container">
-        {loading ? <p className="muted">Загружаем заявки…</p> : null}
         <p className="lead">Регистрации на мероприятия и их статусы.</p>
         {cabinet.demo ? (
           <p className="notice">Войдите, чтобы видеть и отменять свои заявки.</p>
@@ -112,7 +138,7 @@ export default function Applications() {
               const date = dateParts(item.date)
               return (
                 <article
-                  key={item.id}
+                  key={`${item.eventId}-${item.title}`}
                   className="card apply-card"
                   onClick={() => setOpen(item)}
                 >
@@ -135,7 +161,7 @@ export default function Applications() {
                         className="btn btn-ghost"
                         onClick={(mouse) => {
                           mouse.stopPropagation()
-                          onCancel(item.id)
+                          onCancel(item.eventId)
                         }}
                       >
                         Отменить заявку
@@ -186,7 +212,7 @@ export default function Applications() {
             {open.status && open.status !== 'отменена' ? (
               <p className="notice">Ваша заявка: {open.status}.</p>
             ) : null}
-            {!open.status || open.status === 'отменена' || open.status === 'отклонена' ? <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Подать заявку</button> : null}
+            <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Подать заявку</button>
           </div>
         </div>
       ) : null}
