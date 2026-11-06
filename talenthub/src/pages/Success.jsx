@@ -21,7 +21,6 @@ export default function Success() {
     <main>
       <div className="container">
         <p className="lead">Куда школьник сходил и какие результаты подтверждены.</p>
-        {cabinet.demo ? <p className="notice">Показаны демо-успехи.</p> : null}
         {!student ? (
           <p className="muted">Профиль ученика не найден.</p>
         ) : (
