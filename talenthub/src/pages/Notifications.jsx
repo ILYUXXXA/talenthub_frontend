@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { studentCabinet } from '../data/store.js'
+import { markNotificationRead, studentCabinet } from '../data/store.js'
 
 const TYPE_LABELS = {
   confirmation: 'Подтверждение заявки',
@@ -29,15 +29,20 @@ function formatDate(value) {
 }
 
 export default function Notifications() {
-  const cabinet = useState(() => {
+  const [items, setItems] = useState(() => {
     try {
-      return studentCabinet()
+      return studentCabinet().notifications || []
     } catch {
-      return { demo: true, notifications: [] }
+      return []
     }
-  })[0]
-  const items = cabinet.notifications || []
+  })
   const unread = items.filter((item) => !item.read).length
+
+  function openNotification(item) {
+    if (item.read) return
+    markNotificationRead(item.id)
+    setItems((current) => current.map((entry) => entry.id === item.id ? { ...entry, read: true } : entry))
+  }
 
   return (
     <main className="student-workspace">
@@ -46,7 +51,7 @@ export default function Notifications() {
           {items.length === 0
             ? 'Сообщений пока нет.'
             : unread > 0
-              ? `Непрочитанных: ${unread}.`
+              ? `Непрочитанных: ${unread}. Нажмите на уведомление, чтобы отметить его прочитанным.`
               : 'Все уведомления прочитаны.'}
         </p>
         {items.length === 0 ? (
@@ -54,15 +59,23 @@ export default function Notifications() {
         ) : (
           <ul className="inbox">
             {items.map((item) => (
-              <li key={item.id} className={item.read ? 'inbox-row' : 'inbox-row unread'}>
-                <span className="inbox-icon" title={TYPE_LABELS[item.type] || 'Сообщение'}>
-                  <TypeIcon type={item.type} />
-                </span>
-                <div>
-                  <p className="inbox-title">{item.title}</p>
-                  <p className="inbox-body">{item.body}</p>
-                </div>
-                <time className="inbox-time" dateTime={item.date}>{formatDate(item.date)}</time>
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className={item.read ? 'inbox-row' : 'inbox-row unread'}
+                  onClick={() => openNotification(item)}
+                  aria-label={`${item.read ? 'Прочитано' : 'Непрочитано'}: ${item.title}. Отметить прочитанным`}
+                >
+                  <span className="inbox-icon" title={TYPE_LABELS[item.type] || 'Сообщение'}>
+                    <TypeIcon type={item.type} />
+                  </span>
+                  <span className="inbox-content">
+                    <span className="inbox-title">{item.title}</span>
+                    <span className="inbox-body">{item.body}</span>
+                    {!item.read ? <span className="inbox-unread-label"><span className="inbox-unread-dot" />Непрочитано · нажмите, чтобы прочитать</span> : null}
+                  </span>
+                  <time className="inbox-time" dateTime={item.date}>{formatDate(item.date)}</time>
+                </button>
               </li>
             ))}
           </ul>
