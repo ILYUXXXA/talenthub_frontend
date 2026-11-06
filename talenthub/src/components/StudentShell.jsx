@@ -18,7 +18,7 @@ export default function StudentShell({ children }) {
       <header className="header student-header">
         <div className="header-inner">
           <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
-          <nav className="nav student-tabs" aria-label="Разделы кабинета">
+          <nav className="nav student-tabs org-shell-tabs" aria-label="Разделы кабинета">
             {TABS.map((tab) => <NavLink key={tab.to} to={tab.to}>{tab.icon}{tab.label}</NavLink>)}
           </nav>
         </div>
