@@ -383,7 +383,7 @@ label { color: #435573; }
 .th-nav a:hover { color: #3159e8; background: #f2f5ff; }
 .th-login { display: inline-flex; align-items: center; gap: 12px; padding: 11px 16px; border: 1px solid #e2e9f7; border-radius: 12px; color: #3555bc; background: #f8faff; font-size: 12px; font-weight: 800; }
 .th-hero.th-hero-clean { padding-top: 90px!important; padding-bottom: 70px!important; background: linear-gradient(135deg,#f8faff 0%,#f2f6ff 55%,#fff 100%)!important; }
-.th-clean-inner h1 { max-width: 920px; color: #172744; font-size: clamp(56px,7vw,88px); }
+.th-clean-inner h1 { max-width: 920px; color: #000; font-size: clamp(56px,7vw,88px); }
 .th-clean-inner h1 em { color: #3159e8; }
 .th-clean-inner > p { color: #71809a; font-size: 16px; }
 .th-clean-decoration { top: 78px; right: 5%; width: 185px; height: 185px; border-radius: 42px; }
