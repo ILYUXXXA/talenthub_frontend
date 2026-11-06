@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { login, registerStudent, listSchools } from '../data/store.js'
 
 const FALLBACK_SCHOOLS = ['Лицей БГУ', 'Гимназия №1 Минск', 'СШ №4 Гродно', 'Гимназия №2 Брест']
-const DEMO_PASSWORD = 'demo1234'
+const QUICK_ACCESS_PASSWORD = 'demo1234'
 
 const ROLES = [
-  { id: 'student', label: 'Войти как школьник', demo: 'alina@demo.by' },
-  { id: 'parent', label: 'Войти как родитель', demo: 'olga@demo.by' },
-  { id: 'school', label: 'Войти как администрация школы', demo: 'school@demo.by' },
-  { id: 'company', label: 'Войти как представитель компании', demo: 'company@demo.by' },
-  { id: 'admin', label: 'Войти как модератор', demo: 'admin@demo.by' },
+  { id: 'student', label: 'Войти как школьник', quickEmail: 'alina@demo.by' },
+  { id: 'parent', label: 'Войти как родитель', quickEmail: 'olga@demo.by' },
+  { id: 'school', label: 'Войти как администрация школы', quickEmail: 'school@demo.by' },
+  { id: 'company', label: 'Войти как представитель компании', quickEmail: 'company@demo.by' },
+  { id: 'admin', label: 'Войти как модератор', quickEmail: 'admin@demo.by' },
 ]
 
 function readSchools() {
@@ -70,11 +70,24 @@ export default function Auth() {
     setError('')
   }
 
-  function fillDemo() {
-    if (!current?.demo) return
-    setEmail(current.demo)
-    setPassword(DEMO_PASSWORD)
+  function enterAsRole() {
+    if (!current?.quickEmail) return
     setError('')
+    try {
+      const user = userFrom(login(current.quickEmail, QUICK_ACCESS_PASSWORD))
+      if (!user || user.role !== role) {
+        setError('Не удалось открыть профиль выбранной роли.')
+        return
+      }
+      const path = pathFor(user)
+      if (!path) {
+        setError('Для этой роли вход пока недоступен.')
+        return
+      }
+      navigate(path)
+    } catch {
+      setError('Не удалось открыть профиль выбранной роли.')
+    }
   }
 
   function onLogin(event) {
@@ -121,9 +134,9 @@ export default function Auth() {
 
   if (!current) {
     return (
-      <main>
-        <div className="container narrow">
-          <h1>Вход</h1>
+      <main className="auth-page">
+        <div className="container narrow auth-container">
+          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ПЛАТФОРМА</span><h1>Выберите профиль</h1><p className="lead">Перейдите в кабинет своей роли или войдите по данным аккаунта.</p>
           <div className="role-pick">
             {ROLES.map((item) => (
               <button key={item.id} type="button" className="btn btn-ghost" onClick={() => choose(item.id)}>
@@ -137,8 +150,8 @@ export default function Auth() {
   }
 
   return (
-    <main>
-      <div className="container narrow">
+    <main className="auth-page">
+      <div className="container narrow auth-container">
         <button type="button" className="btn btn-ghost" onClick={() => choose('')}>К выбору роли</button>
         <h1>{current.label}</h1>
         {mode === 'register' ? (
@@ -185,11 +198,7 @@ export default function Auth() {
             </label>
             {error ? <p className="notice">{error}</p> : null}
             <button className="btn btn-primary" type="submit">Войти</button>
-            {current.demo ? (
-              <button type="button" className="btn btn-ghost" onClick={fillDemo}>Заполнить демо</button>
-            ) : (
-              <p className="muted">Для представителя компании демо-вход пока не заведён.</p>
-            )}
+            <button type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
             {role === 'student' ? (
               <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}
