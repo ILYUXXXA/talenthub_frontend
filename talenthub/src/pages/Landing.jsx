@@ -28,28 +28,21 @@ export default function Landing() {
         </div>
       </header>
 
-      <section className="th-hero">
-        <div className="th-hero-copy">
-          <div className="th-overline"><span></span> ЕДИНАЯ ПЛАТФОРМА ДЛЯ РАЗВИТИЯ</div>
-          <h1>Находи возможности. Участвуй. Развивайся.</h1>
-          <p>Мероприятия и образовательные проекты для учащихся. Партнёрства и инструменты развития — для школ, компаний и академий.</p>
+      <section className="th-hero th-hero-clean">
+        <div className="th-clean-inner">
+          <div className="th-overline"><span></span> ПЛАТФОРМА ОБРАЗОВАТЕЛЬНЫХ ВОЗМОЖНОСТЕЙ</div>
+          <h1>Возможности<br/><em>начинаются здесь.</em></h1>
+          <p>TalentHub объединяет учащихся, школы, компании и академии. Находите мероприятия, развивайте таланты и создавайте образовательные проекты вместе.</p>
           <div className="th-hero-actions">
-            <Link to="/auth" className="th-primary">Найти свою возможность <span>→</span></Link>
-            <a href="#platform" className="th-secondary">Узнать больше</a>
+            <Link to="/auth" className="th-primary">Открыть TalentHub <span>→</span></Link>
+            <a href="#platform" className="th-secondary">Узнать о платформе ↓</a>
           </div>
-          <div className="th-hero-caption"><span>Для учащихся</span><i></i><span>Для учреждений</span><i></i><span>Для партнёров</span></div>
-        </div>
-
-        <div className="th-hero-visual" aria-label="Открой. Участвуй. Создавай.">
-          <div className="th-visual-orb"></div>
-          <div className="th-visual-wordmark"><span>talent</span><strong>hub</strong></div>
-          <div className="th-visual-index">01 <i></i> 03</div>
-          <div className="th-visual-steps">
-            <div className="th-visual-step"><span>01</span><div><b>Открой</b><small>Найди своё направление</small></div><i>↗</i></div>
-            <div className="th-visual-step"><span>02</span><div><b>Участвуй</b><small>Выбирай события и проекты</small></div><i>↗</i></div>
-            <div className="th-visual-step"><span>03</span><div><b>Создавай</b><small>Сохраняй результаты и связи</small></div><i>↗</i></div>
+          <div className="th-clean-points">
+            <div><span>01</span><b>Находи</b><small>Мероприятия и проекты</small></div>
+            <div><span>02</span><b>Участвуй</b><small>Заявки и достижения</small></div>
+            <div><span>03</span><b>Создавай</b><small>Партнёрства и инициативы</small></div>
           </div>
-          <div className="th-visual-note">ТВОЯ СЛЕДУЮЩАЯ ВОЗМОЖНОСТЬ — ЗДЕСЬ</div>
+          <div className="th-clean-decoration" aria-hidden="true"><span>t.</span><i></i><b></b></div>
         </div>
       </section>
 
