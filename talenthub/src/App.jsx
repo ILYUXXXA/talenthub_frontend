@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppHeader from './components/AppHeader.jsx'
+import StudentShell from './components/StudentShell.jsx'
 import Landing from './pages/Landing.jsx'
 import Auth from './pages/Auth.jsx'
 import FirstLogin from './pages/FirstLogin.jsx'
