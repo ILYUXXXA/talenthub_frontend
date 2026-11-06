@@ -91,12 +91,11 @@ export default function Profile() {
   }
 
   return (
-    <main>
+    <main className="student-workspace">
       <div className="container">
         <div className="grid-2">
           <section className="card">
             <h1>{profileName || 'Школьник'}</h1>
-            {cabinet.demo ? <p className="notice">Войдите, чтобы менять свои настройки.</p> : null}
             {!user && !student ? <p className="muted">Профиль не найден. <Link to="/auth">Войти</Link></p> : (
               <dl className="profile-facts">
                 <div>
