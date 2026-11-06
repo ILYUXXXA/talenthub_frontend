@@ -40,7 +40,7 @@ export default function Notifications() {
   const unread = items.filter((item) => !item.read).length
 
   return (
-    <main>
+    <main className="student-workspace">
       <div className="container">
         <p className="lead">
           {items.length === 0
@@ -49,7 +49,6 @@ export default function Notifications() {
               ? `Непрочитанных: ${unread}.`
               : 'Все уведомления прочитаны.'}
         </p>
-        {cabinet.demo ? <p className="notice">Показаны демо-уведомления.</p> : null}
         {items.length === 0 ? (
           <p className="muted">Когда школа, администратор или организатор напишут, сообщение появится здесь.</p>
         ) : (
