@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { GRADES, INTERESTS } from '../data/store.js'
 import { api, clearSession } from '../api/client.js'
 
 function formatDate(value) {
@@ -14,6 +13,8 @@ export default function Profile() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [schools, setSchools] = useState([])
+  const [gradeOptions, setGradeOptions] = useState([7, 8, 9, 10, 11])
+  const [interestOptions, setInterestOptions] = useState([])
   const [grade, setGrade] = useState('')
   const [interests, setInterests] = useState([])
   const [schoolDraft, setSchoolDraft] = useState('')
@@ -24,14 +25,16 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    Promise.all([api.me(), api.profile(), api.organizations('school')])
-      .then(([account, student, schoolList]) => {
+    Promise.all([api.me(), api.profile(), api.organizations('school'), api.reference()])
+      .then(([account, student, schoolList, reference]) => {
         setUser(account)
         setProfile(student)
         setGrade(student.grade == null ? '' : String(student.grade))
         setInterests(student.interests || [])
         setSchoolDraft(student.school?.id || '')
         setSchools(schoolList)
+        setGradeOptions(reference.grades || [7, 8, 9, 10, 11])
+        setInterestOptions((reference.interests || []).map((item) => item.name))
       })
       .catch((cause) => {
         setMessage(cause.message || 'Не удалось загрузить профиль.')
@@ -42,7 +45,7 @@ export default function Profile() {
 
   const profileName = [user?.first_name || profile?.first_name, user?.last_name || profile?.last_name].filter(Boolean).join(' ')
   const query = draft.trim().toLowerCase()
-  const suggestions = query ? INTERESTS.filter((name) => name.toLowerCase().includes(query) && !interests.includes(name)) : []
+  const suggestions = query ? interestOptions.filter((name) => name.toLowerCase().includes(query) && !interests.includes(name)) : []
 
   function addInterest(value = draft) {
     const name = String(value).trim()
@@ -58,7 +61,9 @@ export default function Profile() {
     }
     setSaving(true)
     try {
-      const saved = await api.updateProfile({ grade: grade ? Number(grade) : null, interests })
+      const payload = { interests }
+      if (grade) payload.grade = Number(grade)
+      const saved = await api.updateProfile(payload)
       setProfile(saved)
       setMessage('Настройки профиля сохранены.')
     } catch (cause) {
@@ -71,7 +76,11 @@ export default function Profile() {
   async function onChangeSchool() {
     setSaving(true)
     try {
-      const saved = await api.updateProfile({ school_id: schoolDraft || null })
+      if (!schoolDraft) {
+        setMessage('Выберите учреждение образования.')
+        return
+      }
+      const saved = await api.updateProfile({ school_id: schoolDraft })
       setProfile(saved)
       setSchoolOpen(false)
       setMessage('Учреждение образования обновлено.')
@@ -105,7 +114,7 @@ export default function Profile() {
             <button type="button" className="btn btn-ghost profile-switch" onClick={() => setSchoolOpen((open) => !open)}>Сменить учреждение образования</button>
             {schoolOpen ? (
               <div className="field profile-school">
-                <select value={schoolDraft} onChange={(event) => setSchoolDraft(event.target.value)}>
+                <select value={schoolDraft} required onChange={(event) => setSchoolDraft(event.target.value)}>
                   <option value="">Не выбрано</option>
                   {schools.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
                 </select>
@@ -120,7 +129,7 @@ export default function Profile() {
               <span>Класс</span>
               <select value={grade} onChange={(event) => setGrade(event.target.value)} disabled={!profile}>
                 <option value="">Не выбран</option>
-                {GRADES.map((item) => <option key={item} value={item}>{item}</option>)}
+                {gradeOptions.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
             <div className="field">
