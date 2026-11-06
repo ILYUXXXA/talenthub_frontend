@@ -1,37 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listUpcoming, completeProfile, GRADES, CITIES, INTERESTS } from '../data/store.js';
+import { api } from '../api/client.js';
 
-const FALLBACK_UPCOMING = [
-  {
-    title: 'Республиканская олимпиада по математике',
-    date: '12 марта 2026',
-    city: 'Минск',
-    category: 'olympiad',
-    categoryLabel: 'Олимпиада',
-  },
-  {
-    title: 'Олимпиада по информатике',
-    date: '4 апреля 2026',
-    city: 'Гродно',
-    category: 'olympiad',
-    categoryLabel: 'Олимпиада',
-  },
-  {
-    title: 'Мастерская робототехники',
-    date: '18 апреля 2026',
-    city: 'Брест',
-    category: 'project',
-    categoryLabel: 'Проектная деятельность',
-  },
-  {
-    title: 'Проектная смена «Своими руками»',
-    date: '22 июня 2026',
-    city: 'Гомель',
-    category: 'project',
-    categoryLabel: 'Проектная деятельность',
-  },
-];
+const GRADES = [7, 8, 9, 10, 11];
+const CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
+const INTERESTS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия', 'Робототехника', 'Проектная работа'];
 
 const FALLBACK_GRADES = [7, 8, 9, 10, 11];
 const FALLBACK_CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
@@ -77,19 +50,19 @@ function listOr(source, fallback) {
   return fallback;
 }
 
-function loadUpcoming() {
-  try {
-    const live = listUpcoming();
-    if (Array.isArray(live) && live.some((event) => event && event.title)) return live;
-  } catch {
-    /* dimmed list still has to show */
-  }
-  return FALLBACK_UPCOMING;
-}
 
 export default function FirstLogin() {
   const navigate = useNavigate();
-  const [upcoming] = useState(loadUpcoming);
+  const [upcoming, setUpcoming] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  useEffect(() => {
+    Promise.all([api.events({ upcoming: true }), api.reference()])
+      .then(([events, reference]) => {
+        setUpcoming(events.map((item) => ({ ...item, date: item.date, categoryLabel: item.category === 'project' ? 'Проектная деятельность' : 'Олимпиада' })));
+      })
+      .catch(() => setUpcoming([]))
+      .finally(() => setLoadingEvents(false));
+  }, []);
   const grades = listOr(GRADES, FALLBACK_GRADES);
   const cities = listOr(CITIES, FALLBACK_CITIES);
   const interests = listOr(INTERESTS, FALLBACK_INTERESTS);
@@ -102,7 +75,7 @@ export default function FirstLogin() {
     setSelected((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]));
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     if (!grade || !city || selected.length < 1) {
       setError('Выберите класс, город и хотя бы один интерес.');
@@ -112,16 +85,15 @@ export default function FirstLogin() {
     const cityItem = cities.find((item) => valueOf(item) === city);
     const picked = interests.filter((item) => selected.includes(valueOf(item))).map(storedValue);
     try {
-      completeProfile({
-        grade: gradeItem == null ? grade : storedValue(gradeItem),
+      await api.updateProfile({
+        grade: Number(gradeItem == null ? grade : storedValue(gradeItem)),
         city: cityItem == null ? city : storedValue(cityItem),
         interests: picked,
       });
-    } catch {
-      setError('Не удалось сохранить профиль.');
-      return;
+      navigate('/events');
+    } catch (cause) {
+      setError(cause.message || 'Не удалось сохранить профиль.');
     }
-    navigate('/events');
   }
 
   return (
@@ -142,6 +114,7 @@ export default function FirstLogin() {
                   </span>
                 </article>
               ))}
+              {loadingEvents ? <p className="muted">Загружаем мероприятия…</p> : null}
             </div>
           </div>
           <form className="modal-card" onSubmit={onSubmit}>
