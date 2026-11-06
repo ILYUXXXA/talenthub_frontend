@@ -74,7 +74,7 @@ export default function OrganizationCabinet({ kind = 'school' }) {
         project_kind: category === 'project' ? (projectKind.trim() || null) : null,
         interests: [interest], grade_min: Number(gradeMin), grade_max: Number(gradeMax),
         event_date: date, registration_deadline: deadline, city: city.trim(),
-        venue: venue.trim() || city.trim(), format, terms: 'Регистрация через платформу TalentHub.',
+        venue: venue.trim() || city.trim(), format, terms: 'Регистрация через экосистему TalentHub.',
         capacity: Number(capacity),
       })
       setNotice('Мероприятие отправлено на модерацию.')
