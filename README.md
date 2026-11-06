@@ -1,0 +1,3 @@
+# TalentHub
+
+TalentHub frontend application.
