@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { listEvents } from '../data/store.js'
 
 const features = [
   { icon: '⌕', title: 'Возможности рядом', text: 'Мероприятия, олимпиады, конкурсы и образовательные программы в одном каталоге.' },
@@ -14,17 +13,7 @@ const roles = [
   { title: 'Родителям', text: 'Следите за образовательной активностью и успехами ребёнка.', link: '/parent', action: 'Подробнее' },
 ]
 
-function formatPreviewDate(value) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value || ''
-  const parts = value.split('-')
-  return parts[2] + '.' + parts[1]
-}
-
 export default function Landing() {
-  const previewEvents = (() => {
-    try { return listEvents().filter((event) => !event.status || event.status === 'published').slice(0, 2) }
-    catch { return [] }
-  })()
   return (
     <main className="th-landing">
       <header className="th-header">
@@ -51,31 +40,18 @@ export default function Landing() {
           <div className="th-hero-caption"><span>Для учащихся</span><i></i><span>Для учреждений</span><i></i><span>Для партнёров</span></div>
         </div>
 
-        <div className="th-dashboard-wrap">
-          <div className="th-dashboard">
-            <div className="th-dash-top"><div className="th-dash-brand"><span className="th-mini-mark">t.</span> TalentHub</div><div className="th-dash-user"><span>Каталог мероприятий</span><b>А</b></div></div>
-            <div className="th-preview-nav"><span className="active">Мероприятия</span><span>Мои заявки</span><span>Уведомления</span><span>Достижения</span><span>Профиль</span></div>
-            <div className="th-preview-content">
-              <div className="th-preview-title"><div><small>КАТАЛОГ</small><h3>Мероприятия</h3><p>Найдите возможность для своего развития</p></div></div>
-              <div className="th-preview-search"><span>⌕</span> Название, организатор или город <b>Фильтры</b></div>
-              <div className="th-preview-list">
-                {previewEvents.map((event) => (
-                  <article className="th-preview-event" key={event.id}>
-                    <span className="th-preview-event-icon">{event.category === 'project' ? '◇' : '✳'}</span>
-                    <div className="th-preview-event-info">
-                      <small>{event.category === 'project' ? 'ПРОЕКТНАЯ ДЕЯТЕЛЬНОСТЬ' : 'ОЛИМПИАДА'} · {event.organizer}</small>
-                      <b>{event.title}</b>
-                      <span>{formatPreviewDate(event.date)} · {event.city} · {event.format}</span>
-                      <em>Дедлайн: {formatPreviewDate(event.deadline)}</em>
-                    </div>
-                    <span className="th-preview-arrow">→</span>
-                  </article>
-                ))}
-                {previewEvents.length === 0 ? <p className="th-preview-empty">Опубликованные мероприятия появятся здесь</p> : null}
-              </div>
-            </div>
-          </div>
-          <div className="th-dashboard-note"><span>✓</span><div><b>Возможности TalentHub</b><small>Мероприятия и проекты в одном месте</small></div></div>
+        <div className="th-hero-art" aria-hidden="true">
+          <div className="th-art-glow"></div>
+          <div className="th-art-orbit th-art-orbit-one"></div>
+          <div className="th-art-orbit th-art-orbit-two"></div>
+          <div className="th-art-tile th-art-tile-back"></div>
+          <div className="th-art-tile th-art-tile-mid"></div>
+          <div className="th-art-tile th-art-tile-front"><span>t.</span></div>
+          <div className="th-art-tag th-art-tag-one"><i>✳</i><span><small>ОТКРЫВАЙ</small><b>Новые возможности</b></span></div>
+          <div className="th-art-tag th-art-tag-two"><i>↗</i><span><small>УЧАСТВУЙ</small><b>Реальные события</b></span></div>
+          <div className="th-art-tag th-art-tag-three"><i>✦</i><span><small>РАЗВИВАЙСЯ</small><b>Собирай достижения</b></span></div>
+          <div className="th-art-spark th-art-spark-one">✳</div>
+          <div className="th-art-spark th-art-spark-two">✦</div>
         </div>
       </section>
 
