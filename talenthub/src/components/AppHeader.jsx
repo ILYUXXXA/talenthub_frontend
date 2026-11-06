@@ -3,11 +3,8 @@ import { Link, NavLink } from 'react-router-dom'
 const LINKS = [
   { to: '/', label: 'Главная', end: true },
   { to: '/auth', label: 'Вход' },
-  { to: '/welcome', label: 'Первый вход' },
   { to: '/events', label: 'Мероприятия' },
   { to: '/school', label: 'Школа' },
-  { to: '/admin', label: 'Админ' },
-  { to: '/parent', label: 'Родитель' },
 ]
 
 export default function AppHeader({ children }) {
@@ -29,7 +26,6 @@ export default function AppHeader({ children }) {
             ))}
           </nav>
         </div>
-        <div className="demo-strip">Демо MVP. Пароль всех аккаунтов: demo1234</div>
       </header>
       {children}
     </>
