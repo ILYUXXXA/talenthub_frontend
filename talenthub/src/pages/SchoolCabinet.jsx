@@ -129,7 +129,7 @@ export default function SchoolCabinet() {
     } catch { setNotice('Не удалось отправить отклик. Попробуйте ещё раз.') }
   }
 
-  return <OrganizationShell tabs={[['overview','Обзор','overview'],['events','Мероприятия','events'],['prestige','Престиж','prestige'],['partners','Сотрудничество','partners'],['market','Предложения компаний','market'],['create','Опубликовать мероприятие','create']]} activeTab={tab} onTabChange={(id) => { setTab(id); setNotice('') }}>
+  return <OrganizationShell tabs={[['overview','Обзор','overview'],['events','Мои мероприятия','events'],['prestige','Престиж','prestige'],['partners','Сотрудничество','partners'],['market','Предложения компаний','market'],['create','Опубликовать мероприятие','create']]} activeTab={tab} onTabChange={(id) => { setTab(id); setNotice('') }}>
     <main className="org-page"><div className="container org-container">
       <section className="org-page-heading"><h1>Кабинет образовательного учреждения</h1><p>Управляйте мероприятиями, отслеживайте активность учащихся и взаимодействуйте с компаниями-партнёрами.</p></section>
 
