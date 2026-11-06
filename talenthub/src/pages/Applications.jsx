@@ -44,7 +44,7 @@ export default function Applications() {
     try {
       return studentCabinet()
     } catch {
-      return { loggedIn: false, demo: true, applications: [] }
+      return { loggedIn: false, applications: [] }
     }
   })
   const [message, setMessage] = useState('')
@@ -126,9 +126,6 @@ export default function Applications() {
     <main>
       <div className="container">
         <p className="lead">Регистрации на мероприятия и их статусы.</p>
-        {cabinet.demo ? (
-          <p className="notice">Войдите, чтобы видеть и отменять свои заявки.</p>
-        ) : null}
         {message ? <p className="notice">{message}</p> : null}
         {items.length === 0 ? (
           <p className="muted">Заявок пока нет. <Link to="/events">Выберите мероприятие</Link> и зарегистрируйтесь.</p>
