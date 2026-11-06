@@ -951,3 +951,28 @@ td {
 @media (max-width: 900px) { .org-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .org-container { padding-top: 16px; } .org-hero { padding: 22px 18px; } .org-hero-mark { width: 78px; height: 78px; border-radius: 16px; } .org-hero-mark > span { font-size: 22px; } .org-dashboard-grid, .org-student-grid, .org-school-grid { grid-template-columns: 1fr; } .org-quick-actions { align-items: flex-start; flex-direction: column; padding: 20px; } .org-participant-row { align-items: flex-start; flex-direction: column; } }
 @media (max-width: 520px) { .org-hero { align-items: flex-start; } .org-hero-mark { display: none; } .org-metrics { gap: 8px; } .org-metric { min-height: 100px; padding: 13px; } .org-metric strong { font-size: 24px; } .org-tabs { flex-wrap: nowrap; overflow-x: auto; } .org-tabs button { flex: none; } .org-section-head { align-items: flex-start; flex-direction: column; } .org-event-top { align-items: flex-start; flex-direction: column; } .org-form-footer { align-items: stretch; flex-direction: column; } .org-form-footer .btn { width: 100%; } }
+
+
+/* Unified workspace styling */
+.org-page,.auth-page{min-height:calc(100vh - 72px);padding:28px 0 64px;background:radial-gradient(ellipse at 8% 0%,rgba(72,105,255,.10),transparent 34%),var(--bg)}
+.org-container{max-width:1440px;margin:0 auto;padding:12px 24px 64px}
+.org-eyebrow{color:#7184b7;font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.org-intro{max-width:720px;color:var(--muted);font-size:16px}
+.parent-page .grid-2{align-items:start;margin-top:22px}
+.parent-page .card,.auth-container .card{padding:24px;border-radius:20px}
+.parent-page .card h2{margin:4px 0 12px}
+.parent-page .badge{width:max-content}
+.auth-container{max-width:620px}
+.auth-container>h1{margin:10px 0}
+.auth-container .card{margin-top:20px}
+.auth-container .role-pick{margin-top:22px}
+.auth-container .role-pick .btn{justify-content:flex-start;min-height:58px;padding:0 20px;border-radius:15px;background:var(--surface)}
+.btn,.chip{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.btn:hover{transform:translateY(-1px)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(75,112,220,.35);outline-offset:2px}
+@media(max-width:760px){
+ .org-page,.auth-page{padding:16px 0 44px}
+ .org-container{padding:8px 16px 40px}
+ .parent-page .grid-2{grid-template-columns:1fr}
+ .parent-page .card,.auth-container .card{padding:18px}
+}
