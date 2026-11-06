@@ -135,7 +135,7 @@ export default function Profile() {
                 <select value={schoolDraft} onChange={(event) => setSchoolDraft(event.target.value)}>
                   {schools.map((name) => <option key={name} value={name}>{name}</option>)}
                 </select>
-                <button type="button" className="btn btn-primary" onClick={onChangeSchool}>Сохранить учреждение</button>
+                <button type="button" className="btn btn-primary" onClick={onChangeSchool}>Сохранить изменения</button>
               </div>
             ) : null}
           </section>
@@ -205,7 +205,7 @@ export default function Profile() {
             {message ? <p className="notice">{message}</p> : null}
             {cabinet.loggedIn ? (
               <div className="profile-actions">
-                <button type="submit" className="btn btn-primary">Сохранить</button>
+                <button type="submit" className="btn btn-primary">Сохранить профиль</button>
                 <button type="button" className="btn btn-ghost" onClick={onLogout}>Выйти</button>
               </div>
             ) : (
