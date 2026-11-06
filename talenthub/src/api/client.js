@@ -126,6 +126,8 @@ export const api = {
     const feed = await request('/api/v1/notifications/me')
     return { ...feed, items: (feed.items || []).map((item) => ({ ...item, date: item.created_at })) }
   },
+  parentChild: () => request('/api/v1/parents/me/child'),
+  linkParentChild: (data) => request('/api/v1/parents/me/child', { method: 'PUT', body: JSON.stringify(data) }),
   profile: () => request('/api/v1/students/me'),
   updateProfile: (data) => request('/api/v1/students/me', { method: 'PATCH', body: JSON.stringify(data) }),
   success: () => request('/api/v1/students/me/success'),
