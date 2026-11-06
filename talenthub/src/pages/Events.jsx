@@ -136,9 +136,6 @@ export default function Events() {
     })
   }, [published, category, status, directions, query, cabinet.applications])
 
-  const profileDirections = (cabinet.user?.interests || []).filter((name) => (
-    OLYMPIAD_DIRECTIONS.includes(name) || PROJECT_DIRECTIONS.includes(name)
-  ))
   useEffect(() => {
     let active = true
     api.recommendations(directions)
