@@ -2458,3 +2458,163 @@ grid-template-columns: 1fr 1fr;
  .th-clean-points>div+div{border-left:0;border-top:1px solid #dfe5f1;padding-left:4px}
  .th-clean-points b{font-size:13px}.th-clean-points small{font-size:9px}
 }
+
+
+/* Unified role workspaces: school, company, student and parent */
+.header:not(.student-header) .header-inner {
+  min-height: 66px;
+  max-width: 1440px;
+  padding: 12px 24px;
+}
+.student-header { position: sticky; top: 0; z-index: 30; backdrop-filter: blur(16px); }
+.student-header .header-inner {
+  max-width: 1440px;
+  gap: 12px 22px;
+  padding: 12px 24px;
+}
+.student-header .brand-lockup { flex: none; }
+.student-header .student-tabs {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.student-header .student-tabs a,
+.student-header .student-tabs button {
+  flex: none;
+  min-height: 44px;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.student-header .student-tabs a:hover,
+.student-header .student-tabs button:hover { background: var(--accent-soft); color: var(--ink); transform: translateY(-1px); }
+.student-header .student-tabs a.active,
+.student-header .student-tabs button.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+.student-header .student-tabs .tab-icon { width: 18px; height: 18px; }
+.org-page-heading {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 22px;
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid #243e7e;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #17264d 0%, #263f7e 58%, #3658a2 100%);
+  box-shadow: 0 18px 42px rgba(23, 38, 77, .16);
+}
+.org-page-heading:after {
+  content: "t.";
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-56%);
+  color: rgba(255,255,255,.07);
+  font-size: clamp(130px, 20vw, 240px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.1em;
+  pointer-events: none;
+}
+.org-page-heading h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 850px;
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(30px, 3.5vw, 44px);
+  letter-spacing: -.035em;
+}
+.org-page-heading p {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0;
+  color: rgba(245,248,255,.82);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.org-container { max-width: 1360px; padding-top: 28px; padding-bottom: 64px; }
+.org-panel,.org-metric,.parent-workspace .card,.student-workspace .card {
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(23,38,77,.055);
+}
+.org-metric { transition: transform .18s ease, box-shadow .18s ease; }
+.org-metric:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(23,38,77,.09); }
+.org-event-row,.org-partner-card,.org-school-card,.org-student-card { transition: border-color .18s ease, background .18s ease; }
+.org-page .btn,.parent-workspace .btn,.student-workspace .btn {
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.org-page .btn:hover:not(:disabled),.parent-workspace .btn:hover:not(:disabled),.student-workspace .btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+.org-page button:disabled,.parent-workspace button:disabled,.student-workspace button:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+  transform: none;
+}
+.parent-workspace,.student-workspace {
+  min-height: calc(100vh - 76px);
+  padding: 24px 0 56px;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(49,89,237,.07), transparent 34%),
+    var(--bg);
+}
+.parent-workspace > .container,.student-workspace > .container {
+  max-width: 1320px;
+  padding: 22px 24px 56px;
+}
+.parent-workspace h1,.student-workspace h1 { font-size: clamp(30px, 3.4vw, 44px); letter-spacing: -.035em; }
+.parent-workspace .stack > .card,.student-workspace .grid-2 > .card { padding: 22px; }
+.parent-workspace .header-greet { color: var(--ink); font-size: 15px; }
+.parent-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.parent-bar .header-greet { margin: 0 auto; }
+.parent-bar .student-tabs { flex: 0 1 auto; justify-content: flex-end; }
+.auth-page {
+  min-height: calc(100vh - 76px);
+  padding: 42px 0 64px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(49,89,237,.10), transparent 55%), var(--bg);
+}
+.auth-container { max-width: 620px; }
+.auth-container > h1 { margin: 10px 0 8px; font-size: clamp(34px, 4vw, 48px); }
+.auth-container > .lead { margin: 0 0 22px; font-size: 16px; }
+.auth-container .card { padding: 26px; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 18px 42px rgba(23,38,77,.08); }
+.auth-container .role-pick .btn { justify-content: flex-start; min-height: 58px; padding: 0 18px; border-radius: 14px; }
+.field input:focus,.field select:focus,.field textarea:focus {
+  border-color: var(--primary);
+  outline: 3px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  outline-offset: 1px;
+}
+@media (max-width: 900px) {
+  .student-header .header-inner { align-items: flex-start; flex-direction: column; }
+  .student-header .student-tabs { width: 100%; justify-content: flex-start; }
+  .parent-bar .header-greet { display: none; }
+  .org-dashboard-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .header:not(.student-header) .header-inner,.student-header .header-inner { padding: 10px 16px; }
+  .org-container { padding: 16px 16px 42px; }
+  .org-page-heading { padding: 22px 20px; border-radius: 18px; }
+  .org-page-heading:after { right: 0; font-size: 120px; }
+  .student-header .student-tabs a,.student-header .student-tabs button { min-height: 42px; padding: 8px 11px; font-size: 13px; }
+  .student-header .student-tabs .tab-icon { display: none; }
+  .parent-workspace,.student-workspace { padding: 12px 0 36px; }
+  .parent-workspace > .container,.student-workspace > .container { padding: 14px 16px 40px; }
+  .parent-workspace .stack > .card,.student-workspace .grid-2 > .card,.auth-container .card { padding: 18px; }
+  .auth-page { padding: 24px 0 42px; }
+}
