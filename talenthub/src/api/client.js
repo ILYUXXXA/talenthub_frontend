@@ -3,7 +3,7 @@ const API_ORIGIN = (() => {
   const withoutApiPath = configured.endsWith('/api/v1') ? configured.slice(0, -7) : configured
   return withoutApiPath.endsWith('/') ? withoutApiPath.slice(0, -1) : withoutApiPath
 })()
-const API_BASE = `${API_ORIGIN}/api/v1`
+const API_BASE = API_ORIGIN
 const TOKEN_KEY = 'talenthub_access_token'
 const LEGACY_TOKEN_KEY = 'talenthub-access-token'
 
