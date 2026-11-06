@@ -2,21 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 
-const GRADES = [7, 8, 9, 10, 11];
-const CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
-const INTERESTS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия', 'Робототехника', 'Проектная работа'];
-
 const FALLBACK_GRADES = [7, 8, 9, 10, 11];
 const FALLBACK_CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
-const FALLBACK_INTERESTS = [
-  'Математика',
-  'Информатика',
-  'Физика',
-  'Биология',
-  'Химия',
-  'Робототехника',
-  'Проектная работа',
-];
+const FALLBACK_INTERESTS = ['Математика', 'Информатика', 'Физика', 'Биология', 'Химия', 'Робототехника', 'Проектная работа'];
 
 function labelOf(item) {
   if (item != null && typeof item === 'object') {
@@ -54,8 +42,10 @@ function listOr(source, fallback) {
 export default function FirstLogin() {
   const navigate = useNavigate();
   const [upcoming, setUpcoming] = useState([]);
+  const [reference, setReference] = useState(null);
   const [loadingEvents, setLoadingEvents] = useState(true);
   useEffect(() => {
+    api.reference().then(setReference).catch(() => setReference(null));
     api.events({ upcoming: true })
       .then((events) => {
         setUpcoming(events.map((item) => ({ ...item, date: item.date, categoryLabel: item.category === 'project' ? 'Проектная деятельность' : 'Олимпиада' })));
@@ -63,9 +53,9 @@ export default function FirstLogin() {
       .catch(() => setUpcoming([]))
       .finally(() => setLoadingEvents(false));
   }, []);
-  const grades = listOr(GRADES, FALLBACK_GRADES);
-  const cities = listOr(CITIES, FALLBACK_CITIES);
-  const interests = listOr(INTERESTS, FALLBACK_INTERESTS);
+  const grades = listOr(reference?.grades, FALLBACK_GRADES);
+  const cities = listOr(reference?.cities, FALLBACK_CITIES);
+  const interests = listOr(reference?.interests, FALLBACK_INTERESTS);
   const [grade, setGrade] = useState('');
   const [city, setCity] = useState('');
   const [selected, setSelected] = useState([]);
@@ -83,14 +73,16 @@ export default function FirstLogin() {
     }
     const gradeItem = grades.find((item) => valueOf(item) === grade);
     const cityItem = cities.find((item) => valueOf(item) === city);
-    const picked = interests.filter((item) => selected.includes(valueOf(item))).map(storedValue);
+    const picked = interests.filter((item) => selected.includes(valueOf(item))).map(labelOf);
     try {
       await api.updateProfile({
         grade: Number(gradeItem == null ? grade : storedValue(gradeItem)),
-        city: cityItem == null ? city : storedValue(cityItem),
+        city: String(cityItem == null ? city : storedValue(cityItem)),
         interests: picked,
       });
-      navigate('/events');
+      const user = await api.me();
+      if (user.profile_complete) navigate('/events');
+      else setError('Профиль сохранён, но сервер не подтвердил его заполнение. Обновите страницу и проверьте данные.');
     } catch (cause) {
       setError(cause.message || 'Не удалось сохранить профиль.');
     }

@@ -66,6 +66,7 @@ function matchesQuery(event, query) {
 export default function Events() {
   const navigate = useNavigate()
   const [catalog, setCatalog] = useState([])
+  const [recommended, setRecommended] = useState([])
   const [cabinet, setCabinet] = useState({ demo: false, loggedIn: false, user: null, applications: [] })
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -135,18 +136,13 @@ export default function Events() {
     })
   }, [published, category, status, directions, query, cabinet.applications])
 
-  const profileDirections = (cabinet.user?.interests || []).filter((name) => (
-    OLYMPIAD_DIRECTIONS.includes(name) || PROJECT_DIRECTIONS.includes(name)
-  ))
-  const suggestionBasis = directions.length > 0 ? directions : profileDirections
-  const recommended = useMemo(() => {
-    if (suggestionBasis.length === 0) return []
-    return published.filter((event) => {
-      if (activeApplication(cabinet.applications, event.id)) return false
-      const interests = Array.isArray(event.interests) ? event.interests : []
-      return suggestionBasis.some((name) => interests.includes(name))
-    }).slice(0, 3)
-  }, [published, suggestionBasis, cabinet.applications])
+  useEffect(() => {
+    let active = true
+    api.recommendations(directions)
+      .then((items) => { if (active) setRecommended(items) })
+      .catch(() => { if (active) setRecommended([]) })
+    return () => { active = false }
+  }, [directions, cabinet.user?.interests])
 
   function changeCategory(value) {
     setCategory(value)
@@ -182,11 +178,22 @@ export default function Events() {
     }
   }
 
+  async function showEvent(event) {
+    setOpen(event)
+    try {
+      const detail = await api.event(event.id)
+      setOpen(detail)
+    } catch (cause) {
+      if (cause.status === 401) navigate('/auth')
+      else setMessage(cause.message || 'Не удалось загрузить карточку мероприятия.')
+    }
+  }
+
   function RegisterButton({ event }) {
     const existing = activeApplication(cabinet.applications, event.id)
     if (existing) {
       return (
-        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); setOpen(event) }}>
+        <button type="button" className="btn btn-ghost" onClick={(mouse) => { mouse.stopPropagation(); showEvent(event) }}>
           {existing.status}
         </button>
       )
@@ -198,7 +205,7 @@ export default function Events() {
     )
   }
 
-  const opened = open ? published.find((event) => event.id === open.id) || open : null
+  const opened = open ? { ...(published.find((event) => event.id === open.id) || {}), ...open } : null
   const openedApp = opened ? activeApplication(cabinet.applications, opened.id) : null
 
   return (
@@ -286,7 +293,7 @@ export default function Events() {
               <h2>Рекомендуем для тебя</h2>
               <div className="event-grid">
                 {recommended.map((event) => (
-                  <article key={event.id} className="card event-card" onClick={() => setOpen(event)}>
+                  <article key={event.id} className="card event-card" onClick={() => showEvent(event)}>
                     <span className="badge badge-muted">{categoryLabel(event)}</span>
                     <h2 className="card-title">{event.title}</h2>
                     <p className="muted">{event.organizer}</p>
