@@ -81,7 +81,7 @@ export default function Events() {
     try {
       return studentCabinet()
     } catch {
-      return { demo: true, loggedIn: false, user: null, applications: [] }
+      return { loggedIn: false, user: null, applications: [] }
     }
   })
   const [directions, setDirections] = useState([])
