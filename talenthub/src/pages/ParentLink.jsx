@@ -100,7 +100,7 @@ export default function ParentLink() {
                   <section className="card org-panel">
                     <span className="org-eyebrow">ПУТЬ РАЗВИТИЯ</span><h2>Посещения и достижения</h2>
                     {attended.length || achievements.length ? <ul className="parent-list">{[...attended, ...achievements].map((item, index) => <li key={item + index}>{item}</li>)}</ul> : <p className="muted">Подтверждённых результатов пока нет. Они появятся здесь после участия.</p>}
-                    <Link className="btn btn-ghost btn-small" to="/success">Все результаты →</Link>
+                    <Link className="btn btn-ghost btn-small" to="/events">Найти новые возможности →</Link>
                   </section>
                 </div>
                 <div className="org-form-footer"><span className="muted">Данные профиля доступны после подтверждённой привязки.</span><button type="button" className="btn btn-ghost" onClick={clearChild}>Отвязать / сменить ребёнка</button></div>
