@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { api, mapEvent } from '../api/client.js'
 
 function TabIcon({ children }) {
   return (
@@ -288,50 +287,11 @@ function Detail({ item, kind, onClose, onDecide }) {
 }
 
 export default function Admin() {
-  const [events, setEvents] = useState([])
-  const [partnerships, setPartnerships] = useState([])
-  const [achievements, setAchievements] = useState([])
+  const [events, setEvents] = useState(SEED.events)
+  const [partnerships, setPartnerships] = useState(SEED.partnerships)
+  const [achievements, setAchievements] = useState(SEED.achievements)
   const [section, setSection] = useState('events')
   const [open, setOpen] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [saving, setSaving] = useState(false)
-
-  async function refresh() {
-    try {
-      const queue = await api.moderationQueue()
-      setEvents((queue.events?.items || []).map(mapEvent))
-      setPartnerships((queue.partnership_requests?.items || []).map((item) => ({
-        id: item.id,
-        title: item.title,
-        from: item.sender?.name || '—',
-        to: item.target?.name || (item.visibility === 'all_schools' ? 'Все школы' : '—'),
-        date: item.created_at?.slice(0, 10) || '',
-        city: '',
-        format: '',
-        text: item.description,
-        description: item.description,
-        status: item.moderation_status,
-      })))
-      setAchievements((queue.achievements?.items || []).map((item) => ({
-        id: item.id,
-        title: item.title,
-        student: [item.student?.first_name, item.student?.last_name].filter(Boolean).join(' '),
-        school: item.student?.school?.name || '',
-        date: '',
-        categoryLabel: 'Достижение',
-        text: '',
-        status: item.status,
-      })))
-      setError('')
-    } catch (cause) {
-      setError(cause.message || 'Не удалось загрузить очередь модерации.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { refresh() }, [])
 
   const queues = {
     events: pendingOf(events),
@@ -359,21 +319,13 @@ export default function Admin() {
     setOpen(null)
   }
 
-  async function onDecide(status) {
-    if (!open || saving) return
-    setSaving(true)
-    const decision = ['published', 'incoming', 'confirmed'].includes(status) ? 'approve' : 'reject'
-    try {
-      if (open.kind === 'events') await api.moderateEvent(open.id, decision)
-      else if (open.kind === 'partnerships') await api.moderatePartnership(open.id, decision)
-      else await api.moderateAchievement(open.id, decision)
-      setOpen(null)
-      await refresh()
-    } catch (cause) {
-      setError(cause.message || 'Не удалось сохранить решение модератора.')
-    } finally {
-      setSaving(false)
-    }
+  function onDecide(status) {
+    if (!open) return
+    const mark = (list) => list.map((item) => (item.id === open.id ? { ...item, status } : item))
+    if (open.kind === 'events') setEvents(mark)
+    else if (open.kind === 'partnerships') setPartnerships(mark)
+    else setAchievements(mark)
+    setOpen(null)
   }
 
   return (
@@ -381,19 +333,29 @@ export default function Admin() {
       <ModeratorBar section={section} onSection={onSection} counts={counts} />
       <main>
         <div className="container">
-          {loading ? <p className="muted">Загружаем очередь модерации…</p> : null}
-          {error ? <p className="notice">{error}</p> : null}
-          {visible.length === 0 && !loading ? <p className="muted">Нет заявок на проверку</p> : null}
-          {visible.length > 0 ? (
+          
+          {visible.length === 0 ? <p className="muted">Нет заявок</p> : (
             <div className="mod-grid">
               {visible.map((item) => (
-                <QueueCard key={item.id} item={item} kind={section} onOpen={() => setOpen({ ...item, kind: section })} />
+                <QueueCard
+                  key={item.id}
+                  item={item}
+                  kind={section}
+                  onOpen={() => setOpen({ ...item, kind: section })}
+                />
               ))}
             </div>
-          ) : null}
+          )}
         </div>
       </main>
-      {open ? <Detail item={open} kind={open.kind} onClose={() => setOpen(null)} onDecide={onDecide} /> : null}
+      {open ? (
+        <Detail
+          item={open}
+          kind={open.kind}
+          onClose={() => setOpen(null)}
+          onDecide={onDecide}
+        />
+      ) : null}
     </>
   )
 }
