@@ -194,13 +194,10 @@ export default function Admin() {
   }
 
   return (
-    <main>
-      <div className="container">
+    <main className="org-page admin-page">
+      <div className="container org-container">
         <div className="stack">
-          <div>
-            <h1>Модерация</h1>
-            <p className="muted">Проверяйте публикации, партнёрские запросы и достижения в одном рабочем пространстве.</p>
-          </div>
+          <section className="org-hero"><div><span className="org-eyebrow">РАБОЧЕЕ ПРОСТРАНСТВО TALENTHUB</span><h1>Центр модерации</h1><p>Проверяйте публикации, партнёрские запросы и достижения в едином пространстве.</p></div><div className="org-hero-mark"><span>✓</span><small>TalentHub<br/>Review</small></div></section>
 
           <section className="card stack">
             <h2 className="card-title">Мероприятия</h2>
