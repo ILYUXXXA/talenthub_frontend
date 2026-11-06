@@ -10,7 +10,7 @@ export default function Success() {
     try {
       return studentCabinet()
     } catch {
-      return { demo: true, student: null }
+      return { student: null }
     }
   })[0]
   const student = cabinet.student
@@ -21,7 +21,6 @@ export default function Success() {
     <main>
       <div className="container">
         <p className="lead">Куда школьник сходил и какие результаты подтверждены.</p>
-        {cabinet.demo ? <p className="notice">Показаны демо-успехи.</p> : null}
         {!student ? (
           <p className="muted">Профиль ученика не найден.</p>
         ) : (
