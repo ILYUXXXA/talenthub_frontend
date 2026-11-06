@@ -2618,3 +2618,8 @@ grid-template-columns: 1fr 1fr;
   .parent-workspace .stack > .card,.student-workspace .grid-2 > .card,.auth-container .card { padding: 18px; }
   .auth-page { padding: 24px 0 42px; }
 }
+
+/* Landing: keep the partnership section title light on its dark gradient. */
+.th-landing .th-partners .th-partners-copy h2 {
+  color: #fff !important;
+}
