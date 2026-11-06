@@ -730,6 +730,29 @@ function load() {
           demoParent.activeChildId = 's1'
           writeRaw(JSON.stringify(parsed))
         }
+        const demoStudent = parsed.students?.find((item) => item.id === 's1')
+        if (demoStudent) {
+          if (!Array.isArray(demoStudent.attended)) demoStudent.attended = []
+          if (!Array.isArray(demoStudent.achievements)) demoStudent.achievements = []
+          const demoVisits = [
+            { title: 'Городская олимпиада по математике', eventId: 'e6', date: '2026-10-18', place: 'Гимназия №2 Брест', note: 'Очный городской тур по математике. Участие подтверждено организатором.' },
+            { title: 'Смена «Инженерные каникулы»', eventId: 'e9', date: '2026-08-14', place: 'Учебная площадка НаноСофт', note: 'Командная работа: сборка и программирование учебного устройства.' },
+            { title: 'Проектная смена «Физическая лаборатория»', eventId: 'e12', date: '2026-06-22', place: 'Лицей БГУ', note: 'Практические занятия и экспериментальная работа по физике.' },
+          ]
+          demoVisits.forEach((visit) => {
+            if (!demoStudent.attended.some((item) => (item.eventId && item.eventId === visit.eventId) || item.title === visit.title)) demoStudent.attended.push(visit)
+          })
+          const demoAchievements = [
+            { title: 'Диплом II степени, городская олимпиада по математике', status: 'confirmed', eventId: 'e6', date: '2026-10-18', level: 'Городской', description: 'Второе место по итогам городского тура олимпиады по математике.' },
+            { title: 'Сертификат участника смены «Инженерные каникулы»', status: 'confirmed', eventId: 'e9', date: '2026-08-14', level: 'Образовательный проект', description: 'Подтверждено участие в инженерной проектной смене.' },
+            { title: 'Сертификат проекта «Физическая лаборатория»', status: 'confirmed', eventId: 'e12', date: '2026-06-22', level: 'Лицейский', description: 'Завершён практический проект по экспериментальной физике.' },
+            { title: 'Финалист командного инженерного задания', status: 'confirmed', eventId: 'e9', date: '2026-08-14', level: 'Командный проект', description: 'Команда представила работающий прототип учебного устройства.' },
+          ]
+          demoAchievements.forEach((achievement) => {
+            if (!demoStudent.achievements.some((item) => (item.title || item) === achievement.title)) demoStudent.achievements.push(achievement)
+          })
+          writeRaw(JSON.stringify(parsed))
+        }
         return parsed
       }
     } catch {
@@ -1131,6 +1154,18 @@ export function studentCabinet() {
     applications: applicationsOf(db, alina),
     notifications: notificationsOf(db, alina),
   }
+}
+
+export function markNotificationRead(notificationId) {
+  const db = load()
+  const session = db.users.find((item) => item.id === db.sessionUserId)
+  const student = session?.role === 'student' ? resolveStudent(db, session) : db.students.find((item) => item.id === 's1')
+  if (!student) return false
+  const notification = (db.notifications || []).find((item) => item.id === notificationId && item.studentId === student.id)
+  if (!notification) return false
+  notification.read = true
+  save(db)
+  return true
 }
 
 export function registerForEvent(eventId) {
