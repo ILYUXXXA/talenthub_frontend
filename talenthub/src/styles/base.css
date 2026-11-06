@@ -951,3 +951,87 @@ td {
 @media (max-width: 900px) { .org-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .org-container { padding-top: 16px; } .org-hero { padding: 22px 18px; } .org-hero-mark { width: 78px; height: 78px; border-radius: 16px; } .org-hero-mark > span { font-size: 22px; } .org-dashboard-grid, .org-student-grid, .org-school-grid { grid-template-columns: 1fr; } .org-quick-actions { align-items: flex-start; flex-direction: column; padding: 20px; } .org-participant-row { align-items: flex-start; flex-direction: column; } }
 @media (max-width: 520px) { .org-hero { align-items: flex-start; } .org-hero-mark { display: none; } .org-metrics { gap: 8px; } .org-metric { min-height: 100px; padding: 13px; } .org-metric strong { font-size: 24px; } .org-tabs { flex-wrap: nowrap; overflow-x: auto; } .org-tabs button { flex: none; } .org-section-head { align-items: flex-start; flex-direction: column; } .org-event-top { align-items: flex-start; flex-direction: column; } .org-form-footer { align-items: stretch; flex-direction: column; } .org-form-footer .btn { width: 100%; } }
+
+
+/* Organization cabinets use the same header and tab geometry as the student cabinet. */
+.org-shell-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.org-shell-tabs button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.org-shell-tabs button:focus-visible,
+.org-audience-options button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  outline-offset: 2px;
+}
+.org-page-heading {
+  margin: 0 0 22px;
+}
+.org-page-heading h1 {
+  margin: 0 0 7px;
+  font-size: clamp(28px, 3.5vw, 38px);
+}
+.org-page-heading p {
+  max-width: 780px;
+  margin: 0;
+  color: var(--muted);
+}
+.org-audience-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.org-audience-options button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 100px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.org-audience-options button.selected {
+  border: 2px solid var(--primary);
+  padding: 14px;
+  background: color-mix(in srgb, var(--primary) 7%, var(--surface));
+}
+.org-audience-options button strong {
+  font-size: 14px;
+}
+.org-audience-options button small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+@media (max-width: 760px) {
+  .org-shell-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .org-shell-tabs button {
+    flex: none;
+  }
+  .org-audience-options {
+    grid-template-columns: 1fr;
+  }
+}
