@@ -125,7 +125,7 @@ export default function FirstLogin() {
   }
 
   return (
-    <main>
+    <main className="student-workspace">
       <div className="container">
         <div className="dim-wrap">
           <div className="dimmed">
@@ -188,7 +188,7 @@ export default function FirstLogin() {
             </div>
             {error ? <p className="notice">{error}</p> : null}
             <button className="btn btn-primary" type="submit">Показать мероприятия</button>
-            <p className="muted">Демо первого входа: mark@demo.by, Марк Левин. Базовая регистрация уже пройдена.</p>
+            
           </form>
         </div>
       </div>
