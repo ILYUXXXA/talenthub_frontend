@@ -82,7 +82,7 @@ export default function FirstLogin() {
       });
       const user = await api.me();
       if (user.profile_complete) navigate('/events');
-      navigate('/events');
+      else setError('Профиль сохранён, но сервер не подтвердил его заполнение. Обновите страницу и проверьте данные.');
     } catch (cause) {
       setError(cause.message || 'Не удалось сохранить профиль.');
     }
