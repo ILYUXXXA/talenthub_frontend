@@ -33,7 +33,7 @@ export default function Notifications() {
     try {
       return studentCabinet()
     } catch {
-      return { demo: true, notifications: [] }
+      return { notifications: [] }
     }
   })[0]
   const items = cabinet.notifications || []
@@ -49,7 +49,6 @@ export default function Notifications() {
               ? `Непрочитанных: ${unread}.`
               : 'Все уведомления прочитаны.'}
         </p>
-        {cabinet.demo ? <p className="notice">Показаны демо-уведомления.</p> : null}
         {items.length === 0 ? (
           <p className="muted">Когда школа, администратор или организатор напишут, сообщение появится здесь.</p>
         ) : (
