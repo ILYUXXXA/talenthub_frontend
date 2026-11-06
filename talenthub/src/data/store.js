@@ -1250,35 +1250,3 @@ export function parentCabinet() {
     schools: clone(SCHOOL_DIRECTORY),
   }
 }
-
-export function parentCabinet() {
-  const db = load()
-  const session = db.users.find((item) => item.id === db.sessionUserId)
-  if (!session || session.role !== 'parent') {
-    return {
-      loggedIn: false,
-      role: session?.role || null,
-      user: null,
-      children: [],
-      activeId: null,
-      suggestions: [],
-      events: [],
-      schools: [],
-    }
-  }
-  const user = viewUser(db, session)
-  const suggestions = (db.suggestions || [])
-    .filter((item) => item.parentId === session.id)
-    .map((item) => clone(item))
-  const events = db.events.filter((item) => !item.status || item.status === 'published')
-  return {
-    loggedIn: true,
-    role: 'parent',
-    user,
-    children: user.children,
-    activeId: user.activeChildId,
-    suggestions,
-    events: clone(events),
-    schools: clone(SCHOOL_DIRECTORY),
-  }
-}
