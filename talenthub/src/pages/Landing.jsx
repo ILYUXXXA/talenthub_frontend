@@ -1,123 +1,83 @@
 import { Link } from 'react-router-dom'
 
-const pillars = [
-  { icon: '⌕', number: '01', title: 'Находи возможности', text: 'Мероприятия, олимпиады, конкурсы и образовательные программы — в одном каталоге. Ищи по интересам и выбирай своё.' },
-  { icon: '↗', number: '02', title: 'Участвуй и развивайся', text: 'Регистрируйся, следи за статусом участия и сохраняй подтверждённые результаты в личном портфолио.' },
-  { icon: '◇', number: '03', title: 'Создавай партнёрства', text: 'Школы, компании и академии находят друг друга, объединяют ресурсы и запускают совместные инициативы.' },
+const paths = [
+  { n: '01', title: 'Найти возможность', text: 'Мероприятия, олимпиады, конкурсы и программы — с поиском по интересам.', icon: '↗' },
+  { n: '02', title: 'Принять участие', text: 'Понятная регистрация и актуальный статус участия в одном месте.', icon: '◎' },
+  { n: '03', title: 'Сохранить результат', text: 'Подтверждённые достижения остаются в личном портфолио.', icon: '◇' },
 ]
 
-const audiences = [
-  { icon: '✳', title: 'Учащимся', text: 'Открывать новые направления, находить события и собирать портфолио.', link: '/auth', action: 'Найти возможности', tone: 'blue' },
-  { icon: '⌂', title: 'Учреждениям', text: 'Публиковать мероприятия, работать с регистрациями и искать партнёров.', link: '/school', action: 'Для учреждений', tone: 'violet' },
-  { icon: '▣', title: 'Компаниям и академиям', text: 'Запускать образовательные инициативы и находить учреждения для сотрудничества.', link: '/company', action: 'Для организаций', tone: 'green' },
-  { icon: '♡', title: 'Родителям', text: 'Быть в курсе образовательной активности и участия ребёнка.', link: '/parent', action: 'Кабинет родителя', tone: 'rose' },
+const roles = [
+  { name: 'Учащимся', text: 'Открывать направления, находить события и собирать портфолио.', to: '/auth', label: 'Найти возможности', symbol: '↗' },
+  { name: 'Учреждениям', text: 'Публиковать события, управлять регистрациями и находить партнёров.', to: '/school', label: 'Профиль учреждения', symbol: '⌂' },
+  { name: 'Компаниям и академиям', text: 'Запускать образовательные инициативы и сотрудничать с учреждениями.', to: '/company', label: 'Профиль организации', symbol: '▣' },
+  { name: 'Родителям', text: 'Быть в курсе образовательной активности ребёнка.', to: '/parent', label: 'Кабинет родителя', symbol: '♡' },
 ]
 
 export default function Landing() {
   return (
-    <main className="showcase prd-showcase">
-      <header className="showcase-nav prd-nav">
-        <Link className="showcase-logo" to="/"><span className="prd-mark">✳</span>Talent<span>Hub</span></Link>
-        <nav aria-label="Основная навигация">
-          <a href="#platform">О платформе</a>
-          <a href="#journey">Как это работает</a>
-          <a href="#partners">Партнёрства</a>
-          <Link to="/auth" className="showcase-nav-cta">Войти <span>↗</span></Link>
-        </nav>
+    <main className="minimal-landing">
+      <header className="minimal-nav">
+        <Link to="/" className="minimal-logo"><span className="minimal-logo-mark">t.</span>talent<span>hub</span></Link>
+        <nav><a href="#about">О платформе</a><a href="#flow">Как это работает</a><a href="#collab">Партнёрства</a><Link to="/auth" className="minimal-login">Войти <span>↗</span></Link></nav>
       </header>
 
-      <section className="showcase-hero prd-hero">
-        <div className="showcase-copy prd-copy">
-          <div className="showcase-pill"><span className="showcase-live-dot" /> Образовательные возможности и партнёрства</div>
-          <h1>Находи возможности.<br /><em>Создавай партнёрства.</em></h1>
-          <p className="showcase-lead">TalentHub объединяет учащихся, школы, компании и академии. Здесь можно находить мероприятия, развивать свои интересы и запускать совместные образовательные инициативы.</p>
-          <div className="showcase-actions">
-            <Link className="showcase-primary" to="/auth">Открыть платформу <span>→</span></Link>
-            <a className="showcase-secondary" href="#platform">Как это работает <span>↓</span></a>
+      <section className="minimal-hero">
+        <div className="minimal-hero-copy">
+          <div className="minimal-eyebrow"><i /> ЕДИНОЕ ПРОСТРАНСТВО ВОЗМОЖНОСТЕЙ</div>
+          <h1>Найди то,<br/>что <em>зажигает.</em></h1>
+          <p className="minimal-lead">TalentHub помогает учащимся находить образовательные возможности, а школам, компаниям и академиям — создавать их вместе.</p>
+          <div className="minimal-actions"><Link to="/auth" className="minimal-button">Открыть TalentHub <span>↗</span></Link><a href="#about" className="minimal-text-link">Исследовать платформу <span>↓</span></a></div>
+          <div className="minimal-proof"><span className="minimal-proof-dot">✳</span><span><b>От интереса — к действию</b><small>События · Портфолио · Партнёрства</small></span></div>
+        </div>
+
+        <div className="minimal-art" aria-label="Абстрактная трёхмерная композиция TalentHub">
+          <div className="minimal-art-halo"></div>
+          <div className="minimal-orbit orbit-one"></div><div className="minimal-orbit orbit-two"></div><div className="minimal-orbit orbit-three"></div>
+          <div className="minimal-core">
+            <div className="core-top"></div><div className="core-side"></div><div className="core-front"><span>t.</span></div>
           </div>
-          <div className="prd-hero-note"><span className="prd-note-icon">◎</span><span><strong>Всё необходимое — в одном пространстве</strong><small>От поиска события до реального сотрудничества</small></span></div>
+          <div className="minimal-float-card float-event"><span className="float-card-icon">✳</span><span><small>ВОЗМОЖНОСТЬ</small><b>Найди своё событие</b></span><i>↗</i></div>
+          <div className="minimal-float-card float-portfolio"><span className="float-card-icon">◇</span><span><small>ТВОЙ ПУТЬ</small><b>Сохраняй достижения</b></span></div>
+          <div className="minimal-float-card float-partner"><span className="float-card-icon">↔</span><span><small>СОТРУДНИЧЕСТВО</small><b>Создавайте вместе</b></span></div>
+          <div className="minimal-art-label">DISCOVER <span>·</span> PARTICIPATE <span>·</span> CREATE</div>
         </div>
+        <div className="minimal-scroll">ЛИСТАЙТЕ НИЖЕ <span>↓</span></div>
+      </section>
 
-        <div className="prd-product-preview" aria-label="Пример интерфейса TalentHub">
-          <div className="preview-window">
-            <div className="preview-topbar"><div className="preview-brand"><span>✳</span> TalentHub</div><div className="preview-top-actions"><i></i><i></i><b>АК</b></div></div>
-            <div className="preview-body">
-              <aside className="preview-sidebar"><span className="active">⌂ <small>Обзор</small></span><span>▦ <small>Мероприятия</small></span><span>◇ <small>Партнёрства</small></span><span>▤ <small>Портфолио</small></span></aside>
-              <div className="preview-content">
-                <div className="preview-greeting"><div><small>ЛИЧНЫЙ КАБИНЕТ</small><strong>Привет, Алина!</strong><p>Твои новые возможности уже здесь.</p></div><span className="preview-avatar">А</span></div>
-                <div className="preview-stats"><div><small>Мероприятия</small><strong>12</strong><em>доступно сейчас</em></div><div><small>Мои достижения</small><strong>08</strong><em>в портфолио</em></div><div><small>Интересы</small><strong>04</strong><em>направления</em></div></div>
-                <div className="preview-section-title">Подобрали для тебя <a href="#audience">Все возможности →</a></div>
-                <div className="preview-event"><div className="preview-event-art art-blue">✦</div><div><small>ОЛИМПИАДА · 18 НОЯБРЯ</small><strong>Технологии будущего</strong><span>Наука · Онлайн</span></div><b>→</b></div>
-                <div className="preview-event"><div className="preview-event-art art-violet">◇</div><div><small>ОБРАЗОВАТЕЛЬНАЯ ПРОГРАММА</small><strong>Лаборатория идей</strong><span>Проектная деятельность</span></div><b>→</b></div>
-              </div>
-            </div>
-          </div>
-          <div className="preview-float preview-float-top"><span>✓</span><div><strong>Твой прогресс</strong><small>Сохраняется в портфолио</small></div></div>
-          <div className="preview-float preview-float-bottom"><span>↗</span><div><strong>Новые партнёрства</strong><small>Школы и организации рядом</small></div></div>
-          <div className="preview-caption">ИНТЕРФЕЙС TALENTHUB</div>
+      <section className="minimal-intro" id="about">
+        <div className="minimal-section-index">01 / ЗАЧЕМ TALENTHUB</div>
+        <div className="minimal-intro-content"><h2>Возможности есть.<br/><em>Найти их — сложнее.</em></h2><p>Мероприятия и программы часто разбросаны по разным площадкам. А организациям непросто найти друг друга для совместных инициатив. TalentHub собирает эти процессы в одном пространстве.</p></div>
+      </section>
+
+      <section className="minimal-flow" id="flow">
+        <div className="minimal-section-head"><div><div className="minimal-section-index">02 / ПУТЬ УЧАЩЕГОСЯ</div><h2>От интереса<br/>к <em>достижению.</em></h2></div><p>Весь путь — без лишних шагов и разрозненных сервисов.</p></div>
+        <div className="minimal-path-list">{paths.map((item) => <article className="minimal-path" key={item.n}><span className="path-num">{item.n}</span><span className="path-symbol">{item.icon}</span><div><h3>{item.title}</h3><p>{item.text}</p></div><span className="path-arrow">↗</span></article>)}</div>
+      </section>
+
+      <section className="minimal-collab" id="collab">
+        <div className="minimal-collab-copy"><div className="minimal-section-index">03 / ПАРТНЁРСТВА</div><h2>Инициатива может<br/>начаться <em>с любой стороны.</em></h2><p>TalentHub поддерживает двустороннее сотрудничество: учреждение может искать компанию или академию, а организация — предлагать инициативу подходящему учреждению.</p></div>
+        <div className="minimal-collab-visual">
+          <div className="collab-node node-school"><span>⌂</span><small>УЧРЕЖДЕНИЕ</small></div>
+          <div className="collab-node node-company"><span>▣</span><small>КОМПАНИЯ</small></div>
+          <div className="collab-link"><i></i><b>↔</b><i></i></div>
+          <div className="collab-center">T<span>H</span></div>
+          <div className="collab-caption">ОБЩАЯ ИНИЦИАТИВА</div>
         </div>
       </section>
 
-      <section className="prd-statement" id="platform">
-        <div className="prd-statement-mark">T<span>H</span></div>
-        <p>Образовательные возможности часто разбросаны по разным площадкам. <strong>TalentHub собирает их в одном месте</strong> — и помогает людям и организациям находить друг друга.</p>
+      <section className="minimal-trust">
+        <div className="trust-object"><div className="trust-ring"></div><div className="trust-cube"><span>✳</span></div></div>
+        <div className="trust-copy"><div className="minimal-section-index">04 / ДОВЕРИЕ</div><h2>Престиж —<br/>это <em>реальный вклад.</em></h2><p>Престиж организации отражает подтверждённое участие в образовательных инициативах. Это прозрачная основа для доверия между партнёрами — не рейтинг учащихся и не платное продвижение.</p></div>
       </section>
 
-      <section className="showcase-section prd-journey" id="journey">
-        <div className="showcase-section-head">
-          <div><span className="showcase-kicker">КАК РАБОТАЕТ TALENTHUB</span><h2>От первого интереса<br /><em>до реального результата.</em></h2></div>
-          <p>Платформа сопровождает путь учащегося и помогает организациям превращать идеи в совместные образовательные инициативы.</p>
-        </div>
-        <div className="showcase-feature-grid prd-pillar-grid">
-          {pillars.map((item) => (
-            <article className="showcase-feature prd-pillar" key={item.number}>
-              <div className="feature-top"><span>{item.icon}</span><small>{item.number}</small></div>
-              <h3>{item.title}</h3><p>{item.text}</p><div className="feature-line" />
-            </article>
-          ))}
-        </div>
+      <section className="minimal-roles">
+        <div className="minimal-section-head"><div><div className="minimal-section-index">05 / ДЛЯ КОГО</div><h2>Одна среда.<br/><em>Разные возможности.</em></h2></div><p>Каждая роль получает инструменты для своей задачи и вносит вклад в общую образовательную среду.</p></div>
+        <div className="minimal-role-grid">{roles.map((role, i) => <article className="minimal-role" key={role.name}><div className="role-top"><span>{role.symbol}</span><small>0{i + 1}</small></div><h3>{role.name}</h3><p>{role.text}</p><Link to={role.to}>{role.label} <span>↗</span></Link></article>)}</div>
       </section>
 
-      <section className="prd-partnership" id="partners">
-        <div className="prd-partnership-copy">
-          <span className="showcase-kicker">ДВА НАПРАВЛЕНИЯ СОТРУДНИЧЕСТВА</span>
-          <h2>Связи, из которых<br /><em>рождаются инициативы.</em></h2>
-          <p>TalentHub помогает выстраивать партнёрства в обе стороны — от запроса учреждения до инициативы компании или академии.</p>
-        </div>
-        <div className="prd-flow">
-          <div className="prd-flow-card"><span className="flow-icon">⌂</span><div><strong>Учреждение ищет партнёра</strong><small>Публикует запрос и получает отклики компаний и академий</small></div><b>01</b></div>
-          <div className="prd-flow-connector"><span>↕</span><small>ВСТРЕЧА ИНТЕРЕСОВ</small></div>
-          <div className="prd-flow-card"><span className="flow-icon company-flow">▣</span><div><strong>Компания ищет учреждение</strong><small>Предлагает инициативу и находит подходящую площадку</small></div><b>02</b></div>
-          <div className="prd-trust-note"><span>✦</span><p><strong>Доверие на основе реальных действий.</strong> Престиж организации формируется подтверждённым вкладом в образовательные инициативы, а не количеством публикаций.</p></div>
-        </div>
-      </section>
+      <section className="minimal-end"><div className="minimal-end-orb"></div><div className="minimal-section-index">TALENTHUB / NEXT STEP</div><h2>Твоя следующая<br/><em>возможность начинается здесь.</em></h2><p>Открой платформу и найди, с чего начать.</p><Link to="/auth" className="minimal-button">Перейти в TalentHub <span>↗</span></Link></section>
 
-      <section className="showcase-audience prd-audience" id="audience">
-        <div className="showcase-section-head audience-head">
-          <div><span className="showcase-kicker">ОДНА ПЛАТФОРМА — РАЗНЫЕ РОЛИ</span><h2>Возможности <em>объединяют.</em></h2></div>
-          <p>Каждый участник получает инструменты для своей задачи — и становится частью общей образовательной среды.</p>
-        </div>
-        <div className="showcase-role-grid prd-role-grid">
-          {audiences.map((item, index) => (
-            <article className={`showcase-role prd-role ${item.tone}`} key={item.title}>
-              <div className="role-number">0{index + 1}</div><div className="role-icon">{item.icon}</div>
-              <h3>{item.title}</h3><p>{item.text}</p><Link to={item.link}>{item.action} <span>↗</span></Link>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="prd-prestige">
-        <div className="prestige-emblem"><span>✦</span><small>TRUST<br />THROUGH<br />IMPACT</small></div>
-        <div><span className="showcase-kicker">ОСОБЕННОСТЬ TALENTHUB</span><h2>Престиж — это<br /><em>подтверждённый вклад.</em></h2><p>Прозрачная история проведённых инициатив помогает организациям видеть активность потенциальных партнёров и принимать более обоснованные решения о сотрудничестве. Это не рейтинг учащихся и не платное повышение позиции.</p></div>
-      </section>
-
-      <section className="showcase-final prd-final">
-        <div><span className="showcase-kicker">НАЧНИТЕ СОТРУДНИЧЕСТВО СЕГОДНЯ</span><h2>Найдите свою возможность.<br /><em>Создайте следующую вместе.</em></h2><p>TalentHub — пространство, где интересы встречаются с инициативами.</p></div>
-        <Link className="showcase-primary" to="/auth">Перейти на платформу <span>→</span></Link><div className="final-star">✳</div>
-      </section>
-
-      <footer className="showcase-footer prd-footer"><Link className="showcase-logo" to="/"><span className="prd-mark">✳</span>Talent<span>Hub</span></Link><span>Платформа образовательных возможностей и партнёрств</span><span>© TalentHub</span></footer>
+      <footer className="minimal-footer"><Link to="/" className="minimal-logo"><span className="minimal-logo-mark">t.</span>talent<span>hub</span></Link><span>Образовательные возможности и партнёрства</span><span>© TalentHub</span></footer>
     </main>
   )
 }
