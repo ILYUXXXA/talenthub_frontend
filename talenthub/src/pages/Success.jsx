@@ -4,7 +4,7 @@ import { listEvents, studentCabinet } from '../data/store.js'
 function entries(list) {
   return (list || []).map((item, index) => {
     if (typeof item === 'string') return { id: `entry-${index}-${item}`, title: item }
-    return { ...item, id: item.id || item.eventId || `entry-${index}-${item.title || 'item'}`, title: item.title || item.name || 'Результат' }
+    return { ...item, id: item.id || `${item.eventId || 'entry'}-${index}`, title: item.title || item.name || 'Результат' }
   }).filter((item) => item.title)
 }
 
