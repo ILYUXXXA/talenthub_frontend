@@ -2391,3 +2391,70 @@ grid-template-columns: 1fr 1fr;
  .th-visual-step small{font-size:9px}
  .th-visual-note{font-size:7px;margin-left:11px}
 }
+
+
+/* Clean centered landing hero — intentionally independent from legacy artwork styles */
+.th-hero.th-hero-clean{
+  display:block!important;position:relative!important;isolation:isolate;overflow:hidden;
+  width:100%;max-width:none!important;min-height:0!important;margin:0!important;
+  padding:88px 28px 58px!important;background:#f7f9ff!important;
+}
+.th-hero-clean:before{
+  content:"";position:absolute;z-index:-1;top:-270px;right:-120px;width:660px;height:660px;
+  border-radius:50%;background:radial-gradient(circle,#e0e8ff 0%,#edf1ff 48%,transparent 72%);
+}
+.th-hero-clean:after{
+  content:"";position:absolute;z-index:-1;bottom:0;left:0;right:0;height:1px;background:#e4e9f4;
+}
+.th-clean-inner{position:relative;width:100%;max-width:1120px;margin:0 auto;text-align:left}
+.th-clean-inner .th-overline{display:inline-flex;align-items:center;gap:10px}
+.th-clean-inner h1{
+  max-width:850px;margin:30px 0 20px;color:#14213d;
+  font-size:clamp(54px,7.2vw,94px);font-weight:850;line-height:.99;letter-spacing:-.075em;
+}
+.th-clean-inner h1 em{color:#3159ed;font-style:normal}
+.th-clean-inner>p{max-width:620px;margin:0;color:#65738e;font-size:17px;line-height:1.75}
+.th-clean-inner .th-hero-actions{display:flex;align-items:center;gap:28px;margin-top:30px}
+.th-clean-inner .th-primary{display:inline-flex;align-items:center;gap:22px}
+.th-clean-points{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;
+  max-width:790px;margin-top:68px;border-top:1px solid #dfe5f1;border-bottom:1px solid #dfe5f1;
+}
+.th-clean-points>div{position:relative;display:grid;grid-template-columns:30px 1fr;column-gap:10px;align-content:center;min-height:86px;padding:15px 22px 15px 0}
+.th-clean-points>div+div{border-left:1px solid #dfe5f1;padding-left:22px}
+.th-clean-points span{grid-row:span 2;color:#3159ed;font-size:10px;font-weight:800;letter-spacing:.08em}
+.th-clean-points b{color:#1b2945;font-size:14px}
+.th-clean-points small{margin-top:4px;color:#8490a5;font-size:10px}
+.th-clean-decoration{
+  position:absolute;right:30px;top:70px;width:220px;height:220px;border-radius:48px;
+  display:grid;place-items:center;transform:rotate(12deg);
+  background:linear-gradient(145deg,#5378ff 0%,#3155df 55%,#203da9 100%);
+  box-shadow:0 28px 55px #3159ed35, inset 0 1px 1px #ffffff80;
+}
+.th-clean-decoration:before{content:"";position:absolute;inset:13px;border:1px solid #ffffff50;border-radius:37px}
+.th-clean-decoration span{color:white;font-size:104px;font-weight:850;letter-spacing:-.1em;transform:rotate(-12deg)}
+.th-clean-decoration i,.th-clean-decoration b{position:absolute;border:1px solid #ffffff55;border-radius:50%;width:290px;height:90px;transform:rotate(-28deg)}
+.th-clean-decoration b{width:330px;height:110px;transform:rotate(34deg);border-color:#9eb1ff80}
+@media(max-width:900px){
+ .th-hero.th-hero-clean{padding:70px 28px 45px!important}
+ .th-clean-decoration{right:20px;top:25px;width:155px;height:155px;border-radius:35px;opacity:.95}
+ .th-clean-decoration span{font-size:76px}
+ .th-clean-decoration:before{inset:9px;border-radius:27px}
+ .th-clean-decoration i{width:210px;height:65px}.th-clean-decoration b{width:235px;height:78px}
+ .th-clean-inner h1{max-width:670px;font-size:clamp(48px,8vw,76px)}
+ .th-clean-points{margin-top:52px}
+}
+@media(max-width:600px){
+ .th-hero.th-hero-clean{padding:54px 20px 36px!important}
+ .th-clean-decoration{position:relative;top:auto;right:auto;width:86px;height:86px;margin:0 0 28px 5px;border-radius:22px}
+ .th-clean-decoration span{font-size:48px}
+ .th-clean-decoration:before{inset:6px;border-radius:16px}
+ .th-clean-decoration i{width:125px;height:38px}.th-clean-decoration b{width:145px;height:46px}
+ .th-clean-inner h1{font-size:clamp(43px,12vw,61px);margin:22px 0 15px}
+ .th-clean-inner>p{font-size:14px;line-height:1.65}
+ .th-clean-inner .th-hero-actions{align-items:flex-start;flex-direction:column;gap:17px;margin-top:24px}
+ .th-clean-points{grid-template-columns:1fr;margin-top:39px}
+ .th-clean-points>div{min-height:65px;padding:12px 4px}
+ .th-clean-points>div+div{border-left:0;border-top:1px solid #dfe5f1;padding-left:4px}
+ .th-clean-points b{font-size:13px}.th-clean-points small{font-size:9px}
+}
