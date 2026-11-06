@@ -1,157 +1,556 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react';
 import {
   schoolStudents,
-  listEvents,
   listPartnerships,
   sendPartnership,
   respondPartnership,
   publishEvent,
-  updateEvent,
-  eventRegistrations,
-  updateEventRegistration,
   COMPANIES,
   INTERESTS,
   CITIES,
   GRADES,
-} from '../data/store.js'
+} from '../data/store.js';
 
-const SCHOOL = 'Лицей БГУ'
+const SCHOOL = 'Лицей БГУ';
+
+const FALLBACK_INTERESTS = [
+  'Математика',
+  'Информатика',
+  'Физика',
+  'Биология',
+  'Химия',
+  'Робототехника',
+  'Проектная работа',
+];
+
+const FALLBACK_CITIES = ['Минск', 'Брест', 'Гродно', 'Гомель', 'Витебск', 'Могилёв'];
+const FALLBACK_GRADES = ['8', '9', '10', '11'];
+const FALLBACK_COMPANIES = ['EPAM Systems', 'IBA Group', 'Wargaming', 'A1', 'Белтелеком'];
+
 const FALLBACK_STUDENTS = [
-  { id: 's1', firstName: 'Алина', lastName: 'Коваль', grade: '10', interests: ['Математика', 'Информатика'], signedUp: [{ title: 'Республиканская олимпиада по математике' }], attended: [{ title: 'Городская олимпиада по математике' }], achievements: [{ title: 'Диплом II степени' }] },
-  { id: 's2', firstName: 'Илья', lastName: 'Савич', grade: '11', interests: ['Физика'], signedUp: [{ title: 'Областная олимпиада по физике' }], attended: [{ title: 'Физическая лаборатория' }], achievements: [{ title: 'Сертификат участника' }] },
-  { id: 's3', firstName: 'Мария', lastName: 'Гуд', grade: '9', interests: ['Биология'], signedUp: [{ title: 'Биологическая интернет-олимпиада' }], attended: [], achievements: [] },
-  { id: 's4', firstName: 'Тимофей', lastName: 'Орлов', grade: '10', interests: ['Робототехника'], signedUp: [{ title: 'Мастерская роботов' }], attended: [{ title: 'Инженерные каникулы' }], achievements: [] },
-]
-const FALLBACK_PARTNERS = [
-  { id: 'p1', from: 'КодМастер', to: SCHOOL, title: 'Мастер-класс по программированию', description: 'Командный практикум по разработке для учеников 9–11 классов.', status: 'incoming' },
-  { id: 'p2', from: 'РобоЛаб', to: SCHOOL, title: 'Оборудование для мастерской', description: 'Комплект оборудования и наставник для школьной мастерской.', status: 'incoming' },
-  { id: 'p3', from: SCHOOL, to: 'ХимПрактикум', title: 'Лабораторная смена', description: 'Практическая программа для учащихся 10 класса.', status: 'pending' },
-  { id: 'p4', from: 'НаноСофт', to: SCHOOL, title: 'IT-каникулы', description: 'Совместная образовательная смена.', status: 'accepted' },
-]
-const statusText = { incoming: 'Входящий запрос', pending: 'Ожидает ответа', accepted: 'Согласовано', declined: 'Отклонено' }
-const statusClass = { incoming: 'badge-muted', pending: 'badge-pending', accepted: 'badge-ok', declined: 'badge-no' }
-const safeRead = (fn, fallback) => { try { const value = fn(); return Array.isArray(value) ? value : fallback } catch { return fallback } }
-const personName = (student) => [student.firstName, student.lastName].filter(Boolean).join(' ') || student.name || 'Ученик'
-const itemText = (items) => (items || []).map((item) => typeof item === 'string' ? item : item?.title || item?.name || '').filter(Boolean).join(', ') || '—'
-const dateText = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Дата не указана'
+  {
+    id: 'alina',
+    name: 'Алина Коваль',
+    grade: '10',
+    school: SCHOOL,
+    interests: ['Математика', 'Информатика'],
+    registered: ['Республиканская олимпиада по математике', 'Мастерская робототехники'],
+    attended: ['Олимпиада по информатике'],
+    achievements: ['Диплом II степени, олимпиада по математике'],
+  },
+  {
+    id: 'ilya',
+    name: 'Илья Савич',
+    grade: '11',
+    school: SCHOOL,
+    interests: ['Физика', 'Робототехника'],
+    registered: ['Проектная смена «Своими руками»'],
+    attended: ['Мастерская робототехники'],
+    achievements: ['Призёр хакатона лицея'],
+  },
+  {
+    id: 'maria',
+    name: 'Мария Гуд',
+    grade: '9',
+    school: SCHOOL,
+    interests: ['Биология', 'Химия'],
+    registered: ['Олимпиада по биологии'],
+    attended: [],
+    achievements: [],
+  },
+  {
+    id: 'tim',
+    name: 'Тимофей Орлов',
+    grade: '8',
+    school: SCHOOL,
+    interests: ['Информатика', 'Проектная работа'],
+    registered: ['Мастерская проектной деятельности'],
+    attended: ['Городской конкурс проектов'],
+    achievements: ['Грамота за проект «Школьный бот»'],
+  },
+];
 
-function Metric({ value, label, note }) {
-  return <article className="card org-metric"><strong>{value}</strong><span>{label}</span>{note ? <small>{note}</small> : null}</article>
+const FALLBACK_PARTNERSHIPS = [
+  {
+    id: 'in-epam',
+    status: 'incoming',
+    from: 'EPAM Systems',
+    to: SCHOOL,
+    title: 'Совместная олимпиада по информатике',
+    text: 'Предлагаем командный тур в марте и наставников для проектных работ лицея.',
+  },
+  {
+    id: 'in-iba',
+    status: 'incoming',
+    from: 'IBA Group',
+    to: SCHOOL,
+    title: 'Мастерская проектной деятельности',
+    text: 'Готовы принять 10 лицеистов на практический интенсив: ученики делают работу руками.',
+  },
+  {
+    id: 'out-wg',
+    status: 'pending',
+    from: SCHOOL,
+    to: 'Wargaming',
+    title: 'Партнёрская смена по разработке игр',
+    text: 'Просим площадку и менторов для проектной смены 11 класса.',
+  },
+];
+
+const STATUS_ORDER = { incoming: 0, pending: 1, accepted: 2, declined: 3 };
+
+const BADGES = {
+  pending: ['badge badge-pending', 'На модерации'],
+  incoming: ['badge badge-muted', 'Входящий'],
+  accepted: ['badge badge-ok', 'Принят'],
+  declined: ['badge badge-no', 'Отклонён'],
+};
+
+function labelOf(item) {
+  if (item != null && typeof item === 'object') {
+    return String(item.label || item.name || item.title || item.id || item.value || '');
+  }
+  return String(item ?? '');
 }
-function SectionTitle({ eyebrow, title, children }) {
-  return <div className="org-section-head"><div><span className="org-eyebrow">{eyebrow}</span><h2>{title}</h2></div>{children}</div>
+
+function valueOf(item) {
+  if (item != null && typeof item === 'object') {
+    return String(item.id ?? item.value ?? item.label ?? item.name ?? '');
+  }
+  return String(item ?? '');
+}
+
+function resolveOptions(source, fallback) {
+  try {
+    const value = typeof source === 'function' ? source() : source;
+    if (Array.isArray(value) && value.length > 0) return value;
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function initialOption(source, fallback, prefer) {
+  const list = resolveOptions(source, fallback);
+  const want = prefer == null ? '' : String(prefer);
+  const found = list.find((item) => {
+    const label = labelOf(item);
+    const value = valueOf(item);
+    return label === want || value === want || (want !== '' && label.startsWith(want));
+  });
+  return valueOf(found || list[0]);
+}
+
+function selectedLabel(list, current) {
+  const found = list.find((item) => valueOf(item) === current);
+  return found == null ? current : labelOf(found);
+}
+
+function asArray(data) {
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.students)) return data.students;
+  if (data && Array.isArray(data.partnerships)) return data.partnerships;
+  if (data && Array.isArray(data.items)) return data.items;
+  if (data && Array.isArray(data.list)) return data.list;
+  return [];
+}
+
+function pick(source, keys) {
+  for (const key of keys) {
+    if (source[key] != null && source[key] !== '') return source[key];
+  }
+  return undefined;
+}
+
+function textOf(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => labelOf(item).trim())
+      .filter(Boolean)
+      .join(', ');
+  }
+  if (value == null || value === '') return '';
+  if (typeof value === 'object') return labelOf(value).trim();
+  return String(value).trim();
+}
+
+function studentName(source) {
+  const direct = textOf(pick(source, ['name', 'fullName', 'student', 'ученик']));
+  if (direct) return direct;
+  const first = textOf(pick(source, ['firstName', 'first', 'имя']));
+  const last = textOf(pick(source, ['lastName', 'last', 'фамилия']));
+  return [first, last].filter(Boolean).join(' ');
+}
+
+function normalizeStudent(item, index) {
+  if (typeof item === 'string' || typeof item === 'number') {
+    return {
+      id: `${item}-${index}`,
+      name: String(item),
+      grade: '',
+      school: '',
+      interests: [],
+      registered: [],
+      attended: [],
+      achievements: [],
+    };
+  }
+  const source = item && typeof item === 'object' ? item : {};
+  const name = studentName(source) || 'Ученик';
+  return {
+    id: source.id != null ? source.id : `${name}-${index}`,
+    name,
+    grade: textOf(pick(source, ['grade', 'className', 'classLabel', 'gradeLabel', 'класс'])),
+    school: textOf(pick(source, ['school', 'schoolName', 'школа'])),
+    interests: pick(source, ['interests', 'interest', 'интересы']) ?? [],
+    registered: pick(source, ['registered', 'signups', 'enrolled', 'registrations', 'joined', 'planned']) ?? [],
+    attended: pick(source, ['attended', 'visits', 'visited', 'went', 'attendance']) ?? [],
+    achievements: pick(source, ['achievements', 'awards', 'achievement']) ?? [],
+  };
+}
+
+function scopeStudents(data) {
+  const list = asArray(data).map(normalizeStudent);
+  const scoped = list.filter((item) => !item.school || item.school.includes('БГУ') || item.school.includes('Лицей'));
+  return scoped.length ? scoped : list;
+}
+
+function normalizeStatus(item) {
+  const status = String(item.status || item.state || '').toLowerCase();
+  if (status === 'approved') return 'accepted';
+  if (status === 'rejected') return 'declined';
+  if (status === 'moderation' || status === 'outgoing') return 'pending';
+  if (status === 'pending' || status === 'incoming' || status === 'accepted' || status === 'declined') return status;
+  const direction = String(item.direction || item.type || item.kind || '').toLowerCase();
+  if (direction === 'incoming' || direction === 'in') return 'incoming';
+  if (direction === 'outgoing' || direction === 'out') return 'pending';
+  return 'pending';
+}
+
+function normalizePartnership(item, index) {
+  const source = item && typeof item === 'object' ? item : {};
+  return {
+    id: source.id != null ? source.id : `p-${index}`,
+    status: normalizeStatus(source),
+    from: textOf(pick(source, ['from', 'sender', 'fromName', 'company'])),
+    to: textOf(pick(source, ['to', 'recipient', 'toName', 'target'])),
+    title: textOf(pick(source, ['title', 'name', 'subject'])) || 'Запрос на партнёрство',
+    text: textOf(pick(source, ['text', 'message', 'body', 'description', 'comment'])),
+  };
+}
+
+function scopePartnerships(data) {
+  const list = asArray(data).map(normalizePartnership);
+  const scoped = list.filter((item) => {
+    if (!item.from && !item.to) return true;
+    return item.from.includes('БГУ') || item.to.includes('БГУ') || item.from.includes(SCHOOL) || item.to.includes(SCHOOL);
+  });
+  const visible = scoped.length ? scoped : list;
+  return [...visible].sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9));
+}
+
+function loadStudents(tick) {
+  void tick;
+  try {
+    const list = scopeStudents(schoolStudents());
+    return list.length ? list : null;
+  } catch {
+    return null;
+  }
+}
+
+function loadPartnerships(tick) {
+  void tick;
+  try {
+    const list = scopePartnerships(listPartnerships());
+    return list.length ? list : null;
+  } catch {
+    return null;
+  }
+}
+
+function Dash({ value }) {
+  const text = textOf(value);
+  if (!text) return <span className="muted">—</span>;
+  return text;
+}
+
+function SelectOptions({ list }) {
+  return list.map((item, index) => {
+    const value = valueOf(item);
+    return (
+      <option key={`${value}-${index}`} value={value}>
+        {labelOf(item)}
+      </option>
+    );
+  });
 }
 
 export default function SchoolCabinet() {
-  const [version, setVersion] = useState(0)
-  const [tab, setTab] = useState('overview')
-  const [expandedEvent, setExpandedEvent] = useState('')
-  const [notice, setNotice] = useState('')
-  const [query, setQuery] = useState('')
-  const [eventTitle, setEventTitle] = useState('Открытая олимпиада по математике')
-  const [category, setCategory] = useState('olympiad')
-  const [interest, setInterest] = useState('Математика')
-  const [grade, setGrade] = useState('10–11')
-  const [city, setCity] = useState('Минск')
-  const [eventDate, setEventDate] = useState('2026-12-12')
-  const [deadline, setDeadline] = useState('2026-12-05')
-  const [format, setFormat] = useState('очно')
-  const [seats, setSeats] = useState('40')
-  const [description, setDescription] = useState('Открытый тур для учащихся 10–11 классов. Участников ждут задачи повышенной сложности и разбор решений.')
-  const [partner, setPartner] = useState(COMPANIES[0])
-  const [requestTitle, setRequestTitle] = useState('Менторы для проектной мастерской')
-  const [requestText, setRequestText] = useState('Ищем партнёра для практической мастерской: ученики 10 класса создадут собственные проекты под руководством специалистов.')
+  const [version, setVersion] = useState(0);
+  const [forceLocal, setForceLocal] = useState(false);
+  const [fallbackPartnerships, setFallbackPartnerships] = useState(FALLBACK_PARTNERSHIPS);
+  const [statusPatch, setStatusPatch] = useState({});
+  const [sentLocally, setSentLocally] = useState([]);
+  const [publishNote, setPublishNote] = useState('');
+  const [requestNote, setRequestNote] = useState('');
 
-  const students = useMemo(() => safeRead(schoolStudents, FALLBACK_STUDENTS), [version])
-  const events = useMemo(() => safeRead(listEvents, []).filter((item) => item.organizer === SCHOOL), [version])
-  const partnerships = useMemo(() => {
-    const list = safeRead(listPartnerships, FALLBACK_PARTNERS)
-    const scoped = list.filter((item) => item.from === SCHOOL || item.to === SCHOOL)
-    const marketplace = list.filter((item) => item.visibility === 'public' && item.audience === 'all_schools' && item.from !== SCHOOL && item.status === 'pending')
-    const combined = [...scoped, ...marketplace.filter((item) => !scoped.some((entry) => entry.id === item.id))]
-    return (combined.length ? combined : FALLBACK_PARTNERS).slice().sort((a, b) => (a.status === 'incoming' ? -1 : 0) - (b.status === 'incoming' ? -1 : 0))
-  }, [version])
-  const incoming = partnerships.filter((item) => item.to === SCHOOL && ['incoming', 'pending'].includes(item.status))
-  const activeEvents = events.filter((item) => ['published', 'registration_closed', 'completed'].includes(item.status)).length
-  const pendingEvents = events.filter((item) => item.status === 'pending').length
-  const publishedRegistrations = events.reduce((sum, item) => sum + eventRegistrations(item.id).length, 0)
-  const filteredStudents = students.filter((student) => `${personName(student)} ${student.grade || ''} ${itemText(student.interests)}`.toLowerCase().includes(query.toLowerCase()))
+  const interests = resolveOptions(INTERESTS, FALLBACK_INTERESTS);
+  const cities = resolveOptions(CITIES, FALLBACK_CITIES);
+  const grades = resolveOptions(GRADES, FALLBACK_GRADES);
+  const companies = resolveOptions(COMPANIES, FALLBACK_COMPANIES);
 
-  function handlePublish(event) {
-    event.preventDefault()
-    if (!eventTitle.trim() || !description.trim() || !eventDate || !deadline || Number(seats) < 1) return
+  const [title, setTitle] = useState('Олимпиада лицея по математике');
+  const [category, setCategory] = useState('olympiad');
+  const [interest, setInterest] = useState(() => initialOption(INTERESTS, FALLBACK_INTERESTS, 'Математика'));
+  const [grade, setGrade] = useState(() => initialOption(GRADES, FALLBACK_GRADES, '10'));
+  const [city, setCity] = useState(() => initialOption(CITIES, FALLBACK_CITIES, 'Минск'));
+  const [date, setDate] = useState('2026-04-18');
+  const [format, setFormat] = useState('очно');
+  const [deadline, setDeadline] = useState('2026-04-01');
+  const [seats, setSeats] = useState('32');
+  const [description, setDescription] = useState(
+    'Очный тур для учеников Лицея БГУ: алгебра и комбинаторика. Карточка уходит администратору и не публикуется сама.',
+  );
+
+  const [company, setCompany] = useState(() => initialOption(COMPANIES, FALLBACK_COMPANIES));
+  const [requestTitle, setRequestTitle] = useState('Менторы для проектной мастерской');
+  const [requestText, setRequestText] = useState(
+    'Просим провести практическую мастерскую для 10 класса: ученики делают работу руками.',
+  );
+
+  const liveStudents = forceLocal ? null : loadStudents(version);
+  const livePartnerships = forceLocal ? null : loadPartnerships(version);
+  const students = liveStudents || FALLBACK_STUDENTS;
+  const partnershipBase = (livePartnerships || fallbackPartnerships).map((item) => {
+    const patched = statusPatch[String(item.id)];
+    return patched ? { ...item, status: patched } : item;
+  });
+  const partnerships = [...partnershipBase, ...sentLocally.filter((item) => !partnershipBase.some((row) => (
+    String(row.id) === String(item.id) || (row.title === item.title && row.to === item.to && row.from === item.from)
+  )))].sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9));
+
+  function onPublish(event) {
+    event.preventDefault();
+    const payload = {
+      title: title.trim(),
+      category,
+      interest: selectedLabel(interests, interest),
+      grade: selectedLabel(grades, grade),
+      city: selectedLabel(cities, city),
+      date,
+      format,
+      deadline,
+      seats: Number(seats) || 0,
+      description: description.trim(),
+      organizer: SCHOOL,
+    };
+    if (!payload.title || !payload.description) return;
     try {
-      publishEvent({ title: eventTitle.trim(), category, interests: [interest], grade, city, date: eventDate, deadline, format, seats: Number(seats), description: description.trim(), organizer: SCHOOL, place: city, terms: 'Регистрация через TalentHub.' })
-      setVersion((value) => value + 1)
-      setNotice('Мероприятие отправлено на модерацию. Оно появится в каталоге после проверки.')
-      setTab('events')
-    } catch { setNotice('Не удалось сохранить мероприятие. Попробуйте ещё раз.') }
-  }
-  function handleRespond(id, decision) {
-    try { respondPartnership(id, decision) } catch { /* состояние демо обновляется ниже */ }
-    setVersion((value) => value + 1)
-    setNotice(decision === 'accepted' ? 'Запрос принят. Можно переходить к согласованию деталей.' : 'Запрос отклонён.')
-  }
-  function handleRequest(event) {
-    event.preventDefault()
-    if (!requestTitle.trim() || !requestText.trim()) return
-    try {
-      sendPartnership({ from: SCHOOL, to: partner, title: requestTitle.trim(), text: requestText.trim(), description: requestText.trim() })
-      setVersion((value) => value + 1)
-      setNotice(`Запрос отправлен организации «${partner}».`)
-      setRequestTitle('')
-      setRequestText('')
-      setTab('partners')
-    } catch { setNotice('Не удалось отправить запрос. Попробуйте ещё раз.') }
-  }
-
-  function handleMarketplaceRespond(item) {
-    const alreadyResponded = partnerships.some((entry) => entry.parentRequestId === item.id && entry.from === SCHOOL)
-    if (alreadyResponded) {
-      setNotice('Вы уже отправили отклик на этот запрос.')
-      return
+      publishEvent(payload);
+      setVersion((value) => value + 1);
+    } catch (error) {
+      void error;
     }
-    try {
-      sendPartnership({
-        from: SCHOOL,
-        to: item.from,
-        title: item.title,
-        text: `Лицей БГУ заинтересован в сотрудничестве по запросу «${item.title}». Свяжитесь с нами, чтобы обсудить детали.`,
-        description: `Отклик на публичный запрос «${item.title}». ${item.description || ''}`.trim(),
-        status: 'incoming',
-        parentRequestId: item.id,
-      })
-      setVersion((value) => value + 1)
-      setNotice(`Отклик отправлен организации «${item.from}».`)
-    } catch { setNotice('Не удалось отправить отклик. Попробуйте ещё раз.') }
+    setPublishNote('Отправлено на модерацию');
   }
 
-  return <main className="org-page"><div className="container org-container">
-    <section className="org-hero">
-      <div><span className="org-eyebrow">КАБИНЕТ ОБРАЗОВАТЕЛЬНОГО УЧРЕЖДЕНИЯ</span><h1>Лицей БГУ</h1><p>Управляйте мероприятиями, следите за интересами учеников и находите партнёров для новых образовательных инициатив.</p><div className="row org-hero-meta"><span>Минск</span><span>·</span><span>Представитель: Елена Брик</span><span className="badge badge-ok">Профиль организации</span></div></div>
-      <div className="org-hero-mark"><span>ЛБ</span><small>TalentHub<br/>Education</small></div>
-    </section>
-    <nav className="org-tabs" aria-label="Разделы кабинета">
-      {[['overview','Обзор'],['events','Мероприятия'],['students','Ученики'],['partners','Партнёрства'],['create','Создать мероприятие']].map(([id,label]) => <button key={id} type="button" className={tab === id ? 'active' : ''} onClick={() => { setTab(id); setNotice('') }}>{label}</button>)}
-    </nav>
-    {notice ? <div className="notice org-notice" role="status">{notice}</div> : null}
+  function onRespond(id, status) {
+    const next = partnerships.map((item) => (String(item.id) === String(id) ? { ...item, status } : item));
+    setStatusPatch((prev) => ({ ...prev, [String(id)]: status }));
+    try {
+      respondPartnership(id, status);
+      setFallbackPartnerships(next);
+      setVersion((value) => value + 1);
+    } catch {
+      setForceLocal(true);
+      setFallbackPartnerships(next);
+    }
+  }
 
-    {tab === 'overview' ? <>
-      <div className="org-metrics"><Metric value={students.length} label="Учеников в профиле" note="Учащиеся лицея"/><Metric value={events.length} label="Всего мероприятий" note={`${activeEvents} опубликовано`}/><Metric value={pendingEvents} label="На модерации" note="Ожидают проверки"/><Metric value={incoming.length} label="Новых запросов" note="От компаний и академий"/><Metric value={publishedRegistrations} label="Регистраций" note="По вашим мероприятиям"/></div>
-      <div className="org-dashboard-grid">
-        <section className="card org-panel"><SectionTitle eyebrow="ВАША АКТИВНОСТЬ" title="Мероприятия"/><div className="org-list">{events.slice(0,3).map((item) => <article className="org-list-item" key={item.id}><div className="org-list-icon">{item.category === 'project' ? '↗' : '✳'}</div><div className="org-list-main"><strong>{item.title}</strong><small>{dateText(item.date)} · {item.format || 'Формат не указан'}</small></div><span className={`badge ${item.status === 'published' ? 'badge-ok' : item.status === 'rejected' ? 'badge-no' : 'badge-pending'}`}>{item.status === 'published' ? 'Опубликовано' : item.status === 'registration_closed' ? 'Регистрация закрыта' : item.status === 'completed' ? 'Завершено' : item.status === 'rejected' ? 'Отклонено' : 'На модерации'}</span></article>)}{events.length === 0 ? <p className="muted">Пока нет мероприятий. Создайте первое, чтобы привлечь участников.</p> : null}</div><button className="btn btn-ghost btn-small" onClick={() => setTab('events')}>Все мероприятия</button></section>
-        <section className="card org-panel"><SectionTitle eyebrow="СОВМЕСТНЫЕ ВОЗМОЖНОСТИ" title="Партнёрства"/><div className="org-list">{partnerships.slice(0,3).map((item) => <article className="org-list-item" key={item.id}><div className="org-list-icon">⇄</div><div className="org-list-main"><strong>{item.title}</strong><small>{item.from === SCHOOL ? `Для: ${item.to}` : `От: ${item.from}`}</small></div><span className={`badge ${statusClass[item.status] || 'badge-muted'}`}>{statusText[item.status] || 'В обработке'}</span></article>)}{partnerships.length === 0 ? <p className="muted">Запросов пока нет.</p> : null}</div><button className="btn btn-ghost btn-small" onClick={() => setTab('partners')}>Открыть партнёрства</button></section>
+  function onSend(event) {
+    event.preventDefault();
+    const payload = {
+      from: SCHOOL,
+      to: selectedLabel(companies, company),
+      title: requestTitle.trim(),
+      text: requestText.trim(),
+    };
+    if (!payload.to || !payload.title || !payload.text) return;
+    const created = { id: `local-${Date.now()}`, ...payload, status: 'pending' };
+    try {
+      sendPartnership({ from: payload.from, to: payload.to, title: payload.title, text: payload.text });
+      setSentLocally((prev) => [...prev, created]);
+      setFallbackPartnerships([...partnerships, created]);
+      setVersion((value) => value + 1);
+    } catch {
+      setForceLocal(true);
+      setFallbackPartnerships([...partnerships, created]);
+    }
+    setRequestNote('Заявка отправлена');
+    setRequestTitle('');
+    setRequestText('');
+  }
+
+  return (
+    <main>
+      <div className="container">
+        <div className="stack">
+          <header>
+            <h1>Кабинет школы</h1>
+            <p className="muted">Елена Брик, представитель Лицея БГУ. Демо: school@demo.by</p>
+          </header>
+
+          <section className="card stack">
+            <h2 className="card-title">Опубликовать мероприятие</h2>
+            <p className="muted">Организатор — Лицей БГУ. После отправки мероприятие ждёт модерации администратора.</p>
+            <form className="stack" onSubmit={onPublish}>
+              <div className="grid-2">
+                <label className="field">
+                  <span>Название</span>
+                  <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+                </label>
+                <label className="field">
+                  <span>Категория</span>
+                  <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                    <option value="olympiad">Олимпиада</option>
+                    <option value="project">Проектная деятельность</option>
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Интерес</span>
+                  <select value={interest} onChange={(e) => setInterest(e.target.value)}>
+                    <SelectOptions list={interests} />
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Класс</span>
+                  <select value={grade} onChange={(e) => setGrade(e.target.value)}>
+                    <SelectOptions list={grades} />
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Город</span>
+                  <select value={city} onChange={(e) => setCity(e.target.value)}>
+                    <SelectOptions list={cities} />
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Дата</span>
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+                </label>
+                <label className="field">
+                  <span>Формат</span>
+                  <select value={format} onChange={(e) => setFormat(e.target.value)}>
+                    <option value="очно">очно</option>
+                    <option value="онлайн">онлайн</option>
+                    <option value="смешанный">смешанный</option>
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Дедлайн</span>
+                  <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} required />
+                </label>
+                <label className="field">
+                  <span>Мест</span>
+                  <input type="number" min="1" value={seats} onChange={(e) => setSeats(e.target.value)} required />
+                </label>
+              </div>
+              <label className="field">
+                <span>Короткое описание</span>
+                <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} required />
+              </label>
+              {publishNote ? <p className="notice">{publishNote}</p> : null}
+              <div className="row">
+                <button className="btn btn-primary" type="submit">Отправить на модерацию</button>
+              </div>
+            </form>
+          </section>
+
+          <section className="card stack">
+            <h2 className="card-title">Успехи учеников</h2>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ученик</th>
+                    <th>Класс</th>
+                    <th>Интересы</th>
+                    <th>Куда записался</th>
+                    <th>Куда сходил</th>
+                    <th>Достижения</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((student) => (
+                    <tr key={student.id}>
+                      <td>{student.name || <span className="muted">—</span>}</td>
+                      <td>{student.grade || <span className="muted">—</span>}</td>
+                      <td><Dash value={student.interests} /></td>
+                      <td><Dash value={student.registered} /></td>
+                      <td><Dash value={student.attended} /></td>
+                      <td><Dash value={student.achievements} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="card stack">
+            <h2 className="card-title">Партнёрство</h2>
+            <div className="stack">
+              {partnerships.map((item) => {
+                const badge = BADGES[item.status] || BADGES.pending;
+                return (
+                  <article className="stack" key={item.id}>
+                    <div className="row spread">
+                      <strong>{item.title}</strong>
+                      <span className={badge[0]}>{badge[1]}</span>
+                    </div>
+                    <p className="muted">{[item.from, item.to].filter(Boolean).join(' → ') || <span className="muted">—</span>}</p>
+                    <p>{item.text ? item.text : <span className="muted">—</span>}</p>
+                    {item.status === 'incoming' ? (
+                      <div className="row">
+                        <button className="btn btn-small btn-primary" type="button" onClick={() => onRespond(item.id, 'accepted')}>
+                          Принять
+                        </button>
+                        <button className="btn btn-small btn-danger" type="button" onClick={() => onRespond(item.id, 'declined')}>
+                          Отклонить
+                        </button>
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
+            </div>
+
+            <form className="stack" onSubmit={onSend}>
+              <p className="muted">Новый исходящий запрос от Лицея БГУ</p>
+              <div className="grid-2">
+                <label className="field">
+                  <span>Компания</span>
+                  <select value={company} onChange={(e) => setCompany(e.target.value)}>
+                    <SelectOptions list={companies} />
+                  </select>
+                </label>
+                <label className="field">
+                  <span>Тема</span>
+                  <input value={requestTitle} onChange={(e) => setRequestTitle(e.target.value)} required />
+                </label>
+              </div>
+              <label className="field">
+                <span>Короткий текст</span>
+                <textarea rows={3} value={requestText} onChange={(e) => setRequestText(e.target.value)} required />
+              </label>
+              {requestNote ? <p className="notice">{requestNote}</p> : null}
+              <div className="row">
+                <button className="btn btn-primary" type="submit">Отправить запрос</button>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
-      <section className="org-quick-actions"><div><span className="org-eyebrow">СЛЕДУЮЩИЙ ШАГ</span><h2>Создайте новую возможность для учеников</h2><p>Опубликуйте олимпиаду или проектную инициативу, а затем отслеживайте её статус и регистрации.</p></div><button className="btn btn-primary" onClick={() => setTab('create')}>Создать мероприятие <span aria-hidden="true">→</span></button></section>
-    </> : null}
-
-    {tab === 'events' ? <section className="card org-panel"><SectionTitle eyebrow="УПРАВЛЕНИЕ ПУБЛИКАЦИЯМИ" title="Мероприятия лицея"><button className="btn btn-primary btn-small" onClick={() => setTab('create')}>＋ Новое мероприятие</button></SectionTitle><div className="org-list">{events.map((item) => <article className="org-event-row" key={item.id}><div className="org-event-top"><span className="org-eyebrow">{item.category === 'project' ? 'ПРОЕКТНАЯ ДЕЯТЕЛЬНОСТЬ' : 'ОЛИМПИАДА'}</span><span className={`badge ${item.status === 'published' ? 'badge-ok' : item.status === 'rejected' ? 'badge-no' : 'badge-pending'}`}>{item.status === 'published' ? 'Опубликовано' : item.status === 'registration_closed' ? 'Регистрация закрыта' : item.status === 'completed' ? 'Завершено' : item.status === 'rejected' ? 'Отклонено' : 'На модерации'}</span></div><h3>{item.title}</h3><p>{item.description}</p><div className="org-event-meta"><span>◷ {dateText(item.date)}</span><span>⌖ {item.city || 'Минск'}</span><span>Лимит: {item.seats || '—'}</span><span>Формат: {item.format || '—'}</span><span>Регистраций: {eventRegistrations(item.id).length}</span></div><div className="row org-event-actions"><button className="btn btn-ghost btn-small" type="button" onClick={() => setExpandedEvent(expandedEvent === item.id ? '' : item.id)}>{expandedEvent === item.id ? 'Скрыть участников' : 'Управлять участниками'}</button>{item.status === 'published' ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'registration_closed' }); setVersion((v) => v + 1); setNotice('Регистрация на мероприятие закрыта.') }}>Закрыть регистрацию</button> : null}{item.status === 'registration_closed' ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'published' }); setVersion((v) => v + 1); setNotice('Регистрация снова открыта.') }}>Открыть регистрацию</button> : null}{['published','registration_closed'].includes(item.status) ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEvent(item.id, { status: 'completed' }); setVersion((v) => v + 1); setNotice('Мероприятие отмечено завершённым.') }}>Завершить</button> : null}</div>{expandedEvent === item.id ? <div className="org-participants"><strong>Заявки участников</strong>{eventRegistrations(item.id).map((person) => <div className="org-participant-row" key={person.studentId}><div><b>{person.name}</b><small>{person.grade ? `${person.grade} класс` : 'Класс не указан'} · {person.status}{person.attended ? ' · Посещение подтверждено' : ''}</small></div><div className="row">{person.status === 'подана' ? <><button className="btn btn-primary btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { status: 'подтверждена' }); setVersion((v) => v + 1) }}>Подтвердить</button><button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { status: 'отклонена' }); setVersion((v) => v + 1) }}>Отклонить</button></> : null}{person.status === 'подтверждена' && !person.attended ? <button className="btn btn-ghost btn-small" type="button" onClick={() => { updateEventRegistration(item.id, person.studentId, { attended: true }); setVersion((v) => v + 1); setNotice(`Посещение подтверждено: ${person.name}.`) }}>Отметить посещение</button> : null}</div></div>)}{eventRegistrations(item.id).length === 0 ? <p className="muted">Заявок пока нет. Они появятся после регистрации школьников.</p> : null}</div> : null}</article>)}{events.length === 0 ? <div className="org-empty"><strong>Здесь появятся ваши мероприятия</strong><p>Создайте первую публикацию — она будет отправлена на модерацию.</p><button className="btn btn-primary" onClick={() => setTab('create')}>Создать мероприятие</button></div> : null}</div></section> : null}
-
-    {tab === 'students' ? <section className="card org-panel"><SectionTitle eyebrow="СООБЩЕСТВО ЛИЦЕЯ" title="Ученики и их активность"/><p className="muted">Сводная информация об интересах, регистрациях, посещённых мероприятиях и достижениях. Персональные данные доступны только представителям учреждения.</p><label className="field org-search"><span>Найти ученика или направление</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Например, информатика или Алина"/></label><div className="org-student-grid">{filteredStudents.map((student) => <article className="org-student-card" key={student.id}><div className="org-student-avatar">{personName(student).split(' ').map((part) => part[0]).slice(0,2).join('')}</div><div><strong>{personName(student)}</strong><small>{student.grade ? `${student.grade} класс` : 'Класс не указан'}</small></div><div className="org-student-facts"><span><b>{(student.signedUp || student.registered || []).length}</b> регистраций</span><span><b>{(student.attended || []).length}</b> посещений</span><span><b>{(student.achievements || []).length}</b> достижений</span></div><div className="chips">{(student.interests || []).map((item) => <span className="chip" key={item}>{item}</span>)}</div></article>)}</div>{filteredStudents.length === 0 ? <p className="muted">По вашему запросу учеников не найдено.</p> : null}</section> : null}
-
-    {tab === 'partners' ? <div className="org-dashboard-grid org-partner-layout"><section className="card org-panel"><SectionTitle eyebrow="ВХОДЯЩИЕ И ИСХОДЯЩИЕ" title="Запросы на сотрудничество"/><div className="org-list">{partnerships.map((item) => <article className="org-partner-card" key={item.id}><div className="row spread"><span className="org-eyebrow">{item.visibility === 'public' ? 'ПУБЛИЧНЫЙ ЗАПРОС ДЛЯ ШКОЛ' : item.parentRequestId ? 'ВАШ ОТКЛИК НА ПУБЛИЧНЫЙ ЗАПРОС' : item.from === SCHOOL ? 'ИСХОДЯЩИЙ ЗАПРОС' : 'ПРЕДЛОЖЕНИЕ ПАРТНЁРА'}</span><span className={`badge ${statusClass[item.status] || 'badge-muted'}`}>{statusText[item.status] || 'В обработке'}</span></div><h3>{item.title}</h3><p className="muted">{item.from || '—'} <span aria-hidden="true">→</span> {item.visibility === 'public' ? 'Все образовательные учреждения' : item.to || '—'}</p><p>{item.description || item.text || 'Описание не добавлено.'}</p>{['incoming', 'pending'].includes(item.status) && item.to === SCHOOL ? <div className="row"><button className="btn btn-primary btn-small" onClick={() => handleRespond(item.id, 'accepted')}>Принять запрос</button><button className="btn btn-ghost btn-small" onClick={() => handleRespond(item.id, 'declined')}>Отклонить</button></div> : null}{item.visibility === 'public' && item.audience === 'all_schools' && item.status === 'pending' ? <div className="row"><button className="btn btn-primary btn-small" onClick={() => handleMarketplaceRespond(item)} disabled={partnerships.some((entry) => entry.parentRequestId === item.id && entry.from === SCHOOL)}>{partnerships.some((entry) => entry.parentRequestId === item.id && entry.from === SCHOOL) ? 'Отклик отправлен' : 'Откликнуться'}</button></div> : null}</article>)}{partnerships.length === 0 ? <p className="muted">Пока нет запросов на сотрудничество.</p> : null}</div></section>
-      <section className="card org-panel"><SectionTitle eyebrow="ПОИСК ПАРТНЁРА" title="Отправить запрос"/><p className="muted">Опишите, какая организация и какая поддержка нужны для вашей инициативы.</p><form className="stack" onSubmit={handleRequest}><label className="field"><span>Компания или академия</span><select value={partner} onChange={(e) => setPartner(e.target.value)}>{COMPANIES.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Тема сотрудничества</span><input value={requestTitle} onChange={(e) => setRequestTitle(e.target.value)} required/></label><label className="field"><span>Описание и условия</span><textarea rows={5} value={requestText} onChange={(e) => setRequestText(e.target.value)} required/></label><button className="btn btn-primary" type="submit">Отправить запрос</button></form></section></div> : null}
-
-    {tab === 'create' ? <section className="card org-panel org-form-panel"><SectionTitle eyebrow="НОВАЯ ПУБЛИКАЦИЯ" title="Создать мероприятие"/><p className="muted">Заполните основные сведения. После отправки мероприятие получит статус «На модерации» и появится в каталоге после проверки.</p><form className="stack" onSubmit={handlePublish}><div className="grid-2"><label className="field"><span>Название мероприятия</span><input value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required/></label><label className="field"><span>Тип мероприятия</span><select value={category} onChange={(e) => setCategory(e.target.value)}><option value="olympiad">Олимпиада</option><option value="project">Проектная деятельность</option></select></label><label className="field"><span>Направление</span><select value={interest} onChange={(e) => setInterest(e.target.value)}>{INTERESTS.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Целевая аудитория</span><select value={grade} onChange={(e) => setGrade(e.target.value)}>{['7–8','8–9','9–10','10–11','7–11'].map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Город</span><select value={city} onChange={(e) => setCity(e.target.value)}>{CITIES.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Формат</span><select value={format} onChange={(e) => setFormat(e.target.value)}><option value="очно">Очно</option><option value="онлайн">Онлайн</option><option value="смешанный">Смешанный</option></select></label><label className="field"><span>Дата проведения</span><input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} min="2026-11-06" required/></label><label className="field"><span>Дедлайн регистрации</span><input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} required/></label><label className="field"><span>Количество мест</span><input type="number" min="1" max="10000" value={seats} onChange={(e) => setSeats(e.target.value)} required/></label></div><label className="field"><span>Описание</span><textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} required/></label><div className="org-form-footer"><span className="muted">Организатор: {SCHOOL}</span><button className="btn btn-primary" type="submit">Отправить на модерацию →</button></div></form></section> : null}
-  </div></main>
+    </main>
+  );
 }
