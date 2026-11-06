@@ -504,7 +504,8 @@ td {
   gap: 8px;
 }
 
-.student-tabs a {
+.student-tabs a,
+.student-tabs button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -517,7 +518,8 @@ td {
   font-size: 15px;
 }
 
-.student-tabs a.active {
+.student-tabs a.active,
+.student-tabs button.active {
   background: var(--primary);
   border-color: var(--primary);
   color: #fff;
