@@ -188,7 +188,7 @@ export default function Events() {
     }
     return (
       <button type="button" className="btn btn-primary" onClick={(mouse) => { mouse.stopPropagation(); onRegister(event) }}>
-        Зарегистрироваться
+        Подать заявку
       </button>
     )
   }
@@ -297,7 +297,7 @@ export default function Events() {
             aria-expanded={listOpen}
             onClick={() => setListOpen((value) => !value)}
           >
-            {listOpen ? 'Свернуть список' : 'Посмотреть всё'}
+            {listOpen ? 'Скрыть список' : 'Показать все мероприятия'}
           </button>
         </section>
         {listOpen ? <p className="muted">Показано {visible.length} из {published.length}</p> : null}
@@ -361,7 +361,7 @@ export default function Events() {
             {openedApp ? (
               <p className="notice">Ваша заявка: {openedApp.status}.</p>
             ) : (
-              <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Зарегистрироваться</button>
+              <button type="button" className="btn btn-primary" onClick={() => onRegister(opened)}>Подать заявку</button>
             )}
           </div>
         </div>
