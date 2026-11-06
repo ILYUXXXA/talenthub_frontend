@@ -1,6 +1,8 @@
-const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://lbsuhack.onrender.com')
-  .replace(/\\/$/, '')
-  .replace(/\\/api\\/v1$/, '')
+const API_ORIGIN = (() => {
+  const configured = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://lbsuhack.onrender.com'
+  const withoutApiPath = configured.endsWith('/api/v1') ? configured.slice(0, -7) : configured
+  return withoutApiPath.endsWith('/') ? withoutApiPath.slice(0, -1) : withoutApiPath
+})()
 const API_BASE = `${API_ORIGIN}/api/v1`
 const TOKEN_KEY = 'talenthub_access_token'
 const LEGACY_TOKEN_KEY = 'talenthub-access-token'
