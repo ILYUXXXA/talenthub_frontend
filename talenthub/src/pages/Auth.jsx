@@ -70,11 +70,23 @@ export default function Auth() {
     setError('')
   }
 
-  function fillDemo() {
+  function enterAsCurrentRole() {
     if (!current?.demo) return
-    setEmail(current.demo)
-    setPassword(DEMO_PASSWORD)
-    setError('')
+    try {
+      const user = userFrom(login(current.demo, DEMO_PASSWORD))
+      if (!user || user.role !== role) {
+        setError('Не удалось открыть профиль выбранной роли.')
+        return
+      }
+      const path = pathFor(user)
+      if (!path) {
+        setError('Для этой роли вход пока не открыт.')
+        return
+      }
+      navigate(path)
+    } catch {
+      setError('Не удалось открыть профиль выбранной роли.')
+    }
   }
 
   function onLogin(event) {
@@ -123,7 +135,7 @@ export default function Auth() {
     return (
       <main>
         <div className="container narrow">
-          <h1>Вход</h1>
+          <span className="org-eyebrow">TALENTHUB · ЕДИНАЯ ПЛАТФОРМА</span><h1>Войти от имени</h1><p className="lead">Выберите профиль, чтобы перейти в соответствующий кабинет.</p>
           <div className="role-pick">
             {ROLES.map((item) => (
               <button key={item.id} type="button" className="btn btn-ghost" onClick={() => choose(item.id)}>
@@ -137,8 +149,8 @@ export default function Auth() {
   }
 
   return (
-    <main>
-      <div className="container narrow">
+    <main className="auth-page">
+      <div className="container narrow auth-container">
         <button type="button" className="btn btn-ghost" onClick={() => choose('')}>К выбору роли</button>
         <h1>{current.label}</h1>
         {mode === 'register' ? (
@@ -186,9 +198,9 @@ export default function Auth() {
             {error ? <p className="notice">{error}</p> : null}
             <button className="btn btn-primary" type="submit">Войти</button>
             {current.demo ? (
-              <button type="button" className="btn btn-ghost" onClick={fillDemo}>Заполнить демо</button>
+              <button type="button" className="btn btn-ghost" onClick={enterAsCurrentRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
             ) : (
-              <p className="muted">Для представителя компании демо-вход пока не заведён.</p>
+              <p className="muted">Войдите с данными своей учётной записи.</p>
             )}
             {role === 'student' ? (
               <button type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
