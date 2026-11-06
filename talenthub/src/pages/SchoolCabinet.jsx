@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import OrganizationShell from '../components/OrganizationShell.jsx'
 import {
   schoolStudents,
   listEvents,
@@ -126,14 +127,11 @@ export default function SchoolCabinet() {
     } catch { setNotice('Не удалось отправить отклик. Попробуйте ещё раз.') }
   }
 
-  return <main className="org-page"><div className="container org-container">
-    <section className="org-hero">
-      <div><span className="org-eyebrow">КАБИНЕТ ОБРАЗОВАТЕЛЬНОГО УЧРЕЖДЕНИЯ</span><h1>Лицей БГУ</h1><p>Управляйте мероприятиями, следите за интересами учеников и находите партнёров для новых образовательных инициатив.</p><div className="row org-hero-meta"><span>Минск</span><span>·</span><span>Представитель: Елена Брик</span><span className="badge badge-ok">Профиль организации</span></div></div>
-      <div className="org-hero-mark"><span>ЛБ</span><small>TalentHub<br/>Education</small></div>
-    </section>
-    <nav className="org-tabs" aria-label="Разделы кабинета">
-      {[['overview','Обзор'],['events','Мероприятия'],['students','Ученики'],['partners','Партнёрства'],['create','Создать мероприятие']].map(([id,label]) => <button key={id} type="button" className={tab === id ? 'active' : ''} onClick={() => { setTab(id); setNotice('') }}>{label}</button>)}
-    </nav>
+  return <OrganizationShell tabs={[['overview','Обзор'],['events','Мероприятия'],['students','Ученики'],['partners','Партнёрства'],['create','Создать мероприятие']]} activeTab={tab} onTabChange={(id) => { setTab(id); setNotice('') }}>
+    <main className="org-page"><div className="container org-container">
+      <section className="org-page-heading"><h1>Кабинет образовательного учреждения</h1><p>Управляйте мероприятиями, отслеживайте активность учащихся и взаимодействуйте с компаниями-партнёрами.</p></section>
+
+
     {notice ? <div className="notice org-notice" role="status">{notice}</div> : null}
 
     {tab === 'overview' ? <>
@@ -153,5 +151,6 @@ export default function SchoolCabinet() {
       <section className="card org-panel"><SectionTitle eyebrow="ПОИСК ПАРТНЁРА" title="Отправить запрос"/><p className="muted">Опишите, какая организация и какая поддержка нужны для вашей инициативы.</p><form className="stack" onSubmit={handleRequest}><label className="field"><span>Компания или академия</span><select value={partner} onChange={(e) => setPartner(e.target.value)}>{COMPANIES.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Тема сотрудничества</span><input value={requestTitle} onChange={(e) => setRequestTitle(e.target.value)} required/></label><label className="field"><span>Описание и условия</span><textarea rows={5} value={requestText} onChange={(e) => setRequestText(e.target.value)} required/></label><button className="btn btn-primary" type="submit">Отправить запрос</button></form></section></div> : null}
 
     {tab === 'create' ? <section className="card org-panel org-form-panel"><SectionTitle eyebrow="НОВАЯ ПУБЛИКАЦИЯ" title="Создать мероприятие"/><p className="muted">Заполните основные сведения. После отправки мероприятие получит статус «На модерации» и появится в каталоге после проверки.</p><form className="stack" onSubmit={handlePublish}><div className="grid-2"><label className="field"><span>Название мероприятия</span><input value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required/></label><label className="field"><span>Тип мероприятия</span><select value={category} onChange={(e) => setCategory(e.target.value)}><option value="olympiad">Олимпиада</option><option value="project">Проектная деятельность</option></select></label><label className="field"><span>Направление</span><select value={interest} onChange={(e) => setInterest(e.target.value)}>{INTERESTS.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Целевая аудитория</span><select value={grade} onChange={(e) => setGrade(e.target.value)}>{['7–8','8–9','9–10','10–11','7–11'].map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Город</span><select value={city} onChange={(e) => setCity(e.target.value)}>{CITIES.map((item) => <option key={item}>{item}</option>)}</select></label><label className="field"><span>Формат</span><select value={format} onChange={(e) => setFormat(e.target.value)}><option value="очно">Очно</option><option value="онлайн">Онлайн</option><option value="смешанный">Смешанный</option></select></label><label className="field"><span>Дата проведения</span><input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} min="2026-11-06" required/></label><label className="field"><span>Дедлайн регистрации</span><input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} required/></label><label className="field"><span>Количество мест</span><input type="number" min="1" max="10000" value={seats} onChange={(e) => setSeats(e.target.value)} required/></label></div><label className="field"><span>Описание</span><textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} required/></label><div className="org-form-footer"><span className="muted">Организатор: {SCHOOL}</span><button className="btn btn-primary" type="submit">Отправить на модерацию →</button></div></form></section> : null}
-  </div></main>
+    </div></main>
+  </OrganizationShell>
 }
