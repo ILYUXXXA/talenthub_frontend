@@ -263,9 +263,9 @@ function seed() {
         role: 'parent',
         firstName: 'Ольга',
         lastName: 'Коваль',
-        childId: null,
-        childIds: [],
-        activeChildId: null,
+        childId: 's1',
+        childIds: ['s1'],
+        activeChildId: 's1',
       },
       {
         id: 'u-school',
@@ -720,6 +720,14 @@ function load() {
             lastName: 'Мороз',
             orgName: 'КодМастер',
           })
+          writeRaw(JSON.stringify(parsed))
+        }
+        const demoParent = parsed.users.find((item) => item && item.id === 'u-olga' && item.role === 'parent')
+        const demoChildExists = Array.isArray(parsed.students) && parsed.students.some((item) => item && item.id === 's1')
+        if (demoParent && demoChildExists && linkedChildIds(demoParent).length === 0) {
+          demoParent.childIds = ['s1']
+          demoParent.childId = 's1'
+          demoParent.activeChildId = 's1'
           writeRaw(JSON.stringify(parsed))
         }
         return parsed
