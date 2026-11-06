@@ -41,11 +41,11 @@ export default function Landing() {
 
       <section className="th-hero">
         <div className="th-hero-copy">
-          <div className="th-overline"><span></span> ПЛАТФОРМА ОБРАЗОВАТЕЛЬНЫХ ВОЗМОЖНОСТЕЙ</div>
-          <h1>Образование открывает возможности.</h1>
-          <p>TalentHub объединяет учащихся, школы, компании и академии — чтобы находить события, развивать таланты и создавать новые образовательные проекты.</p>
+          <div className="th-overline"><span></span> ЕДИНАЯ ПЛАТФОРМА ДЛЯ РАЗВИТИЯ</div>
+          <h1>Находи возможности. Участвуй. Развивайся.</h1>
+          <p>Мероприятия и образовательные проекты для учащихся. Партнёрства и инструменты развития — для школ, компаний и академий.</p>
           <div className="th-hero-actions">
-            <Link to="/auth" className="th-primary">Перейти на платформу <span>→</span></Link>
+            <Link to="/auth" className="th-primary">Найти свою возможность <span>→</span></Link>
             <a href="#platform" className="th-secondary">Узнать больше</a>
           </div>
           <div className="th-hero-caption"><span>Для учащихся</span><i></i><span>Для учреждений</span><i></i><span>Для партнёров</span></div>
@@ -75,13 +75,13 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <div className="th-dashboard-note"><span>✓</span><div><b>Реальный каталог TalentHub</b><small>Данные загружаются из приложения</small></div></div>
+          <div className="th-dashboard-note"><span>✓</span><div><b>Возможности TalentHub</b><small>Мероприятия и проекты в одном месте</small></div></div>
         </div>
       </section>
 
       <section className="th-intro" id="platform">
         <div className="th-section-label">TALENTHUB / ПЛАТФОРМА</div>
-        <div><h2>Единая среда для развития и сотрудничества</h2><p>Возможности для учащихся и инструменты для организаций собраны на одной платформе. Меньше разрозненной информации — больше полезных связей и реальных результатов.</p></div>
+        <div><h2>От интереса — к реальным достижениям</h2><p>Возможности для учащихся и инструменты для организаций собраны на одной платформе. Находите события, подавайте заявки, сохраняйте результаты и выстраивайте сотрудничество в единой среде.</p></div>
       </section>
 
       <section className="th-features" id="how">
