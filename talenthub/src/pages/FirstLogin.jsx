@@ -188,7 +188,7 @@ export default function FirstLogin() {
             </div>
             {error ? <p className="notice">{error}</p> : null}
             <button className="btn btn-primary" type="submit">Показать мероприятия</button>
-            <p className="muted">Демо первого входа: mark@demo.by, Марк Левин. Базовая регистрация уже пройдена.</p>
+            <p className="muted">Заполните профиль, чтобы получать рекомендации мероприятий и образовательных возможностей.</p>
           </form>
         </div>
       </div>
