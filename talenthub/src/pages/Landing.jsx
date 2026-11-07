@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import capturedCSS from '../styles/talent-connect-landing.css?raw'
+import '../styles/talent-connect-landing-page.css'
 
 const audiences = [
   { title: 'Родителям', role: 'parent', icon: '♡', headline: 'Рядом на каждом\nэтапе развития.', description: 'Следите за образовательной активностью и успехами ребёнка.', tags: ['Активность', 'Результаты', 'Развитие'] },
@@ -33,7 +33,6 @@ export default function Landing() {
   }, [])
 
   return <>
-    <style>{`@layer imported-inline { ${capturedCSS} }`}</style>
     <main id="top" className="kt" ref={root}>
       <header className="kt-header">
         <Link to="/" className="kt-logo" aria-label="TalentHub — главная"><span className="kt-logo-mark">t.</span><span>Talent<span>Hub</span></span></Link>
