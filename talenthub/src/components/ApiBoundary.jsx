@@ -12,7 +12,7 @@ export function ApiBoundary({ children }) {
     window.addEventListener('focus', onFocus)
     return () => window.removeEventListener('focus', onFocus)
   }, [])
-  if (!state.ready) return <main><div className="container"><p className="notice" role="status">Загрузка данных…</p></div></main>
+  if (!state.ready) return <main className="app-loading" aria-live="polite"><div className="app-loading-content"><span className="th-spinner th-spinner-large" aria-hidden="true" /><p>Загружаем TalentHub…</p></div></main>
   if (state.error) return <main><div className="container"><p className="notice" role="alert">{state.error}</p><button className="btn btn-primary" onClick={retry}>Повторить</button></div></main>
   return children
 }
