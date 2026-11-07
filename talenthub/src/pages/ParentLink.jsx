@@ -169,6 +169,9 @@ export default function ParentLink() {
   const [ownCategory, setOwnCategory] = useState('Математика|олимпиады')
   const [rankCategory, setRankCategory] = useState('Математика|олимпиады')
   const [progressOpen, setProgressOpen] = useState(null)
+  const [linking, setLinking] = useState(false)
+  const [selectingChild, setSelectingChild] = useState(null)
+  const [suggestingEvent, setSuggestingEvent] = useState(null)
 
   const active = cabinet.children.find((child) => child.id === cabinet.activeId) || cabinet.children[0] || null
 
@@ -193,6 +196,7 @@ export default function ParentLink() {
     event.preventDefault()
     setLinkError('')
     setLinkNote('')
+    setLinking(true)
     try {
       const result = await linkChild({
         firstName: firstName.trim(),
@@ -211,14 +215,18 @@ export default function ParentLink() {
       refresh()
     } catch (error) {
       setLinkError(error.message || 'Не удалось проверить запись. Попробуйте ещё раз.')
+    } finally {
+      setLinking(false)
     }
   }
 
   async function onSelect(childId) {
+    if (selectingChild) return
+    setSelectingChild(childId)
     try {
       await selectChild(childId)
     } catch (error) { setLinkNote(error.message) }
-    refresh()
+    finally { setSelectingChild(null); refresh() }
   }
 
   function openProgress(item, kind) {
@@ -232,6 +240,7 @@ export default function ParentLink() {
 
   async function onSuggestEvent(event) {
     if (!active) return { ok: false, message: 'Сначала выберите ребёнка.' }
+    setSuggestingEvent(event.id)
     try {
       const result = await suggestToChild({ childId: active.id, eventId: event.id })
       if (!result || result.ok !== true) return { ok: false, message: 'Не удалось предложить мероприятие.' }
@@ -243,6 +252,8 @@ export default function ParentLink() {
       }
     } catch (error) {
       return { ok: false, message: error.message || 'Не удалось предложить мероприятие.' }
+    } finally {
+      setSuggestingEvent(null)
     }
   }
 
@@ -279,6 +290,21 @@ export default function ParentLink() {
   }, [cabinet.schools, rankCategory])
 
   const parentName = personName(cabinet.user)
+
+  if (!cabinet.ready) {
+    return (
+      <>
+        <ParentBar section={section} onSection={setSection} />
+        <main className="parent-workspace parent-loading" aria-busy="true">
+          <div className="container">
+            <div className="parent-loading-heading"><span className="skeleton skeleton-kicker" /><span className="skeleton skeleton-heading" /><span className="skeleton skeleton-copy" /></div>
+            <div className="parent-loading-grid"><span className="skeleton skeleton-panel" /><span className="skeleton skeleton-panel" /><span className="skeleton skeleton-panel" /></div>
+            <p className="loading-caption"><span className="spinner" /> Загружаем данные кабинета…</p>
+          </div>
+        </main>
+      </>
+    )
+  }
 
   if (!cabinet.loggedIn) {
     return (
@@ -317,11 +343,13 @@ export default function ParentLink() {
                 type="button"
                 className={child.id === active?.id ? 'parent-child-pill active' : 'parent-child-pill'}
                 onClick={() => onSelect(child.id)}
+                disabled={Boolean(selectingChild)}
+                aria-busy={selectingChild === child.id}
                 aria-pressed={child.id === active?.id}
               >
                 <span className="parent-child-avatar">{personName(child).split(' ').map((part) => part[0]).slice(0, 2).join('')}</span>
                 <span>{personName(child)}</span>
-                {child.id === active?.id ? <span className="parent-child-check">✓</span> : null}
+                {selectingChild === child.id ? <span className="spinner spinner-small" aria-label="Загрузка" /> : child.id === active?.id ? <span className="parent-child-check">✓</span> : null}
               </button>
             ))}
             {cabinet.children.length > 0 ? (
@@ -362,8 +390,9 @@ export default function ParentLink() {
                 <input type="date" value={birthDate} required onChange={(event) => setBirthDate(event.target.value)} />
               </label>
               {linkError ? <p className="notice">{linkError}</p> : null}
+            {linking ? <p className="loading-caption"><span className="spinner" /> Ищем профиль ребёнка в базе…</p> : null}
               <div className="row">
-                <button className="btn btn-primary" type="submit">Привязать</button>
+                <button className="btn btn-primary" type="submit" disabled={linking}>{linking ? <><span className="spinner spinner-light" /> Проверяем…</> : 'Привязать'}</button>
                 <button className="btn btn-ghost" type="button" onClick={() => { setAdding(false); setLinkError(''); }}>Отмена</button>
               </div>
             </form>
@@ -429,6 +458,7 @@ export default function ParentLink() {
                   ))}
                   actionLabel="Предложить ребёнку"
                   onAction={onSuggestEvent}
+                  pendingActionId={suggestingEvent}
                 />
               ) : null}
 
