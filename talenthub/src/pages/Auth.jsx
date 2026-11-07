@@ -71,26 +71,11 @@ export default function Auth() {
     setError('')
   }
 
-  async function enterAsRole() {
-    if (!current?.quickEmail) return
-    if (busy) return
-    setBusy(true)
+  function fillDemoData() {
+    if (busy || !current?.quickEmail) return
+    setEmail(current.quickEmail)
+    setPassword(QUICK_ACCESS_PASSWORD)
     setError('')
-    try {
-      const user = userFrom(await login(current.quickEmail, QUICK_ACCESS_PASSWORD, role))
-      if (!user || user.role !== role) {
-        setError('Не удалось открыть профиль выбранной роли.')
-        return
-      }
-      const path = pathFor(user)
-      if (!path) {
-        setError('Для этой роли вход пока недоступен.')
-        return
-      }
-      navigate(path)
-    } catch (error) {
-      setError(error.message || 'Не удалось открыть профиль выбранной роли.')
-    } finally { setBusy(false) }
   }
 
   async function onLogin(event) {
@@ -207,7 +192,7 @@ export default function Auth() {
             </label>
             {error ? <p className="notice" role="alert">{error}</p> : null}
             <button disabled={busy} className="btn btn-primary" type="submit">{busy ? <><span className="th-spinner" aria-hidden="true" /> Входим…</> : 'Войти'}</button>
-            <button disabled={busy} type="button" className="btn btn-ghost" onClick={enterAsRole}>{busy ? <><span className="th-spinner" aria-hidden="true" /> Выполняется вход…</> : <>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</>}</button>
+            <button disabled={busy} type="button" className="btn btn-ghost" onClick={fillDemoData}>Заполнить демо-данные</button>
             {role === 'student' || role === 'parent' ? (
               <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}

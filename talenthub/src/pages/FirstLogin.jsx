@@ -102,8 +102,8 @@ export default function FirstLogin() {
             </div>
           </div>
           <form className="modal-card" onSubmit={onSubmit}>
-            <h1 className="title" style={{ fontSize: 28 }}>Заполните профиль</h1>
-            <p className="lead" style={{ fontSize: 16 }}>
+            <h1 className="title">Заполните профиль</h1>
+            <p className="lead">
               Класс, город и интересы нужны, чтобы показать подходящие мероприятия. Список событий сзади приглушён.
             </p>
             <label className="field">

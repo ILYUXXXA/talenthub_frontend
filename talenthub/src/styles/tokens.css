@@ -19,5 +19,13 @@
   --radius: 16px;
   --radius-sm: 12px;
   --font-display: "Unbounded", sans-serif;
+  --text-body: 18px;
+  --text-control: 16px;
+  --text-meta: 14px;
+  --text-card-title: 24px;
+  --text-section-title: 32px;
+  --control-height: 52px;
+  --control-compact-height: 44px;
+  --action-icon-size: 22px;
   --font-body: "Manrope", sans-serif;
 }
