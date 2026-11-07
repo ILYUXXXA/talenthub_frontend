@@ -2628,7 +2628,7 @@ grid-template-columns: 1fr 1fr;
 /* Parent school catalogue: predictable navigation and clickable school cards */
 .parent-bar { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 20px; }
 .parent-bar .brand-lockup { flex: 0 0 auto; }
-.parent-bar .student-tabs { display: flex; flex: 1 1 auto; min-width: 0; justify-content: flex-end; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.parent-bar .student-tabs { display: flex; flex: 1 1 auto; min-width: 0; margin-left: 28px; justify-content: flex-end; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
 .parent-bar .student-tabs::-webkit-scrollbar { display: none; }
 .parent-bar .student-tabs button { flex: 0 0 auto; }
 .school-split { grid-template-columns: minmax(0,1.04fr) minmax(360px,.96fr); align-items: start; gap: 20px; }
@@ -2666,7 +2666,7 @@ grid-template-columns: 1fr 1fr;
 @media (max-width: 900px) {
  .school-split { grid-template-columns: 1fr; }
  .parent-bar { flex-wrap: wrap; }
- .parent-bar .student-tabs { flex: 1 1 100%; width: 100%; justify-content: flex-start; }
+ .parent-bar .student-tabs { flex: 1 1 100%; width: 100%; margin-left: 0; justify-content: flex-start; }
 }
 @media (max-width: 640px) {
  .school-tiles { grid-template-columns: 1fr; }
