@@ -2623,3 +2623,47 @@ grid-template-columns: 1fr 1fr;
 .th-landing .th-partners .th-partners-copy h2 {
   color: #fff !important;
 }
+
+
+/* Parent school catalogue: predictable navigation and clickable school cards */
+.parent-bar { display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 20px; }
+.parent-bar .brand-lockup { flex: 0 0 auto; }
+.parent-bar .student-tabs { display: flex; flex: 1 1 auto; min-width: 0; justify-content: flex-end; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.parent-bar .student-tabs::-webkit-scrollbar { display: none; }
+.parent-bar .student-tabs button { flex: 0 0 auto; }
+.school-split { grid-template-columns: minmax(0,1.04fr) minmax(360px,.96fr); align-items: start; gap: 20px; }
+.school-board { gap: 14px; }
+.school-pane { border: 1px solid #e5ebf5; border-radius: 20px; box-shadow: 0 10px 28px rgba(31,55,98,.045); }
+.school-pane > .school-head { gap: 9px; }
+.school-head .school-kicker { color: #7d8ba3; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.school-pane .field > span { color: #53647f; font-size: 12px; font-weight: 750; }
+.school-rank li { padding: 0; overflow: hidden; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.school-rank li:hover, .school-rank li.selected { border-color: #9db5fa; box-shadow: 0 6px 18px rgba(49,89,232,.08); }
+.school-rank-select, .school-missing-select { display: flex; width: 100%; gap: 12px; padding: 13px 15px; border: 0; border-radius: inherit; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.school-rank-select { align-items: flex-start; }
+.school-rank-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; }
+.school-rank-copy > span:not(.spread) { line-height: 1.45; }
+.school-rank-copy .spread { align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.school-rank-select:hover, .school-missing-select:hover { background: rgba(49,89,232,.035); }
+.school-rank-select[aria-pressed="true"], .school-missing-select[aria-pressed="true"] { background: rgba(49,89,232,.055); }
+.school-open-hint { color: #3159e8; font-size: 11px; font-weight: 750; opacity: .78; }
+.school-missing li { padding: 0; overflow: hidden; transition: border-color .16s ease,box-shadow .16s ease; }
+.school-missing li.selected { border-color: #9db5fa; box-shadow: 0 5px 16px rgba(49,89,232,.07); }
+.school-missing-select { flex-direction: column; gap: 3px; }
+.school-missing-select .school-rank-name { color: #203451; }
+.school-gap { padding-top: 18px; border-top: 1px solid #e5ebf5; }
+.school-gap > .card-title { margin-bottom: 8px; }
+.school-gap > .muted { line-height: 1.55; }
+.school-tiles { gap: 14px; }
+.school-tile { border: 1px solid #e8edf6; border-radius: 16px; background: #fff; }
+.school-prestige { background: linear-gradient(145deg,#fff,#f8faff); }
+@media (max-width: 900px) {
+ .school-split { grid-template-columns: 1fr; }
+ .parent-bar { flex-wrap: wrap; }
+ .parent-bar .student-tabs { flex: 1 1 100%; width: 100%; justify-content: flex-start; }
+}
+@media (max-width: 640px) {
+ .school-tiles { grid-template-columns: 1fr; }
+ .school-tile.wide,.school-tile.school-prestige { grid-column: auto; }
+ .school-rank-select { padding: 12px; }
+}
