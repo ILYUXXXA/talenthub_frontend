@@ -2673,3 +2673,18 @@ grid-template-columns: 1fr 1fr;
  .school-tile.wide,.school-tile.school-prestige { grid-column: auto; }
  .school-rank-select { padding: 12px; }
 }
+
+
+/* Keep the shared header frame compact and centered on every cabinet page. */
+.header-inner {
+  box-sizing: border-box;
+  width: min(1440px, calc(100% - 64px));
+  max-width: 1440px;
+  margin-inline: auto;
+}
+@media (max-width: 760px) {
+  .header-inner { width: calc(100% - 32px); }
+}
+@media (max-width: 560px) {
+  .header-inner { width: calc(100% - 28px); }
+}
