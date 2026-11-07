@@ -178,6 +178,7 @@ export default function ParentLink() {
 
   useEffect(() => {
     setProgressOpen(null)
+    setSelectedSchoolId(null)
   }, [active?.id])
 
   useEffect(() => {
