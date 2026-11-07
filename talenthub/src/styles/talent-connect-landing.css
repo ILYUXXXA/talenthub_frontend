@@ -229,3 +229,14 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
   }
 }
 
+
+
+/* Fail-safe: content must never disappear if the reveal observer is delayed or unavailable. */
+.kt .kt-reveal { opacity: 1 !important; transform: none !important; visibility: visible !important; }
+.kt .kt-platform > h2,
+.kt .kt-platform > .kt-audiences,
+.kt .kt-platform > .kt-audience-content,
+.kt .kt-how > h2,
+.kt .kt-how > .kt-steps,
+.kt .kt-partners > .kt-partners-content,
+.kt .kt-partners > .kt-partner-types { visibility: visible !important; }
