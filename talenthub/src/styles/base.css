@@ -2751,3 +2751,14 @@ grid-template-columns: 1fr 1fr;
     flex-direction: row;
   }
 }
+
+
+/* Fix the first card's status badge alignment when its label wraps. */
+.org-event-top .badge,
+.org-market-card-head .badge {
+  align-self: center;
+}
+.org-event-top .org-eyebrow,
+.org-market-card-head .org-eyebrow {
+  line-height: 1.4;
+}
