@@ -2475,7 +2475,11 @@ grid-template-columns: 1fr 1fr;
 .student-header .brand-lockup { flex: none; }
 .student-header .student-tabs {
   display: flex;
-  flex: 1;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  margin-left: auto;
   justify-content: flex-end;
   flex-wrap: nowrap;
   overflow-x: auto;
