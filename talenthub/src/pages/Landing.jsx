@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import '../styles/talent-connect-landing-page.css'
+import capturedCSS from '../styles/talent-connect-landing.css?raw'
 
 const audiences = [
   { title: 'Родителям', role: 'parent', icon: '♡', headline: 'Рядом на каждом\nэтапе развития.', description: 'Следите за образовательной активностью и успехами ребёнка.', tags: ['Активность', 'Результаты', 'Развитие'] },
@@ -33,6 +33,7 @@ export default function Landing() {
   }, [])
 
   return <>
+    <style>{`@layer imported-inline { ${capturedCSS} }`}</style>
     <main id="top" className="kt" ref={root}>
       <header className="kt-header">
         <Link to="/" className="kt-logo" aria-label="TalentHub — главная"><span className="kt-logo-mark">t.</span><span>Talent<span>Hub</span></span></Link>
@@ -58,7 +59,7 @@ export default function Landing() {
       <section className="kt-platform kt-section" id="platform">
         <div className="kt-section-top kt-reveal"><span>01 / ЭКОСИСТЕМА</span><span>РАЗНЫЕ РОЛИ. ОБЩИЕ ВОЗМОЖНОСТИ.</span></div>
         <h2 className="kt-reveal">Не просто платформа.<br /><span>Точка пересечения.</span></h2>
-        <div className="kt-audiences kt-reveal" role="tablist" aria-label="Участники экосистемы">{audiences.map((item, i) => <button type="button" role="tab" aria-selected={audience === i} aria-controls="audience-panel" key={item.role} className={audience === i ? 'is-active' : ''} onClick={() => setAudience(i)}><Icon>{item.icon}</Icon>{item.title}<span>↗</span></button>)}</div>
+        <div className="kt-audiences kt-reveal" role="tablist" aria-label="Участники экосистемы">{audiences.map((item, i) => <button type="button" role="tab" aria-selected={audience === i} aria-controls="audience-panel" id={`audience-${i}`} key={item.role} className={audience === i ? 'is-active' : ''} onClick={() => setAudience(i)}><Icon>{item.icon}</Icon>{item.title}<span>↗</span></button>)}</div>
         <div className="kt-audience-content" role="tabpanel" id="audience-panel" aria-labelledby={`audience-${audience}`}>
           <div key={audience} className="kt-audience-copy"><span className="kt-mini">TALENTHUB / {person.title.toUpperCase()}</span><h3>{person.headline}</h3><p>{person.description}</p><div className="kt-tags">{person.tags.map(tag => <span key={tag}>{tag}</span>)}</div><button type="button" onClick={() => setJoin(true)} className="kt-text-link">Открыть экосистему ↗</button></div>
           <div className="kt-audience-image"><img src="https://raw.githubusercontent.com/ILYUXXXA/talent-connect/fix/landing-step-actions/src/assets/talenthub-team.jpg" width="1920" height="1024" loading="lazy" alt="Учащиеся работают над совместным проектом" /><span>ОТ ИНТЕРЕСА — К РЕАЛЬНЫМ ДОСТИЖЕНИЯМ ↗</span></div>
