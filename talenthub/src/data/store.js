@@ -148,6 +148,7 @@ export const login = (email, password, expectedRole) => authenticate('/auth/logi
 export const registerStudent = data => authenticate('/auth/register', { role: data.role || 'student',
   first_name: data.firstName, last_name: data.lastName, email: data.email, password: data.password,
   ...(data.role === 'parent' ? {} : { birth_date: data.birthDate, school_id: organizationId(data.school, 'school') }) })
+export const registerParent = data => registerStudent({ ...data, role: 'parent' })
 function organizationId(value, kind) {
   const matches = state.organizations.filter(o => (o.id === value || o.name === value) && (!kind || o.kind === kind))
   if (matches.length !== 1) throw new ApiError('Выберите организацию из справочника.', 422, 'invalid_organization')

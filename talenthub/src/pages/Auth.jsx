@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login, registerStudent, listSchools } from '../data/store.js'
+import { login, registerStudent, registerParent, listSchools } from '../data/store.js'
 
 const QUICK_ACCESS_PASSWORD = 'demo1234'
 
@@ -121,7 +121,8 @@ export default function Auth() {
     setBusy(true)
     setError('')
     try {
-      const result = await registerStudent({
+      const register = role === 'parent' ? registerParent : registerStudent
+      const result = await register({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthDate,
@@ -133,7 +134,7 @@ export default function Auth() {
         setError('Не удалось зарегистрироваться. Проверьте данные.')
         return
       }
-      navigate('/welcome')
+      navigate(role === 'parent' ? '/parent' : '/welcome')
     } catch (error) {
       setError(error.message || 'Не удалось зарегистрироваться. Проверьте данные.')
     } finally { setBusy(false) }
@@ -160,37 +161,38 @@ export default function Auth() {
     <main className="auth-page">
       <div className="container narrow auth-container">
         <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => choose('')}>К выбору роли</button>
-        <h1>{current.label}</h1>
+        <h1>{mode === 'register' ? (role === 'parent' ? 'Регистрация родителя' : 'Регистрация школьника') : current.label}</h1>
         {mode === 'register' ? (
-          <form className="card stack" onSubmit={onRegister}>
+          <form className="card stack" onSubmit={onRegister} aria-busy={busy}>
             <label className="field">
               <span>Имя</span>
-              <input value={firstName} required onChange={(event) => setFirstName(event.target.value)} />
+              <input value={firstName} autoComplete="given-name" maxLength={100} required onChange={(event) => setFirstName(event.target.value)} />
             </label>
             <label className="field">
               <span>Фамилия</span>
-              <input value={lastName} required onChange={(event) => setLastName(event.target.value)} />
+              <input value={lastName} autoComplete="family-name" maxLength={100} required onChange={(event) => setLastName(event.target.value)} />
             </label>
-            <label className="field">
+            {role === 'student' ? <label className="field">
               <span>Дата рождения</span>
               <input type="date" value={birthDate} required onChange={(event) => setBirthDate(event.target.value)} />
-            </label>
+            </label> : null}
             <label className="field">
               <span>Электронная почта</span>
-              <input type="email" value={email} required onChange={(event) => setEmail(event.target.value)} />
+              <input type="email" value={email} autoComplete="email" required onChange={(event) => setEmail(event.target.value)} />
             </label>
             <label className="field">
               <span>Пароль</span>
-              <input type="password" value={password} required onChange={(event) => setPassword(event.target.value)} />
+              <input type="password" value={password} autoComplete="new-password" minLength={8} maxLength={128} aria-describedby="registration-password-hint" required onChange={(event) => setPassword(event.target.value)} />
+              <small id="registration-password-hint">От 8 до 128 символов</small>
             </label>
-            <label className="field">
+            {role === 'student' ? <label className="field">
               <span>Школа</span>
               <select value={school || schoolList[0] || ''} onChange={(event) => setSchool(event.target.value)}>
                 {schoolList.map((name) => <option key={name} value={name}>{name}</option>)}
               </select>
-            </label>
-            {error ? <p className="notice">{error}</p> : null}
-            <button disabled={busy} className="btn btn-primary" type="submit">Зарегистрироваться</button>
+            </label> : null}
+            {error ? <p className="notice" role="alert">{error}</p> : null}
+            <button disabled={busy} className="btn btn-primary" type="submit">{busy ? 'Создаём аккаунт…' : 'Зарегистрироваться'}</button>
             <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('login'); setError('') }}>Уже есть аккаунт</button>
           </form>
         ) : (
@@ -203,10 +205,10 @@ export default function Auth() {
               <span>Пароль</span>
               <input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} />
             </label>
-            {error ? <p className="notice">{error}</p> : null}
+            {error ? <p className="notice" role="alert">{error}</p> : null}
             <button disabled={busy} className="btn btn-primary" type="submit">Войти</button>
             <button disabled={busy} type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
-            {role === 'student' ? (
+            {role === 'student' || role === 'parent' ? (
               <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}
           </form>

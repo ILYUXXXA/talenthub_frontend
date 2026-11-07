@@ -1,14 +1,328 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/270f405a6a58f47c.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
 
-/* The host app does not use the original shadcn button reset. */
-.kt button { appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.kt a { color: inherit; }
-.kt-menu { width: 42px; height: 42px; border: 1px solid var(--kinetic-line, #d8dce5) !important; background: transparent; border-radius: 6px; }
-.kt .kt-login { display: inline-flex; align-items: center; justify-content: center; }
-.kt .kt-final-link { border: 0; }
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/85a47c7dcfcf4c5a.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
 
-/* TalentHub kinetic design: intentionally independent of the source selectors. */
-:root {
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/8b9fe9ac0c96746a.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/1571139117091718.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/ca01630a7764b435.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/site-assets/1a551706a819f99c.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/270f405a6a58f47c.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/85a47c7dcfcf4c5a.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/8b9fe9ac0c96746a.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/1571139117091718.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/ca01630a7764b435.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/1a551706a819f99c.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/270f405a6a58f47c.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/85a47c7dcfcf4c5a.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/8b9fe9ac0c96746a.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/1571139117091718.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/ca01630a7764b435.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/site-assets/1a551706a819f99c.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/270f405a6a58f47c.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/85a47c7dcfcf4c5a.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/8b9fe9ac0c96746a.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/1571139117091718.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/ca01630a7764b435.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/1a551706a819f99c.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/a5df16d8135b4111.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/a19d936814f18212.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/699bf23107013dd3.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/37809322a538075f.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/site-assets/9b3963915707a91f.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/a5df16d8135b4111.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/a19d936814f18212.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/699bf23107013dd3.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/37809322a538075f.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/site-assets/9b3963915707a91f.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Adapt the reference controls to the host app without loading Tailwind globally. */
+.kt, .kt-join { line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.kt-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; border: 0; border-radius: 6px; padding: 8px 16px; height: 36px; background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
+.kt-button svg { width: 16px; height: 16px; flex-shrink: 0; pointer-events: none; }
+.kt-button-icon { width: 36px; padding: 0; }
+.kt-button-outline { border: 1px solid var(--kinetic-line); }
+.kt img { display: block; max-width: 100%; }
+.kt svg { vertical-align: middle; }
+.kt h1, .kt h2, .kt h3 { letter-spacing: 0; }
+.kt-dialog-overlay { position: fixed; inset: 0; z-index: 100; background: #000c; }
+.kt-join { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 101; display: grid; gap: 16px; width: min(512px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 24px; border: 1px solid var(--kinetic-line); box-shadow: 0 20px 60px #0003; }
+.kt-join h2 { margin: 0; padding-right: 24px; font-size: 18px; font-weight: 600; }
+.kt-join > p { margin: 0; font-size: 14px; color: var(--kinetic-muted); }
+.kt-dialog-close { position: absolute; top: 16px; right: 16px; width: 24px; height: 24px; padding: 0; }
+.kt-join a { text-decoration: none; }
+.kt-join :focus-visible { outline: 3px solid var(--kinetic-blue); outline-offset: 3px; }
+
+
+.kt, .kt-join {
   --kinetic-paper: oklch(0.99 0 0);
   --kinetic-ink: oklch(0.17 0 0);
   --kinetic-blue: oklch(0.51 0.25 264);
@@ -18,7 +332,7 @@
   --kinetic-inverse: oklch(1 0 0);
   --kinetic-dark-line: oklch(0.34 0 0);
 }
-html { scroll-behavior: smooth; scroll-padding-top: 0; }
+html:has(.kt) { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt { background: var(--kinetic-paper); color: var(--kinetic-ink); font-family: Manrope, sans-serif; overflow: clip; }
 .kt *, .kt-join * { letter-spacing: 0; }
 .kt a { text-decoration: none; }
@@ -43,7 +357,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt h1 { font-family: Unbounded, sans-serif; font-size: 72px; line-height: 1.23; font-weight: 650; margin: 66px 0 38px; position: relative; }
 .kt h1 > span { display: block; width: fit-content; }
 .kt-line-one { animation: kt-enter .8s both; }
-.kt h1 .kt-line-two { color: var(--kinetic-inverse); background: var(--kinetic-blue); padding: 5px 18px 13px; margin-top: 12px; margin-left: 7%; transform: rotate(-2deg); display: flex; align-items: center; gap: 25px; animation: kt-highlight .9s both; }
+.kt h1 .kt-line-two { width: fit-content; border: 0; font: inherit; text-align: left; cursor: pointer; color: var(--kinetic-inverse); background: var(--kinetic-blue); padding: 5px 18px 13px; margin-top: 12px; margin-left: 0; transform: rotate(-2deg); display: flex; align-items: center; gap: 25px; animation: kt-highlight .9s both; }
 .kt-line-two > svg { width: 72px; height: 72px; stroke-width: 1.5; transition: transform .4s; }
 .kt-line-two:hover > svg { transform: translate(6px,-6px); }
 .kt-hero-bottom { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 44px; }
@@ -75,7 +389,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt-audiences button > svg:last-child { margin-left: auto; }
 .kt .kt-audiences button.is-active { border-color: var(--kinetic-blue); background: var(--kinetic-dark-line); }
 .kt-audience-content { display: grid; grid-template-columns: 1fr 1fr; gap: 65px; padding-top: 42px; align-items: center; }
-.kt-audience-copy { animation: kt-enter .4s both; }
+.kt-audience-copy { min-width: 0; animation: kt-enter .4s both; }
 .kt-mini { font-size: 9px; opacity: .6; }
 .kt h3 { font-family: Unbounded,sans-serif; font-size: 29px; line-height: 1.5; font-weight: 400; white-space: pre-line; margin: 20px 0; }
 .kt-audience-copy > p { font-size: 14px; line-height: 1.8; max-width: 420px; opacity: .7; }
@@ -83,9 +397,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt-tags > span { font-size: 10px; border-bottom: 1px solid var(--kinetic-dark-line); padding: 6px 0; margin-right: 16px; }
 .kt .kt-text-link { background: transparent; color: var(--kinetic-inverse); padding: 0; gap: 35px; font-size: 12px; }
 .kt-audience-image { position: relative; overflow: hidden; }
-.kt-audience-image img { width: 100%; aspect-ratio: 1.5; object-fit: cover; filter: grayscale(1); transition: filter .5s, transform .7s; }
+.kt-audience-image img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; filter: grayscale(1); transition: filter .5s, transform .7s; }
 .kt-audience-image:hover img { filter: grayscale(0); transform: scale(1.035); }
-.kt-audience-image > span { display: flex; align-items: center; justify-content: space-between; background: var(--kinetic-blue); font-size: 9px; padding: 15px; position: relative; }
 .kt-step { border-top: 1px solid var(--kinetic-line); }
 .kt-step:last-child { border-bottom: 1px solid var(--kinetic-line); }
 .kt .kt-step-trigger { width: 100%; height: 110px; justify-content: flex-start; gap: 35px; padding: 0; color: var(--kinetic-ink); border-radius: 0; background: transparent; }
@@ -142,14 +455,14 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
  .kt-step-title { font-size: 26px; }
 }
 @media (max-width:700px) {
- html { scroll-padding-top: 0; }
+ html:has(.kt) { scroll-padding-top: 0; }
  #partners.kt-section { scroll-margin-top: 45px; }
  .kt-header { padding: 0 20px; height: 70px; } .kt-logo { font-size: 18px; } .kt-logo-mark { width: 34px; height: 34px; font-size: 23px; }
  .kt-menu { display: inline-flex; color: var(--kinetic-ink); } .kt-login { height: 40px; font-size: 13px; gap: 10px; padding-inline: 14px; }
  .kt-nav { display: none; } .kt-nav.is-open { display: flex; position: absolute; top: 70px; left: 0; width: 100%; flex-direction: column; align-items: stretch; background: var(--kinetic-paper); border-bottom: 1px solid var(--kinetic-line); padding: 15px; } .kt-nav a { justify-content: flex-start; height: 50px; font-size: 16px; border-bottom: none; }
  .kt-hero { padding: 22px 20px 0; } .kt-hero-top { font-size: 8px; } .kt-hero-top > span:last-child { display: none; }
  .kt h1 { font-size: 29px; line-height: 1.4; margin: 42px 0 100px; font-weight: 600; }
- .kt h1 .kt-line-two { margin-left: 0; padding: 6px 10px 10px; gap: 10px; margin-top: 9px; }
+ .kt h1 .kt-line-two { width: fit-content; border: 0; font: inherit; text-align: left; cursor: pointer; margin-left: 0; padding: 6px 10px 10px; gap: 10px; margin-top: 9px; }
  .kt-line-two > svg { width: 30px; height: 30px; }
  .kt-hero-art { height: 310px; width: 580px; max-width: none; top: 68px; bottom: auto; right: -125px; opacity: .45; -webkit-mask-image: none; mask-image: none; }
  .kt-hero-bottom { padding-bottom: 26px; } .kt-hero-bottom > div { max-width: none; } .kt-hero-bottom p { font-size: 12px; line-height: 1.85; }
@@ -159,7 +472,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
  .kt-section { padding: 40px 20px 48px; } .kt-section-top { font-size: 8px; padding-bottom: 20px; } .kt-section-top > span:last-child { display: none; }
  .kt h2 { font-size: 25px; line-height: 1.5; margin: 30px 0; } .kt h3 { font-size: 22px; }
  .kt-audiences { grid-template-columns: 1fr 1fr; } .kt .kt-audiences button { height: 54px; padding: 0 10px; font-size: 11px; gap: 9px; }
- .kt-audience-content { grid-template-columns: 1fr; gap: 28px; padding-top: 30px; } .kt-audience-copy > p { font-size: 13px; } .kt-audience-image > span { font-size: 8px; }
+ .kt-audience-content { grid-template-columns: 1fr; gap: 28px; padding-top: 30px; } .kt-audience-copy > p { font-size: 13px; }
  .kt .kt-step-trigger { height: 86px; gap: 16px; } .kt-step-number { width: 20px; font-size: 10px; } .kt .kt-step-trigger > svg { width: 25px; height: 25px; } .kt-step-title { font-size: 21px; } .kt-step-subtitle { display: none; } .kt-step-toggle { margin-left: auto; width: 32px; height: 32px; } .kt-step-body { margin: 0 0 25px 36px; } .kt-step-body p { font-size: 13px; } .kt-step-body > span { font-size: 9px; }
  .kt-partners-content { grid-template-columns: 1fr; gap: 0; padding-bottom: 30px; } .kt-partners h2 { font-size: 34px; margin-bottom: 0; } .kt-partners-content p { font-size: 13px; } .kt .kt-network { width: 40px; height: 40px; }
  .kt-partner-types { flex-direction: column; align-items: flex-start; gap: 20px; } .kt-partner-types > svg, .kt-partner-equals { display: none !important; }
@@ -167,7 +480,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
  .kt-footer { margin: 0 20px; padding: 25px 0; gap: 20px; flex-wrap: wrap; } .kt-footer > span:nth-child(2) { order: 4; width: 100%; line-height: 1.8; } .kt-footer > span:nth-child(3) { margin-left: auto; }
 }
 @media (max-width:370px) { .kt h1 { font-size: 25px; } .kt .kt-final-link { font-size: 25px; } .kt h2 { font-size: 22px; } }
-@media (prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } .kt *, .kt *::before, .kt *::after { animation: none !important; transition: none !important; } .kt-reveal { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion:reduce) { html:has(.kt) { scroll-behavior: auto; } .kt *, .kt *::before, .kt *::after { animation: none !important; transition: none !important; } .kt-reveal { opacity: 1; transform: none; } }
 
 /* Consistent, carefully rounded controls across the TalentHub landing page. */
 .kt .kt-login,
@@ -229,14 +542,16 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
   }
 }
 
-
-
-
-/* Match the original wide-desktop composition when the browser viewport is
-   between 1101px and 1599px (for example, high-DPI / zoomed desktop windows). */
-@media (min-width: 1101px) and (max-width: 1599px) {
-  .kt h1 { font-size: 90px; }
-  .kt-hero { padding-top: 40px; }
-  .kt-hero-bottom { padding-bottom: 65px; }
-  .kt-line-two > svg { width: 72px; height: 72px; }
+/* The header, hero and ticker together form the first screen.
+   Grid accounts for their actual heights without resizing the typography. */
+.kt-opening {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
+.kt-opening .kt-hero { display: flex; flex-direction: column; }
+.kt-opening .kt-hero > * { flex-shrink: 0; }
+.kt-opening .kt-hero-footer { margin-top: auto; }
+
+/* Fill the second screen without distributing or stretching its content. */
+.kt-platform { min-height: 100svh; }
