@@ -2762,3 +2762,36 @@ grid-template-columns: 1fr 1fr;
 .org-market-card-head .org-eyebrow {
   line-height: 1.4;
 }
+
+
+/* Consistent loading feedback and stable top spacing for first marketplace cards. */
+@keyframes talenthub-spin { to { transform: rotate(360deg); } }
+.th-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: -3px;
+  animation: talenthub-spin .7s linear infinite;
+}
+.th-spinner-large { width: 28px; height: 28px; flex-basis: 28px; border-width: 3px; color: var(--primary); }
+.app-loading { display: grid; min-height: 100vh; place-items: center; background: var(--bg); }
+.app-loading-content { display: flex; align-items: center; gap: 13px; color: var(--muted); font-weight: 700; }
+.app-loading-content p { margin: 0; }
+.auth-page { padding: 28px 0 42px; }
+.auth-container > h1 { margin: 8px 0 10px; }
+.auth-container .card { padding: 22px 26px; }
+.auth-container .stack { gap: 14px; }
+.auth-container .field { gap: 6px; }
+.auth-container .field input,
+.auth-container .field select { min-height: 48px; }
+.auth-container .btn { min-height: 48px; }
+.org-list > .org-partner-card:first-child,
+.org-list > .org-event-row:first-child { padding-top: 18px; }
+@media (max-width: 600px) {
+  .auth-page { padding: 20px 0 32px; }
+  .auth-container .card { padding: 18px; }
+}
