@@ -34,7 +34,7 @@ export const dashboard = () => state.dashboard
 export const studentCabinet = () => ({ demo: false, loggedIn: state.user?.role === 'student',
   user: state.user?.role === 'student' ? state.user : null, student: state.student,
   applications: state.applications, notifications: state.notifications })
-export const parentCabinet = () => ({ loggedIn: state.user?.role === 'parent', role: state.user?.role,
+export const parentCabinet = () => ({ ready: state.ready, error: state.error, loggedIn: state.user?.role === 'parent', role: state.user?.role,
   user: state.user, children: state.children, activeId: state.activeId,
   suggestions: state.suggestions, events: state.events, schools: state.schools })
 function clearSession() {
