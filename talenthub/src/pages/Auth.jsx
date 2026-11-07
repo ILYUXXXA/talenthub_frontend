@@ -192,11 +192,11 @@ export default function Auth() {
               </select>
             </label> : null}
             {error ? <p className="notice" role="alert">{error}</p> : null}
-            <button disabled={busy} className="btn btn-primary" type="submit">{busy ? 'Создаём аккаунт…' : 'Зарегистрироваться'}</button>
+            <button disabled={busy} className="btn btn-primary" type="submit">{busy ? <><span className="th-spinner" aria-hidden="true" /> Создаём аккаунт…</> : 'Зарегистрироваться'}</button>
             <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('login'); setError('') }}>Уже есть аккаунт</button>
           </form>
         ) : (
-          <form className="card stack" onSubmit={onLogin}>
+          <form className="card stack" onSubmit={onLogin} aria-busy={busy}>
             <label className="field">
               <span>Электронная почта</span>
               <input type="email" value={email} autoComplete="username" required onChange={(event) => setEmail(event.target.value)} />
@@ -206,8 +206,8 @@ export default function Auth() {
               <input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} />
             </label>
             {error ? <p className="notice" role="alert">{error}</p> : null}
-            <button disabled={busy} className="btn btn-primary" type="submit">Войти</button>
-            <button disabled={busy} type="button" className="btn btn-ghost" onClick={enterAsRole}>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</button>
+            <button disabled={busy} className="btn btn-primary" type="submit">{busy ? <><span className="th-spinner" aria-hidden="true" /> Входим…</> : 'Войти'}</button>
+            <button disabled={busy} type="button" className="btn btn-ghost" onClick={enterAsRole}>{busy ? <><span className="th-spinner" aria-hidden="true" /> Выполняется вход…</> : <>Войти от имени {role === 'student' ? 'школьника' : role === 'parent' ? 'родителя' : role === 'school' ? 'школы' : role === 'company' ? 'компании' : 'администратора'}</>}</button>
             {role === 'student' || role === 'parent' ? (
               <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
             ) : null}
