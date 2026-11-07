@@ -168,6 +168,7 @@ export default function ParentLink() {
   const [section, setSection] = useState('progress')
   const [ownCategory, setOwnCategory] = useState('Математика|олимпиады')
   const [rankCategory, setRankCategory] = useState('Математика|олимпиады')
+  const [selectedSchoolId, setSelectedSchoolId] = useState(null)
   const [progressOpen, setProgressOpen] = useState(null)
   const [linking, setLinking] = useState(false)
   const [selectingChild, setSelectingChild] = useState(null)
@@ -275,7 +276,8 @@ export default function ParentLink() {
   }, [prestigeCategories, ownCategory, rankCategory])
 
   const childSchool = cabinet.schools.find((school) => school.name === active?.school) || null
-  const ownFact = factFor(childSchool, ownCategory)
+  const selectedSchool = cabinet.schools.find((school) => school.id === selectedSchoolId) || childSchool
+  const ownFact = factFor(selectedSchool, ownCategory)
 
   const ranking = useMemo(() => {
     const ranked = []
@@ -467,12 +469,13 @@ export default function ParentLink() {
                   <div className="school-board">
                     <section className="card school-pane">
                       <header className="school-head">
-                        <h2 className="card-title">{childSchool?.name || active.school || 'Школа не указана'}</h2>
-                        <p className="school-note">Школа ребёнка</p>
-                        {childSchool ? (
+                        <h2 className="card-title">{selectedSchool?.name || active.school || 'Школа не указана'}</h2>
+                        <p className="school-note">{selectedSchool?.id === childSchool?.id ? 'Школа ребёнка' : 'Карточка школы из каталога'}</p>
+                        {selectedSchool ? (
                           <div className="row">
-                            <span className="badge badge-muted">{childSchool.type}</span>
-                            <span className="badge">{childSchool.region}</span>
+                            <span className="badge badge-muted">{selectedSchool.type}</span>
+                            <span className="badge">{selectedSchool.region}</span>
+                            {selectedSchool.id !== childSchool?.id ? <button type="button" className="btn btn-ghost btn-small" onClick={() => setSelectedSchoolId(childSchool?.id || null)}>Вернуться к школе ребёнка</button> : null}
                           </div>
                         ) : null}
                       </header>
@@ -481,43 +484,43 @@ export default function ParentLink() {
                       <div className="school-tiles">
                         <section className="card school-tile">
                           <h3 className="card-title">Направления</h3>
-                          {(childSchool.directions || []).length > 0 ? (
+                          {(selectedSchool.directions || []).length > 0 ? (
                             <div className="chips">
-                              {childSchool.directions.map((name) => <span key={name} className="chip school-chip">{name}</span>)}
+                              {selectedSchool.directions.map((name) => <span key={name} className="chip school-chip">{name}</span>)}
                             </div>
                           ) : <p className="muted">не указаны</p>}
                         </section>
                         <section className="card school-tile">
                           <h3 className="card-title">Партнёрства</h3>
-                          {(childSchool.partnerships || []).length > 0 ? (
+                          {(selectedSchool.partnerships || []).length > 0 ? (
                             <div className="chips">
-                              {childSchool.partnerships.map((name) => <span key={name} className="chip school-chip">{name}</span>)}
+                              {selectedSchool.partnerships.map((name) => <span key={name} className="chip school-chip">{name}</span>)}
                             </div>
                           ) : <p className="muted">нет подтверждённых</p>}
                         </section>
                         <section className="card school-tile wide">
                           <h3 className="card-title">Достижения</h3>
-                          <SchoolLines items={childSchool.achievements} empty="нет подтверждённых в открытых данных" />
+                          <SchoolLines items={selectedSchool.achievements} empty="нет подтверждённых в открытых данных" />
                         </section>
                         <section className="card school-tile wide">
                           <h3 className="card-title">История</h3>
-                          <SchoolLines items={childSchool.history} empty="недостаточно данных" />
+                          <SchoolLines items={selectedSchool.history} empty="недостаточно данных" />
                         </section>
                         <section className="card school-tile">
                           <h3 className="card-title">Программы</h3>
-                          <SchoolLines items={childSchool.programs} empty="не указаны" />
+                          <SchoolLines items={selectedSchool.programs} empty="не указаны" />
                         </section>
                         <section className="card school-tile">
                           <h3 className="card-title">Мероприятия</h3>
-                          <SchoolLines items={childSchool.events} empty="нет в карточке" />
+                          <SchoolLines items={selectedSchool.events} empty="нет в карточке" />
                         </section>
                         <section className="card school-tile">
                           <h3 className="card-title">Поступление</h3>
-                          <p>{childSchool.admission}</p>
+                          <p>{selectedSchool.admission}</p>
                         </section>
                         <section className="card school-tile">
                           <h3 className="card-title">Контакты</h3>
-                          <p>{childSchool.contacts}</p>
+                          <p>{selectedSchool.contacts}</p>
                         </section>
                         <section className="card school-tile wide school-prestige">
                           <h3 className="card-title">Престиж</h3>
@@ -570,8 +573,9 @@ export default function ParentLink() {
                   </div>
                   <section className="card school-pane">
                     <header className="school-head">
+                      <span className="school-kicker">СРАВНЕНИЕ ПО ПОДТВЕРЖДЁННЫМ ДАННЫМ</span>
                       <h2 className="card-title">Рейтинг школ</h2>
-                      <p className="muted">Место — только по выбранной категории и числу подтверждённых результатов за 2024–2026. Это не общий балл школы.</p>
+                      <p className="muted">Место рассчитывается только по выбранной категории и числу подтверждённых результатов за 2024–2026. Это не общий балл школы.</p>
                     </header>
                     <label className="field">
                       <span>Категория престижа</span>
@@ -581,17 +585,17 @@ export default function ParentLink() {
                     </label>
                     <ol className="school-rank">
                       {ranking.ranked.map(({ school, fact }, index) => (
-                        <li key={school.id} className={school.id === childSchool?.id ? 'mine' : undefined}>
-                          <span className="school-place">{index + 1}</span>
-                          <div>
-                            <div className="spread">
-                              <span className="school-rank-name">{school.name}</span>
-                              {school.id === childSchool?.id ? <span className="badge badge-ok">школа ребёнка</span> : null}
-                            </div>
-                            <p className="muted">{school.type} · {school.region}</p>
-                            <p>{fact.count} результатов · {fact.level}</p>
-                            <p className="muted">{fact.confirmation}</p>
-                          </div>
+                        <li key={school.id} className={`${school.id === childSchool?.id ? 'mine ' : ''}${school.id === selectedSchool?.id ? 'selected' : ''}`}>
+                          <button type="button" className="school-rank-select" onClick={() => setSelectedSchoolId(school.id)} aria-pressed={school.id === selectedSchool?.id}>
+                            <span className="school-place">{index + 1}</span>
+                            <span className="school-rank-copy">
+                              <span className="spread"><span className="school-rank-name">{school.name}</span>{school.id === childSchool?.id ? <span className="badge badge-ok">школа ребёнка</span> : null}</span>
+                              <span className="muted">{school.type} · {school.region}</span>
+                              <span>{fact.count} результатов · {fact.level}</span>
+                              <span className="muted">{fact.confirmation}</span>
+                              <span className="school-open-hint">Открыть карточку школы →</span>
+                            </span>
+                          </button>
                         </li>
                       ))}
                     </ol>
@@ -601,9 +605,12 @@ export default function ParentLink() {
                       {ranking.unknown.length === 0 ? <p className="muted">Таких школ нет.</p> : (
                         <ul className="school-missing">
                           {ranking.unknown.map((school) => (
-                            <li key={school.id}>
-                              <span className="school-rank-name">{school.name}</span>
-                              <span className="muted">{school.type} · {school.region}</span>
+                            <li key={school.id} className={school.id === selectedSchool?.id ? 'selected' : undefined}>
+                              <button type="button" className="school-missing-select" onClick={() => setSelectedSchoolId(school.id)} aria-pressed={school.id === selectedSchool?.id}>
+                                <span className="school-rank-name">{school.name}</span>
+                                <span className="muted">{school.type} · {school.region}</span>
+                                <span className="school-open-hint">Открыть карточку школы →</span>
+                              </button>
                             </li>
                           ))}
                         </ul>
