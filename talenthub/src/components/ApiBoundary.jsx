@@ -1,3 +1,4 @@
+import { pendingInvitationPath } from '../data/family-invitation.js'
 import { useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { getState, initialize, refresh, retry } from '../data/store.js'
@@ -24,7 +25,7 @@ export function RequireRole({ role, onboarding = false, children }) {
   if (user.role !== role) return <Navigate to={rolePath(user)} replace />
   if (role === 'student') {
     if (!onboarding && !user.profileComplete) return <Navigate to="/welcome" replace />
-    if (onboarding && user.profileComplete) return <Navigate to="/events" replace />
+    if (onboarding && user.profileComplete) return <Navigate to={pendingInvitationPath() || '/events'} replace />
   }
   return children
 }

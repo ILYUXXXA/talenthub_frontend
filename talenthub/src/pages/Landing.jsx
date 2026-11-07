@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, ArrowDown, ArrowRight, Menu, X, Compass, Trophy, Network, GraduationCap, School, Building2, Heart, Asterisk, Mail, Send, Phone } from "lucide-react";
+import { ArrowUpRight, ArrowDown, ArrowRight, Menu, X, Compass, Trophy, Network, GraduationCap, School, Building2, Heart, Asterisk, Mail, Send } from "lucide-react";
 import { Button, Dialog, DialogContent, DialogTitle, DialogDescription } from "../components/LandingUI.jsx";
 import "../styles/talent-connect-landing.css";
 import sculpture from "../assets/landing/talenthub-sculpture.jpg";
+import { contacts } from "../data/contacts.js";
 import teamPhoto from "../assets/landing/team_photo.jpg";
 
 import studentsArt from "../assets/landing/illustrations/students.png";
@@ -31,7 +32,7 @@ const audiences = [
     description: "Помогайте ребёнку открывать новые возможности и следите за его образовательным прогрессом в одном кабинете.",
     action: "Создать аккаунт или войти",
     features: [
-      { icon: Heart, title: "Все дети в одном кабинете", text: "Привяжите профили детей по имени, фамилии и дате рождения. Переключайтесь между ними, чтобы видеть информацию о каждом." },
+      { icon: Heart, title: "Все дети в одном кабинете", text: "Создайте семейную ссылку и отправьте её детям. После входа по ссылке их профили появятся в вашем кабинете." },
       { icon: Trophy, title: "Прогресс перед глазами", text: "Смотрите заявки, посещённые мероприятия и достижения ребёнка. Важные этапы его образовательного пути собраны вместе." },
       { icon: Compass, title: "Помогайте с выбором", text: "Находите мероприятия и предлагайте их ребёнку. Изучайте школы, их программы и показатели по подтверждённым достижениям." },
     ],
@@ -66,13 +67,6 @@ const navigation = [
   ["#contacts", "Контакты"],
 ];
 
-// Fill value and href when the public contact details are ready.
-const contacts = [
-  { label: "Почта", value: "", href: "", icon: Mail },
-  { label: "Telegram", value: "", href: "", icon: Send },
-  { label: "Телефон", value: "", href: "", icon: Phone },
-];
-
 function AudienceSection({ item }) {
   return <section id={item.id} className={`kt-section kt-role-section kt-role-${item.role}`} aria-labelledby={`${item.id}-title`}>
     <div className="kt-chapter-content">
@@ -103,7 +97,25 @@ export default function Landing() {
       if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); }
     }), { threshold: 0.12 });
     elements?.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+    // The API loading boundary can mount the landing after the browser's initial hash scroll.
+    const hash = window.location.hash;
+    let alignHash = navigation.some(([href]) => href === hash);
+    const align = () => {
+      if (alignHash && window.location.hash === hash) root.current?.querySelector(hash)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    };
+    const cancelAlignment = () => { alignHash = false; };
+    align();
+    document.fonts.ready.then(align);
+    window.addEventListener('wheel', cancelAlignment, { passive: true });
+    window.addEventListener('touchstart', cancelAlignment, { passive: true });
+    window.addEventListener('keydown', cancelAlignment);
+    return () => {
+      alignHash = false;
+      observer.disconnect();
+      window.removeEventListener('wheel', cancelAlignment);
+      window.removeEventListener('touchstart', cancelAlignment);
+      window.removeEventListener('keydown', cancelAlignment);
+    };
   }, []);
   useEffect(() => {
     const page = root.current;

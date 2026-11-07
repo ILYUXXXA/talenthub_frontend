@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { login, registerStudent, registerParent, listSchools } from '../data/store.js'
+import { Link, useNavigate } from 'react-router-dom'
+import { studentDestination } from '../data/family-invitation.js'
+import { loginOrganization, login, registerStudent, registerParent, listSchools } from '../data/store.js'
+
+const DEMO_TOKENS = {'school': 'th_demo_school_1f85ed08247f646e3309082eee04b85f885a4db17382d06fc82ebf95dee030f0', 'company': 'th_demo_company_71a1140475560d032a232e3fb660700021e5d7106ad006026366d71e6e2adcd3'}
 
 const QUICK_ACCESS_PASSWORD = 'demo1234'
 
@@ -51,6 +54,7 @@ export default function Auth() {
   const schoolList = readSchools()
   const [role, setRole] = useState(() => { const requested = new URLSearchParams(window.location.search).get('role'); return ROLES.some((item) => item.id === requested) ? requested : '' })
   const [mode, setMode] = useState('login')
+  const [accessToken, setAccessToken] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -60,12 +64,14 @@ export default function Auth() {
   const [birthDate, setBirthDate] = useState('')
   const [school, setSchool] = useState(schoolList[0] || '')
 
+  const organizationRole = role === 'school' || role === 'company'
   const current = ROLES.find((item) => item.id === role)
 
   function choose(next) {
     if (busy) return
     setRole(next)
     setMode('login')
+    setAccessToken('')
     setEmail('')
     setPassword('')
     setError('')
@@ -73,7 +79,8 @@ export default function Auth() {
 
   function fillDemoData() {
     if (busy || !current?.quickEmail) return
-    setEmail(current.quickEmail)
+    if (organizationRole) setAccessToken(DEMO_TOKENS[role])
+    else setEmail(current.quickEmail)
     setPassword(QUICK_ACCESS_PASSWORD)
     setError('')
   }
@@ -84,7 +91,7 @@ export default function Auth() {
     setBusy(true)
     setError('')
     try {
-      const user = userFrom(await login(email.trim(), password, role))
+      const user = userFrom(await (organizationRole ? loginOrganization(accessToken.trim(), role) : login(email.trim(), password, role)))
       if (!user || user.role !== role) {
         setError('Неверная почта или пароль для этой роли.')
         return
@@ -94,7 +101,7 @@ export default function Auth() {
         setError('Для этой роли вход пока не открыт.')
         return
       }
-      navigate(path)
+      navigate(user.role === 'student' ? studentDestination(user) : path)
     } catch (error) {
       setError(error.message || 'Неверная почта или пароль для этой роли.')
     } finally { setBusy(false) }
@@ -119,7 +126,7 @@ export default function Auth() {
         setError('Не удалось зарегистрироваться. Проверьте данные.')
         return
       }
-      navigate(role === 'parent' ? '/parent' : '/welcome')
+      navigate(role === 'parent' ? '/parent' : studentDestination(userFrom(result)))
     } catch (error) {
       setError(error.message || 'Не удалось зарегистрироваться. Проверьте данные.')
     } finally { setBusy(false) }
@@ -182,6 +189,7 @@ export default function Auth() {
           </form>
         ) : (
           <form className="card stack" onSubmit={onLogin} aria-busy={busy}>
+            {organizationRole ? <label className="field"><span>Токен доступа</span><input type="password" value={accessToken} autoComplete="off" required onChange={event => setAccessToken(event.target.value)} /></label> : <>
             <label className="field">
               <span>Электронная почта</span>
               <input type="email" value={email} autoComplete="username" required onChange={(event) => setEmail(event.target.value)} />
@@ -190,12 +198,13 @@ export default function Auth() {
               <span>Пароль</span>
               <input type="password" value={password} autoComplete="current-password" required onChange={(event) => setPassword(event.target.value)} />
             </label>
+            </>}
             {error ? <p className="notice" role="alert">{error}</p> : null}
             <button disabled={busy} className="btn btn-primary" type="submit">{busy ? <><span className="th-spinner" aria-hidden="true" /> Входим…</> : 'Войти'}</button>
             <button disabled={busy} type="button" className="btn btn-ghost" onClick={fillDemoData}>Заполнить демо-данные</button>
             {role === 'student' || role === 'parent' ? (
               <button disabled={busy} type="button" className="btn btn-ghost" onClick={() => { setMode('register'); setError('') }}>Создать аккаунт</button>
-            ) : null}
+            ) : organizationRole ? <Link className="btn btn-ghost" to={`/organization-registration?role=${role}`}>Зарегистрироваться</Link> : null}
           </form>
         )}
       </div>

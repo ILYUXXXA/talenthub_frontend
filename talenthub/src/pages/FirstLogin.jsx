@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { pendingInvitationPath } from '../data/family-invitation.js';
 import { useNavigate } from 'react-router-dom';
 import { listUpcoming, completeProfile, GRADES, CITIES, INTERESTS } from '../data/store.js';
 
@@ -78,7 +79,7 @@ export default function FirstLogin() {
       setError(error.message || 'Не удалось сохранить профиль.');
       return;
     }
-    navigate('/events');
+    navigate(pendingInvitationPath() || '/events');
   }
 
   return (

@@ -1,4 +1,5 @@
 import { useDialogFocus } from '../components/useDialogFocus.js'
+import OrganizationAccounts from '../components/OrganizationAccounts.jsx'
 import CabinetNav from '../components/CabinetNav.jsx'
 import { moderationQueue, moderate } from '../data/store.js'
 import { useStoreRevision } from '../data/hooks.js'
@@ -14,6 +15,7 @@ function TabIcon({ children }) {
 }
 
 const TABS = [
+  { id: 'accounts', label: 'Аккаунты организаций', icon: <TabIcon><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h4" /></TabIcon> },
   {
     id: 'events',
     label: 'Мероприятия',
@@ -248,7 +250,7 @@ export default function Admin() {
     partnerships: queues.partnerships.length,
     achievements: queues.achievements.length,
   }
-  const visible = queues[section]
+  const visible = queues[section] || []
 
 
   function onSection(id) {
@@ -269,7 +271,7 @@ export default function Admin() {
         <div className="container">
           
           {error ? <p className="notice" role="alert">{error}</p> : null}
-          {visible.length === 0 ? <p className="muted">Нет заявок</p> : (
+          {section === 'accounts' ? <OrganizationAccounts /> : visible.length === 0 ? <p className="muted">Нет заявок</p> : (
             <div className="mod-grid">
               {visible.map((item) => (
                 <QueueCard

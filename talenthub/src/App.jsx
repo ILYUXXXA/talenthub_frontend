@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppHeader from './components/AppHeader.jsx'
 import StudentShell from './components/StudentShell.jsx'
 import Landing from './pages/Landing.jsx'
+import FamilyJoin from './pages/FamilyJoin.jsx'
+import OrganizationRegistration from './pages/OrganizationRegistration.jsx'
 import Auth from './pages/Auth.jsx'
 import FirstLogin from './pages/FirstLogin.jsx'
 import Events from './pages/Events.jsx'
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="/success" element={<RequireRole role="student"><StudentShell><Success /></StudentShell></RequireRole>} />
         <Route path="/profile" element={<RequireRole role="student"><StudentShell><Profile /></StudentShell></RequireRole>} />
         <Route path="/" element={<Landing />} />
+        <Route path="/family/join/:token" element={<WithHeader><FamilyJoin /></WithHeader>} />
+        <Route path="/organization-registration" element={<WithHeader><OrganizationRegistration /></WithHeader>} />
         <Route path="/auth" element={<WithHeader><Auth /></WithHeader>} />
         <Route path="/welcome" element={<RequireRole role="student" onboarding><WithHeader><FirstLogin /></WithHeader></RequireRole>} />
         <Route path="/school" element={<RequireRole role="school"><SchoolCabinet /></RequireRole>} />

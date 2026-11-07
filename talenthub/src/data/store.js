@@ -145,6 +145,7 @@ async function authenticateOnce(path, body) {
   return state.user
 }
 export const login = (email, password, expectedRole) => authenticate('/auth/login', { email, password, ...(expectedRole ? { expected_role: expectedRole } : {}) })
+export const loginOrganization = (token, expectedRole) => authenticate('/auth/organization-login', { token, expected_role: expectedRole })
 export const registerStudent = data => authenticate('/auth/register', { role: data.role || 'student',
   first_name: data.firstName, last_name: data.lastName, email: data.email, password: data.password,
   ...(data.role === 'parent' ? {} : { birth_date: data.birthDate, school_id: organizationId(data.school, 'school') }) })
@@ -206,10 +207,13 @@ export const sendPartnership = data => mutate(`partnership:${data.parentRequestI
 })
 export const respondPartnership = (id, decision) => mutate(`partnership-decision:${id}`, () => request(id.startsWith('response:')
   ? `/partnership-responses/${id.slice(9)}/decision` : `/partnership-requests/${id}/decision`, { method: 'PATCH', body: { decision } }))
-export const linkChild = data => mutate('children', async () => {
-  const result = await request('/parents/me/children', { method: 'POST', body: { first_name: data.firstName, last_name: data.lastName, birth_date: data.birthDate } })
-  return { ok: true, child: childView(result.child) }
-})
+export const getFamilyInvitation = () => request('/parents/me/invitation')
+export const createFamilyInvitation = () => request('/parents/me/invitation', { method: 'POST' })
+export const deleteFamilyInvitation = () => request('/parents/me/invitation', { method: 'DELETE' })
+export const acceptFamilyInvitation = token => mutate(`family:${token}`, () => request('/family-invitations/accept', { method: 'POST', body: { token } }))
+export const listOrganizationAccounts = () => request('/moderation/organization-accounts')
+export const createOrganizationAccount = body => mutate('organization-account', () => request('/moderation/organization-accounts', { method: 'POST', body }))
+export const rotateOrganizationToken = id => request(`/moderation/organization-accounts/${id}/token`, { method: 'POST' })
 export const selectChild = id => mutate('children', async () => { await request(`/parents/me/children/${id}/select`, { method: 'PUT' }); return { ok: true } })
 export const suggestToChild = ({ childId, eventId }) => mutate(`suggestion:${childId}:${eventId}`, async () => {
   const already = state.suggestions.some(s => s.childId === childId && s.eventId === eventId)

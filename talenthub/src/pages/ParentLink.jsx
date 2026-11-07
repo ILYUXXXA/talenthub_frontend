@@ -4,7 +4,8 @@ import { useStoreRevision } from '../data/hooks.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
-import { linkChild, parentCabinet, selectChild, suggestToChild } from '../data/store.js'
+import FamilyInvitation from '../components/FamilyInvitation.jsx'
+import { parentCabinet, selectChild, suggestToChild } from '../data/store.js'
 
 function categoryId(item) {
   return `${item.subject}|${item.direction}`
@@ -162,18 +163,11 @@ function ParentBar({ section, onSection }) {
 export default function ParentLink() {
   const apiRevision = useStoreRevision()
   const cabinet = readCabinet()
-  const [adding, setAdding] = useState(false)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [birthDate, setBirthDate] = useState('')
-  const [linkError, setLinkError] = useState('')
-  const [linkNote, setLinkNote] = useState('')
   const [section, setSection] = useState('progress')
   const [ownCategory, setOwnCategory] = useState('Математика|олимпиады')
   const [rankCategory, setRankCategory] = useState('Математика|олимпиады')
   const [selectedSchoolId, setSelectedSchoolId] = useState(null)
   const [progressOpen, setProgressOpen] = useState(null)
-  const [linking, setLinking] = useState(false)
   const [selectingChild, setSelectingChild] = useState(null)
   const [suggestingEvent, setSuggestingEvent] = useState(null)
 
@@ -186,45 +180,13 @@ export default function ParentLink() {
 
   const detailRef = useDialogFocus(Boolean(progressOpen), () => setProgressOpen(null))
 
-  function refresh() {
-    readCabinet()
-  }
-
-  async function onLink(event) {
-    event.preventDefault()
-    setLinkError('')
-    setLinkNote('')
-    setLinking(true)
-    try {
-      const result = await linkChild({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        birthDate,
-      })
-      if (!result || result.ok !== true || !result.child) {
-        setLinkError('Совпадений нет. Проверьте имя, фамилию и дату рождения.')
-        return
-      }
-      setAdding(false)
-      setLinkNote(result.already
-        ? 'Этот ребёнок уже привязан. Открыта его карточка.'
-        : `${personName(result.child)} привязан к вашему аккаунту.`)
-      setSection('progress')
-      refresh()
-    } catch (error) {
-      setLinkError(error.message || 'Не удалось проверить запись. Попробуйте ещё раз.')
-    } finally {
-      setLinking(false)
-    }
-  }
-
   async function onSelect(childId) {
     if (selectingChild) return
     setSelectingChild(childId)
     try {
       await selectChild(childId)
     } catch (error) { setLinkNote(error.message) }
-    finally { setSelectingChild(null); refresh() }
+    finally { setSelectingChild(null) }
   }
 
   function openProgress(item, kind) {
@@ -242,7 +204,6 @@ export default function ParentLink() {
     try {
       const result = await suggestToChild({ childId: active.id, eventId: event.id })
       if (!result || result.ok !== true) return { ok: false, message: 'Не удалось предложить мероприятие.' }
-      refresh()
       return {
         ok: true,
         already: result.already,
@@ -351,51 +312,12 @@ export default function ParentLink() {
                 {selectingChild === child.id ? <span className="spinner spinner-small" aria-label="Загрузка" /> : child.id === active?.id ? <span className="parent-child-check">✓</span> : null}
               </button>
             ))}
-            {cabinet.children.length > 0 ? (
-              <button type="button" className="parent-child-add" onClick={() => { setLinkError(''); setAdding(true); }}>
-                <span aria-hidden="true">＋</span> Добавить
-              </button>
-            ) : null}
+
           </div>
         </div>
         <div className="stack">
-          {linkNote ? <p className="notice">{linkNote}</p> : null}
-
-          {cabinet.children.length === 0 && !adding ? (
-            <section className="card stack">
-              <h2 className="card-title">Детей пока нет</h2>
-              <p>Добавьте ребёнка по имени, фамилии и дате рождения. Совпадение должно быть полным: так, как запись лежит в базе.</p>
-              <p className="muted">После привязки здесь появятся прогресс, лента мероприятий, предложения ребёнку, сравнение школ и навигатор.</p>
-              <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>Добавить ребёнка</button>
-            </section>
-          ) : null}
-
-          {adding ? (
-            <form className="card stack" onSubmit={onLink}>
-              <h2 className="card-title">Добавить ребёнка</h2>
-              <p className="muted">Заполните данные ребёнка, чтобы найти его профиль и связать с вашим аккаунтом.</p>
-              <div className="grid-2">
-                <label className="field">
-                  <span>Имя</span>
-                  <input value={firstName} autoComplete="given-name" required onChange={(event) => setFirstName(event.target.value)} />
-                </label>
-                <label className="field">
-                  <span>Фамилия</span>
-                  <input value={lastName} autoComplete="family-name" required onChange={(event) => setLastName(event.target.value)} />
-                </label>
-              </div>
-              <label className="field">
-                <span>Дата рождения</span>
-                <input type="date" value={birthDate} required onChange={(event) => setBirthDate(event.target.value)} />
-              </label>
-              {linkError ? <p className="notice">{linkError}</p> : null}
-            {linking ? <p className="loading-caption"><span className="spinner" /> Ищем профиль ребёнка в базе…</p> : null}
-              <div className="row">
-                <button className="btn btn-primary" type="submit" disabled={linking}>{linking ? <><span className="spinner spinner-light" /> Проверяем…</> : 'Привязать'}</button>
-                <button className="btn btn-ghost" type="button" onClick={() => { setAdding(false); setLinkError(''); }}>Отмена</button>
-              </div>
-            </form>
-          ) : null}
+          <FamilyInvitation />
+          {cabinet.children.length === 0 ? <section className="card stack"><h2 className="card-title">Детей пока нет</h2><p>Поделитесь семейной ссылкой. Когда ребёнок присоединится, здесь появятся его прогресс, мероприятия и достижения.</p></section> : null}
 
           {active ? (
             <>

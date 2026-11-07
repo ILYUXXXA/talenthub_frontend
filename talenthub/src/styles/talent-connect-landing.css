@@ -402,9 +402,6 @@ html:has(.kt) { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt-section-top { padding-bottom: 26px; border-bottom: 1px solid var(--kinetic-line); }
 .kt h2 { font-family: Unbounded, sans-serif; font-size: 44px; font-weight: 500; line-height: 1.35; margin: 48px 0; }
 .kt h2 > span { color: var(--kinetic-blue); }
-.kt-platform { min-height: 100svh; background: var(--kinetic-ink); color: var(--kinetic-inverse); }
-.kt-platform .kt-section-top { border-color: var(--kinetic-dark-line); }
-.kt-platform h2 > span { color: var(--kinetic-inverse); opacity: .5; }
 .kt-audiences { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border-bottom: 1px solid var(--kinetic-dark-line); }
 .kt .kt-audiences button { min-width: 0; white-space: normal; height: 64px; padding: 0 20px; color: var(--kinetic-inverse); border-radius: 0; justify-content: flex-start; gap: 14px; font-size: var(--text-meta); background: transparent; border-bottom: 3px solid transparent; }
 .kt-audiences button > svg:last-child { margin-left: auto; }
@@ -676,7 +673,7 @@ html:has(.kt) { scroll-behavior: smooth; scroll-padding-top: 0; }
   min-height: 100svh;
   padding-block: calc(var(--landing-header-height) + clamp(24px, 3svh, 40px)) clamp(32px, 4svh, 56px);
 }
-.kt .kt-platform, .kt .kt-role-section, .kt .kt-contacts {
+.kt .kt-role-section, .kt .kt-contacts {
   display: flex;
   flex-direction: column;
   gap: clamp(28px, 3.5svh, 44px);
@@ -727,9 +724,9 @@ html:has(.kt) { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt-role-parent { background: var(--kinetic-soft); }
 .kt-role-school { background: var(--kinetic-ink); color: var(--kinetic-inverse); }
 .kt-role-company { background: var(--kinetic-blue); color: var(--kinetic-inverse); }
-.kt-platform .kt-chapter-feature, .kt-role-school .kt-chapter-feature { border-color: var(--kinetic-dark-line); }
+.kt-role-school .kt-chapter-feature { border-color: var(--kinetic-dark-line); }
 .kt-role-company .kt-chapter-feature, .kt-role-company .kt-section-top { border-color: #ffffff55; }
-.kt-platform .kt-chapter-feature > svg, .kt-role-school .kt-chapter-feature > svg, .kt-role-company .kt-chapter-feature > svg { color: var(--kinetic-inverse); }
+.kt-role-school .kt-chapter-feature > svg, .kt-role-company .kt-chapter-feature > svg { color: var(--kinetic-inverse); }
 .kt .kt-role-school .kt-role-accent, .kt .kt-role-company .kt-role-accent { color: var(--kinetic-inverse); opacity: .65; }
 .kt .kt-role-school .kt-cta, .kt .kt-role-company .kt-cta { background: var(--kinetic-inverse); color: var(--kinetic-ink); }
 .kt .kt-role-school .kt-cta:hover, .kt .kt-role-company .kt-cta:hover { background: var(--kinetic-ink); color: var(--kinetic-inverse); outline: 1px solid currentColor; }
@@ -747,7 +744,7 @@ html:has(.kt) { scroll-behavior: smooth; scroll-padding-top: 0; }
 .kt-contact-card span { font-size: var(--text-meta); color: #aaa; }
 .kt-contact-card strong { font-size: var(--text-body); font-weight: 500; }
 .kt a.kt-contact-card:hover { border-color: var(--kinetic-blue); }
-.kt-platform .kt-section-visual img, .kt-role-school .kt-section-visual img { filter: grayscale(1); }
+.kt-role-school .kt-section-visual img { filter: grayscale(1); }
 .kt-contact-team { margin: 0; min-width: 0; }
 .kt-contact-team figcaption { display: grid; gap: 8px; padding-top: 20px; }
 .kt-contact-team figcaption strong { font-size: 22px; font-weight: 500; }
