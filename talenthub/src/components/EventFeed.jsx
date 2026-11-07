@@ -83,6 +83,7 @@ export default function EventFeed({
   const [listOpen, setListOpen] = useState(false)
   const [open, setOpen] = useState(null)
   const [message, setMessage] = useState('')
+  const [pendingAction, setPendingAction] = useState(null)
   const catalog = useCatalog({ query, category, directions, status }, setMessage)
   const published = catalog
 
@@ -124,11 +125,14 @@ export default function EventFeed({
   async function runAction(event) {
     if (!onAction) return
     let result
+    setPendingAction(event.id)
     try {
       result = await onAction(event)
     } catch (error) {
       setMessage(error.message || 'Не удалось выполнить действие.')
       return
+    } finally {
+      setPendingAction(null)
     }
     if (!result || result.ok === false) {
       if (result?.reason === 'auth') onAuthRequired?.()
@@ -150,8 +154,8 @@ export default function EventFeed({
       )
     }
     return (
-      <button type="button" className="btn btn-primary" onClick={(mouse) => { mouse.stopPropagation(); runAction(event) }}>
-        {actionLabel}
+      <button type="button" className="btn btn-primary" disabled={pendingAction === event.id} onClick={(mouse) => { mouse.stopPropagation(); runAction(event) }}>
+        {pendingAction === event.id ? <><span className="spinner spinner-light" /> Отправляем…</> : actionLabel}
       </button>
     )
   }
@@ -322,8 +326,8 @@ export default function EventFeed({
             {openedApp ? (
               <p className="notice">Ваша заявка: {openedApp.status}.</p>
             ) : (
-              <button type="button" className="btn btn-primary" onClick={() => runAction(opened)}>
-                {actionLabel}
+              <button type="button" className="btn btn-primary" disabled={pendingAction === opened.id} onClick={() => runAction(opened)}>
+                {pendingAction === opened.id ? <><span className="spinner spinner-light" /> Отправляем…</> : actionLabel}
               </button>
             )}
           </div>
