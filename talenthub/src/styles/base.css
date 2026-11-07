@@ -2710,3 +2710,44 @@ grid-template-columns: 1fr 1fr;
   flex: 0 0 auto;
   margin-left: 0;
 }
+
+
+/* Keep category/status labels grouped together in every organization card. */
+.org-event-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.org-event-top .org-eyebrow,
+.org-market-card-head .org-eyebrow {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.org-event-top .badge,
+.org-market-card-head .badge {
+  flex: 0 0 auto;
+  margin: 0;
+  white-space: nowrap;
+}
+.org-event-row,
+.org-partner-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.org-event-row h3,
+.org-event-row p,
+.org-partner-card h3,
+.org-partner-card p {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 520px) {
+  .org-event-top {
+    align-items: center;
+    flex-direction: row;
+  }
+}
