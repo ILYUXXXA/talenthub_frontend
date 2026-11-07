@@ -2692,3 +2692,21 @@ grid-template-columns: 1fr 1fr;
 @media (max-width: 560px) {
   .header-inner { width: calc(100% - 28px); }
 }
+
+
+/* Marketplace cards: keep the open-status badge next to its eyebrow label. */
+.org-market-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.org-market-card-head .org-eyebrow {
+  min-width: 0;
+}
+.org-market-card-head .badge {
+  flex: 0 0 auto;
+  margin-left: 0;
+}
