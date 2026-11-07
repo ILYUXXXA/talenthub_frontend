@@ -49,7 +49,7 @@ function pathFor(user) {
 export default function Auth() {
   const navigate = useNavigate()
   const schoolList = readSchools()
-  const [role, setRole] = useState('')
+  const [role, setRole] = useState(() => { const requested = new URLSearchParams(window.location.search).get('role'); return ROLES.some((item) => item.id === requested) ? requested : '' })
   const [mode, setMode] = useState('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
