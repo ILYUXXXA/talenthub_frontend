@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@400;500;600;700&display=swap');
+
+/* The host app does not use the original shadcn button reset. */
+.kt button { appearance: none; border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.kt a { color: inherit; }
+.kt-menu { width: 42px; height: 42px; border: 1px solid var(--kinetic-line, #d8dce5) !important; background: transparent; border-radius: 6px; }
+.kt .kt-login { display: inline-flex; align-items: center; justify-content: center; }
+.kt .kt-final-link { border: 0; }
+
 /* TalentHub kinetic design: intentionally independent of the source selectors. */
 :root {
   --kinetic-paper: oklch(0.99 0 0);
