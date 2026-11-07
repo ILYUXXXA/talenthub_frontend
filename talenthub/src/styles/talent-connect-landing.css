@@ -231,12 +231,12 @@ html { scroll-behavior: smooth; scroll-padding-top: 0; }
 
 
 
-/* Fail-safe: content must never disappear if the reveal observer is delayed or unavailable. */
-.kt .kt-reveal { opacity: 1 !important; transform: none !important; visibility: visible !important; }
-.kt .kt-platform > h2,
-.kt .kt-platform > .kt-audiences,
-.kt .kt-platform > .kt-audience-content,
-.kt .kt-how > h2,
-.kt .kt-how > .kt-steps,
-.kt .kt-partners > .kt-partners-content,
-.kt .kt-partners > .kt-partner-types { visibility: visible !important; }
+
+/* Match the original wide-desktop composition when the browser viewport is
+   between 1101px and 1599px (for example, high-DPI / zoomed desktop windows). */
+@media (min-width: 1101px) and (max-width: 1599px) {
+  .kt h1 { font-size: 90px; }
+  .kt-hero { padding-top: 40px; }
+  .kt-hero-bottom { padding-bottom: 65px; }
+  .kt-line-two > svg { width: 72px; height: 72px; }
+}
