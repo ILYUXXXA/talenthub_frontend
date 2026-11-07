@@ -1,7 +1,8 @@
+import { useDialogFocus } from '../components/useDialogFocus.js'
 import { getState, fetchEvent } from '../data/store.js'
 import { useCatalog, useRecommendations } from '../data/hooks.js'
 import { useStoreRevision } from '../data/hooks.js'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listEvents, registerForEvent, studentCabinet } from '../data/store.js'
 
@@ -82,14 +83,7 @@ export default function Events() {
   const catalog = useCatalog({ query, category, directions, status }, setMessage)
   const published = catalog
 
-  useEffect(() => {
-    if (!open) return undefined
-    function onKey(event) {
-      if (event.key === 'Escape') setOpen(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  const detailRef = useDialogFocus(Boolean(open), () => setOpen(null))
 
   async function openEvent(event) {
     try { setOpen(await fetchEvent(event.id)) } catch (error) { setMessage(error.message) }
@@ -299,6 +293,8 @@ export default function Events() {
         <div className="detail-backdrop" onClick={() => setOpen(null)}>
           <div
             className="detail-panel"
+            ref={detailRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="event-detail-title"

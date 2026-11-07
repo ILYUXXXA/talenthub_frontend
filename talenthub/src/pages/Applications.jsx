@@ -1,5 +1,6 @@
+import { useDialogFocus } from '../components/useDialogFocus.js'
 import { useStoreRevision } from '../data/hooks.js'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { cancelRegistration, listEvents, registerForEvent, studentCabinet } from '../data/store.js'
 
@@ -46,14 +47,7 @@ export default function Applications() {
   const [message, setMessage] = useState('')
   const [open, setOpen] = useState(null)
 
-  useEffect(() => {
-    if (!open) return undefined
-    function onKey(event) {
-      if (event.key === 'Escape') setOpen(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  const detailRef = useDialogFocus(Boolean(open), () => setOpen(null))
 
   function refresh() {
     try {
@@ -175,6 +169,8 @@ export default function Applications() {
         <div className="detail-backdrop" onClick={() => setOpen(null)}>
           <div
             className="detail-panel"
+            ref={detailRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="application-detail-title"

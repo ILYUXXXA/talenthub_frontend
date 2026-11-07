@@ -1,6 +1,8 @@
+import { useDialogFocus } from '../components/useDialogFocus.js'
+import CabinetNav from '../components/CabinetNav.jsx'
 import { moderationQueue, moderate } from '../data/store.js'
 import { useStoreRevision } from '../data/hooks.js'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 function TabIcon({ children }) {
@@ -65,7 +67,7 @@ function ModeratorBar({ section, onSection, counts }) {
       <div className="header-inner parent-bar">
         <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
         <p className="header-greet">Здравствуйте!</p>
-        <nav className="nav student-tabs mod-tabs">
+        <CabinetNav activeKey={section} className="nav student-tabs mod-tabs" aria-label="Разделы модерации">
           {TABS.map((tab) => {
             const count = counts[tab.id]
             return (
@@ -73,6 +75,7 @@ function ModeratorBar({ section, onSection, counts }) {
                 key={tab.id}
                 type="button"
                 className={section === tab.id ? 'active' : undefined}
+                aria-current={section === tab.id ? 'page' : undefined}
                 onClick={() => onSection(tab.id)}
               >
                 {tab.icon}
@@ -81,7 +84,7 @@ function ModeratorBar({ section, onSection, counts }) {
               </button>
             )
           })}
-        </nav>
+        </CabinetNav>
       </div>
     </header>
   )
@@ -120,6 +123,7 @@ function QueueCard({ item, kind, onOpen }) {
 }
 
 function Detail({ item, kind, onClose, onDecide }) {
+  const detailRef = useDialogFocus(true, onClose)
   const actions = kind === 'events'
     ? [
       { status: 'published', label: 'Опубликовать', tone: 'btn btn-primary btn-small' },
@@ -145,6 +149,8 @@ function Detail({ item, kind, onClose, onDecide }) {
     <div className="detail-backdrop" onClick={onClose}>
       <div
         className="detail-panel"
+        ref={detailRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="moderator-detail-title"
@@ -244,14 +250,6 @@ export default function Admin() {
   }
   const visible = queues[section]
 
-  useEffect(() => {
-    if (!open) return undefined
-    function onKey(event) {
-      if (event.key === 'Escape') setOpen(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
 
   function onSection(id) {
     setSection(id)

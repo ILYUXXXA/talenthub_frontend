@@ -1,3 +1,5 @@
+import { useDialogFocus } from '../components/useDialogFocus.js'
+import CabinetNav from '../components/CabinetNav.jsx'
 import { useStoreRevision } from '../data/hooks.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -138,19 +140,20 @@ function ParentBar({ section, onSection }) {
     <header className="header student-header">
       <div className="header-inner parent-bar">
         <Link to="/" className="brand-lockup" aria-label="TalentHub — главная"><span className="brand-mark">t.</span><span className="brand-word">Talent<span>Hub</span></span></Link>
-        <nav className="nav student-tabs org-shell-tabs">
+        <CabinetNav activeKey={section} className="nav student-tabs org-shell-tabs" aria-label="Разделы родительского кабинета">
           {PARENT_TABS.map((tab) => (
             <button
               key={tab.id}
               type="button"
               className={section === tab.id ? 'active' : undefined}
+              aria-current={section === tab.id ? 'page' : undefined}
               onClick={() => onSection(tab.id)}
             >
               {tab.icon}
               {tab.label}
             </button>
           ))}
-        </nav>
+        </CabinetNav>
       </div>
     </header>
   )
@@ -181,14 +184,7 @@ export default function ParentLink() {
     setSelectedSchoolId(null)
   }, [active?.id])
 
-  useEffect(() => {
-    if (!progressOpen) return undefined
-    function onKey(event) {
-      if (event.key === 'Escape') setProgressOpen(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [progressOpen])
+  const detailRef = useDialogFocus(Boolean(progressOpen), () => setProgressOpen(null))
 
   function refresh() {
     readCabinet()
@@ -629,6 +625,8 @@ export default function ParentLink() {
         <div className="detail-backdrop" onClick={() => setProgressOpen(null)}>
           <div
             className="detail-panel"
+            ref={detailRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-labelledby="progress-detail-title"

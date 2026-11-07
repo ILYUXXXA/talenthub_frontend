@@ -43,10 +43,12 @@ export default function Landing() {
         <div className="kt-header-actions"><Button asChild className="kt-login" variant="outline"><Link to="/auth">Войти <ArrowRight /></Link></Button><Button className="kt-menu" variant="ghost" size="icon" aria-controls="landing-navigation" aria-expanded={menu} aria-label={menu ? 'Закрыть меню' : 'Открыть меню'} onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</Button></div>
       </header>
       <section className="kt-hero">
-        <img className="kt-hero-art" src={sculpture} width={1920} height={1024} alt="Синяя скульптура в форме звезды" />
         <div className="kt-hero-top"><span><span className="kt-live" /> ОБРАЗОВАТЕЛЬНАЯ ЭКОСИСТЕМА</span><span><Asterisk size={16} /></span></div>
+        <div className="kt-hero-copy">
         <h1><span className="kt-line-one">Твои возможности</span><button type="button" className="kt-line-two" onClick={() => setJoin(true)} aria-haspopup="dialog">В одном месте <ArrowUpRight aria-hidden="true" /></button></h1>
         <div className="kt-hero-bottom"><div><p>TalentHub — это образовательная экосистема, которая объединяет школьников, родителей, школы, компании и образовательные организации вокруг развития талантов, образовательных возможностей и достижений.</p><div className="kt-hero-actions"><Button className="kt-cta" onClick={() => setJoin(true)}>Открыть TalentHub <ArrowUpRight /></Button><Button asChild variant="ghost" className="kt-scroll"><a href="#platform">Об экосистеме <ArrowDown /></a></Button></div></div></div>
+        </div>
+        <div className="kt-hero-art-frame"><img className="kt-hero-art" src={sculpture} width={1920} height={1024} alt="Синяя скульптура в форме звезды" /></div>
         <div className="kt-hero-footer"><span>ЛЮДИ / ИДЕИ / ВОЗМОЖНОСТИ</span><a href="#platform" aria-label="Перейти к экосистеме"><ArrowDown /></a><span>ТВОЙ СЛЕДУЮЩИЙ ШАГ ↓</span></div>
       </section>
       <div className="kt-ticker" aria-hidden="true"><div>{Array.from({ length: 4 }, (_, i) => <span key={i}>НАХОДИ <Asterisk /> УЧАСТВУЙ <Asterisk /> СОЗДАВАЙ <Asterisk /></span>)}</div></div>
