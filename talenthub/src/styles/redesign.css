@@ -594,3 +594,59 @@ label { color: #435573; }
   .parent-child-pill, .parent-child-add { justify-content: flex-start; min-width: 0; padding-right: 9px; font-size: 13px; }
   .parent-child-add { grid-column: 1 / -1; }
 }
+
+
+/* Parent cabinet — clearer hierarchy, calmer navigation and backend feedback */
+.parent-workspace { min-height: calc(100vh - 86px); padding: 38px 0 64px; background: #f5f7fc; }
+.parent-dashboard-toolbar {
+  align-items: flex-end; margin: 8px 0 34px; padding: 30px 32px;
+  border: 1px solid #e7edf8; border-radius: 24px; background: linear-gradient(120deg,#fff 0%,#f7f9ff 100%);
+  box-shadow: 0 12px 34px rgba(29,53,96,.055);
+}
+.parent-greeting h1 { font-size: clamp(28px,3.2vw,40px); letter-spacing: -.045em; font-weight: 800; }
+.parent-greeting-eyebrow { color: #5271c8; letter-spacing: .14em; }
+.parent-child-switcher { gap: 8px; }
+.parent-child-pill, .parent-child-add { border-radius: 12px; min-height: 44px; padding: 6px 12px 6px 7px; }
+.parent-child-pill.active { background: #edf3ff; border-color: #b9cbff; box-shadow: inset 0 0 0 1px #dce6ff; }
+.parent-child-add { background: #fff; }
+.org-shell-tabs { gap: 8px; padding: 7px; border: 1px solid #e7edf7; border-radius: 16px; background: #f8faff; }
+.org-shell-tabs button { min-height: 42px; padding: 0 16px; border: 1px solid transparent; border-radius: 11px; color: #667792; font-weight: 650; transition: .18s ease; }
+.org-shell-tabs button:hover { color: #294ec8; background: #fff; }
+.org-shell-tabs button.active { color: #fff; background: #3159e8; box-shadow: 0 5px 14px rgba(49,89,232,.2); }
+.parent-dashboard-toolbar + .stack { gap: 22px; }
+.parent-dashboard-toolbar ~ .stack .grid-3 { align-items: start; gap: 18px; }
+.parent-dashboard-toolbar ~ .stack .grid-3 > .stack { min-width: 0; gap: 12px; }
+.parent-dashboard-toolbar ~ .stack .grid-3 > .stack > .card-title { margin: 0 0 2px; font-size: 21px; letter-spacing: -.025em; }
+.parent-dashboard-toolbar ~ .stack .event-card {
+  width: 100%; min-height: 92px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 9px; padding: 20px 22px; text-align: left; border: 1px solid #e4ebf6; border-radius: 17px;
+  background: #fff; box-shadow: 0 6px 20px rgba(28,49,86,.035); transition: transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.parent-dashboard-toolbar ~ .stack .event-card:hover { transform: translateY(-2px); border-color: #b8c9f8; box-shadow: 0 12px 26px rgba(28,49,86,.08); }
+.parent-dashboard-toolbar ~ .stack .event-card .card-title { color: #1b2c4a; font-size: 16px; line-height: 1.4; font-weight: 650; }
+.parent-loading { padding-top: 58px; }
+.parent-loading-heading { display: grid; gap: 14px; margin: 0 0 36px; }
+.skeleton { display: block; border-radius: 12px; background: linear-gradient(90deg,#e9eef7 25%,#f5f7fb 38%,#e9eef7 62%); background-size: 400% 100%; animation: parent-shimmer 1.35s ease infinite; }
+.skeleton-kicker { width: 130px; height: 12px; }
+.skeleton-heading { width: min(480px,75vw); height: 42px; }
+.skeleton-copy { width: min(360px,70vw); height: 16px; }
+.parent-loading-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+.skeleton-panel { height: 180px; border: 1px solid #e6edf7; border-radius: 20px; }
+.loading-caption { display: flex; align-items: center; gap: 10px; color: #71809a; font-size: 13px; margin-top: 22px; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #d7e1f7; border-top-color: #3159e8; border-radius: 50%; animation: parent-spin .7s linear infinite; vertical-align: -3px; flex: 0 0 auto; }
+.spinner-light { border-color: #ffffff66; border-top-color: #fff; margin-right: 7px; }
+.spinner-small { width: 13px; height: 13px; }
+button:disabled { cursor: wait; opacity: .72; }
+@keyframes parent-spin { to { transform: rotate(360deg); } }
+@keyframes parent-shimmer { to { background-position: -200% 0; } }
+@media (max-width: 850px) {
+  .parent-workspace { padding-top: 24px; }
+  .parent-dashboard-toolbar { padding: 24px; }
+  .parent-loading-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .parent-dashboard-toolbar { padding: 20px; border-radius: 18px; }
+  .org-shell-tabs { width: 100%; overflow-x: auto; justify-content: flex-start; }
+  .org-shell-tabs button { flex: 0 0 auto; padding-inline: 12px; }
+  .parent-dashboard-toolbar ~ .stack .grid-3 { grid-template-columns: 1fr; }
+}
