@@ -139,7 +139,9 @@ export default function Events() {
     }
     refresh()
     if (!result.already) setStatus(result.status || 'подана')
-    setMessage(result.already ? `Заявка уже есть: ${result.status}.` : 'Заявка подана. Список переключён на этот статус.')
+    const successMessage = result.already ? `Заявка уже есть: ${result.status}.` : 'Заявка подана. Список переключён на этот статус.'
+    setMessage(successMessage)
+    if (!result.already) window.dispatchEvent(new CustomEvent('talenthub:action-success', { detail: { message: 'Заявка на мероприятие успешно подана.' } }))
     setOpen(event)
   }
 
