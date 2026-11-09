@@ -841,3 +841,52 @@ input[type="checkbox"], input[type="radio"] { min-height: 18px; }
   .school-rank-select { flex-wrap: wrap; }
   .org-audience-options button { min-height: 120px; }
 }
+
+
+/* Shared success feedback for student and parent actions */
+.action-toast {
+  position: fixed;
+  z-index: 1200;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(440px, calc(100vw - 32px));
+  padding: 16px 18px;
+  color: #14532d;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(20, 83, 45, .16);
+  font-weight: 600;
+  animation: action-toast-in .18s ease-out;
+}
+.action-toast-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  color: #fff;
+  background: #16a34a;
+  border-radius: 50%;
+}
+.action-toast > span:nth-child(2) { flex: 1; }
+.action-toast button {
+  flex: 0 0 auto;
+  padding: 0 2px;
+  color: #166534;
+  background: transparent;
+  border: 0;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+@keyframes action-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 560px) {
+  .action-toast { top: max(12px, env(safe-area-inset-top)); right: 12px; width: calc(100vw - 24px); }
+}
