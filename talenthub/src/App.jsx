@@ -16,6 +16,7 @@ import SchoolCabinet from './pages/SchoolCabinet.jsx'
 import Admin from './pages/Admin.jsx'
 import ParentLink from './pages/ParentLink.jsx'
 import Company from './pages/Company.jsx'
+import ActionToast from './components/ActionToast.jsx'
 
 function WithHeader({ children }) {
   return <AppHeader>{children}</AppHeader>
@@ -24,6 +25,7 @@ function WithHeader({ children }) {
 export default function App() {
   return (
     <ApiBoundary><BrowserRouter>
+      <ActionToast />
       <Routes>
         <Route path="/events" element={<CatalogGuard><StudentShell><Events /></StudentShell></CatalogGuard>} />
         <Route path="/applications" element={<RequireRole role="student"><StudentShell><Applications /></StudentShell></RequireRole>} />
